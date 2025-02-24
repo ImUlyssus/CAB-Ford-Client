@@ -6,9 +6,9 @@ import PDFReport from "./pages/PDFReport";
 import Presentation from "./pages/Presentation";
 import DataVisualization from "./pages/DataVisualization";
 import ExcelFiles from "./pages/ExcelFiles";
-import Logout from "./pages/Logout";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
+import VerificationPage from "./pages/VerificationPage";
 // import NotFound from "./pages/NotFound";
 
 function App() {
@@ -18,6 +18,7 @@ function App() {
         {/* Wrap all pages inside the Layout */}
         <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verification-page" element={<VerificationPage />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="/change-request" element={<ChangeRequest />} />
