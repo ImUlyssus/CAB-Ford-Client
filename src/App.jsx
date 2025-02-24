@@ -9,6 +9,7 @@ import ExcelFiles from "./pages/ExcelFiles";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import VerificationPage from "./pages/VerificationPage";
+import ChangeRequestData from "./pages/ChangeRequestData";
 // import NotFound from "./pages/NotFound";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/verification-page" element={<VerificationPage />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="/change-request-data" element={<ChangeRequestData />} />
           <Route path="/change-request" element={<ChangeRequest />} />
           <Route path="/excel-files" element={<ExcelFiles />} />
           <Route path="/pdf-report" element={<PDFReport />} />

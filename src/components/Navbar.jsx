@@ -42,7 +42,7 @@ function Navbar() {
             </h2>
             <div style={{ padding: "10px" }}>
                 <Link
-                    to="/change-request"
+                    to="/change-request-data"
                     style={navLinkStyle}
                 >
                     Change Request
