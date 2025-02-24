@@ -42,37 +42,37 @@ function Navbar() {
             </h2>
             <div style={{ padding: "10px" }}>
                 <Link
-                    to="change-request"
+                    to="/change-request"
                     style={navLinkStyle}
                 >
                     Change Request
                 </Link>
                 <Link
-                    to="pdf-report"
+                    to="/pdf-report"
                     style={navLinkStyle}
                 >
                     PDF Reports
                 </Link>
                 <Link
-                    to="excel-files"
+                    to="/excel-files"
                     style={navLinkStyle}
                 >
                     Excel Files
                 </Link>
                 <Link
-                    to="presentation"
+                    to="/presentation"
                     style={navLinkStyle}
                 >
                     Presentation
                 </Link>
                 <Link
-                    to="data-visualization"
+                    to="/data-visualization"
                     style={navLinkStyle}
                 >
                     Data Visualization
                 </Link>
                 <Link
-                    to="logout"
+                    to="/login"
                     style={{color: "red", textDecoration: "none", margin: "0 15px", borderWidth: "1px", borderStyle: 'solid', borderColor: "red", padding: "8px 13px", borderRadius: "5px"}}
                 >
                     Logout

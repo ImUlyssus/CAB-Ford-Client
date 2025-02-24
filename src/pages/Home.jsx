@@ -1,7 +1,7 @@
 import React from 'react';
 function Home() {
     return (
-        <div class="text-3xl font-bold underline text-white">
+        <div class="text-3xl font-bold text-white">
         <h1>Welcome to Home Page</h1>
         </div>
     )

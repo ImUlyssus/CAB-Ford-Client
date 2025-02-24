@@ -7,6 +7,8 @@ import Presentation from "./pages/Presentation";
 import DataVisualization from "./pages/DataVisualization";
 import ExcelFiles from "./pages/ExcelFiles";
 import Logout from "./pages/Logout";
+import LoginPage from "./pages/Login";
+import RegisterPage from "./pages/Register";
 // import NotFound from "./pages/NotFound";
 
 function App() {
@@ -14,14 +16,15 @@ function App() {
     <Router>
       <Routes>
         {/* Wrap all pages inside the Layout */}
+        <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="change-request" element={<ChangeRequest />} />
-          <Route path="excel-files" element={<ExcelFiles />} />
-          <Route path="pdf-report" element={<PDFReport />} />
-          <Route path="presentation" element={<Presentation />} />
-          <Route path="data-visualization" element={<DataVisualization />} />
-          <Route path="logout" element={<Logout />} />
+          <Route path="/change-request" element={<ChangeRequest />} />
+          <Route path="/excel-files" element={<ExcelFiles />} />
+          <Route path="/pdf-report" element={<PDFReport />} />
+          <Route path="/presentation" element={<Presentation />} />
+          <Route path="/data-visualization" element={<DataVisualization />} />
           {/* <Route path="logout" element={<Contact />} /> */}
           {/* <Route path="*" element={<NotFound />} /> Handles 404 */}
         </Route>
