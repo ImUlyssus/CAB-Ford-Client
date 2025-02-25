@@ -1,11 +1,8 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useTheme } from "styled-components";
 
 function Navbar() {
     const theme = useTheme(); // Access theme
-    const navLinkStyle = {
-        color: theme.colors.secondary500, textDecoration: "none", margin: "0 15px", borderWidth: "1px", borderStyle: 'solid', borderColor: theme.colors.secondary500, padding: "8px 13px", borderRadius: "5px"
-    }
 
     return (
         <nav
@@ -23,60 +20,58 @@ function Navbar() {
                 paddingTop: "10px",
                 paddingBottom: "10px",
                 borderBottomColor: theme.colors.primary200,
-        borderBottomStyle: "solid", // Add this line
-        borderBottomWidth: "1px",
+                borderBottomStyle: "solid",
+                borderBottomWidth: "1px",
             }}
         >
             <h2 style={{ margin: 0, paddingLeft: "20px" }}>
-                <Link
+                <NavLink
                     to="/"
                     style={{
-                        textDecoration: "none",   // Remove the underline
-                        listStyle: "none",        // This is not necessary for <Link> but harmless
-                        color: "inherit",         // Keeps the link color same as surrounding text
-                        fontWeight: "bold",       // Makes the text bold
+                        textDecoration: "none",
+                        color: "inherit",
+                        fontWeight: "bold",
                     }}
                 >
                     Welcome Kyaw
-                </Link>
+                </NavLink>
             </h2>
             <div style={{ padding: "10px" }}>
-                <Link
-                    to="/change-request-data"
-                    style={navLinkStyle}
-                >
-                    Change Request
-                </Link>
-                <Link
-                    to="/pdf-report"
-                    style={navLinkStyle}
-                >
-                    PDF Reports
-                </Link>
-                <Link
-                    to="/excel-files"
-                    style={navLinkStyle}
-                >
-                    Excel Files
-                </Link>
-                <Link
-                    to="/presentation"
-                    style={navLinkStyle}
-                >
-                    Presentation
-                </Link>
-                <Link
-                    to="/data-visualization"
-                    style={navLinkStyle}
-                >
-                    Data Visualization
-                </Link>
-                <Link
+                {[
+                    { path: "/change-request-data", label: "Change Request" },
+                    { path: "/pdf-report", label: "PDF Reports" },
+                    { path: "/excel-files", label: "Excel Files" },
+                    { path: "/presentation", label: "Presentation" },
+                    { path: "/data-visualization", label: "Data Visualization" }
+                ].map((item) => (
+                    <NavLink
+                        key={item.path}
+                        to={item.path}
+                        style={({ isActive }) => ({
+                            color: isActive ? theme.colors.primaryButton : theme.colors.secondary500,
+                            textDecoration: "none",
+                            margin: "0 15px",
+                            padding: "8px 13px",
+                            borderBottom: isActive ? `2px solid ${theme.colors.primaryButton}` : "none",
+                        })}
+                    >
+                        {item.label}
+                    </NavLink>
+                ))}
+
+                <NavLink
                     to="/login"
-                    style={{color: "red", textDecoration: "none", margin: "0 15px", borderWidth: "1px", borderStyle: 'solid', borderColor: "red", padding: "8px 13px", borderRadius: "5px"}}
+                    style={{
+                        color: "red",
+                        textDecoration: "none",
+                        margin: "0 15px",
+                        border: "1px solid red",
+                        padding: "8px 13px",
+                        borderRadius: "5px",
+                    }}
                 >
                     Logout
-                </Link>
+                </NavLink>
             </div>
         </nav>
     );

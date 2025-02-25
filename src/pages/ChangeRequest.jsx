@@ -97,7 +97,10 @@ function ChangeRequest() {
 
   return (
     <div>
-      <div className="p-8 border-1 rounded-lg" style={{ borderColor: theme.colors.secondary500 }}>
+      <div className="px-8 py-4 border-1 rounded-lg" style={{ borderColor: theme.colors.secondary500 }}>
+        <div className="flex justify-center">
+          <h1 className="text-2xl font-bold text-center mb-3">Add Change Request</h1>
+        </div>
         <form onSubmit={handleSubmit}>
           {/* Category Field */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">

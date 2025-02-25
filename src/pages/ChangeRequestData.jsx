@@ -42,8 +42,9 @@ export default function ChangeRequestData() {
     };
 
     return (
-        <div>
+        <div className="h-150 flex flex-col">
             <h1 className="text-2xl font-bold text-center my-4">Change Request Data</h1>
+
             <div className="flex items-center p-2" style={{ border: '1px solid', borderColor: theme.colors.secondary400, borderTopLeftRadius: '5px', borderTopRightRadius: '5px' }}>
                 <h5 className="m-0">Change requests from 2024 - Quarter 1</h5>
                 <button
@@ -55,93 +56,98 @@ export default function ChangeRequestData() {
                 </button>
             </div>
             {changeRequests.length === 0 ? 
+            <div className="flex-1 overflow-auto">
+            <div className="overflow-x-auto h-full">
                 <table className="w-full border border-gray-300 rounded-lg shadow-md text-sm" style={{ backgroundColor: theme.colors.primary400 }}>
-                    <thead>
-                        <tr className="text-white bg-gray-800">
-                            <th className={thStyle3}>No change requests found.</th>
+                    <thead className="sticky top-0 bg-gray-800">
+                        <tr>
+                            <th className={thStyle1}>No change requests found.</th>
                         </tr>
                     </thead>
                 </table>
-                            :
-            
-            <div className="overflow-x-auto">
-                <table className="w-full border border-gray-300 rounded-lg shadow-md text-sm" style={{ backgroundColor: theme.colors.primary400 }}>
-                    <thead>
-                        <tr className="text-white bg-gray-800">
-                            <th className={thStyle1}>Change Record</th>
-                            <th className={thStyle1}>Category</th>
-                            <th className={thStyle1}>Reason</th>
-                            <th className={thStyle1}>Impact</th>
-                            <th className={thStyle1}>Priority</th>
-                            <th className={thStyle3}>Change Name</th>
-                            <th className={thStyle2}>Change Sites</th>
-                            {/* <th className="py-2 px-4 border-b">Common Change</th> */}
-                            <th className={thStyle1}>Request Change</th>
-                            <th className={thStyle1}>FTM Schedule Change</th>
-                            <th className={thStyle1}>AAT Schedule Change</th>
-                            <th className={thStyle1}>FSST Schedule Change</th>
-                            <th className={thStyle1}>Time of Change (Hours)</th>
-                            <th className={thStyle1}>Achieve 2 Weeks Request Change</th>
-                            <th className={thStyle3}>Description</th>
-                            <th className={thStyle3}>Test Plan</th>
-                            <th className={thStyle3}>Rollback Plan</th>
-                            <th className={thStyle2}>FTM Site IT Contact</th>
-                            <th className={thStyle2}>AAT Site IT Contact</th>
-                            <th className={thStyle2}>FSST Site IT Contact</th>
-                            <th className={thStyle2}>Global Team Contact</th>
-                            <th className={thStyle2}>Business Team Contact</th>
-                            <th className={thStyle2}>FTM CRQ</th>
-                            <th className={thStyle2}>AAT CRQ</th>
-                            <th className={thStyle2}>FSST CRQ</th>
-                            <th className={thStyle2}>Common CRQ</th>
-                            <th className="py-2 px-4 border-b border-r">Approval</th>
-                            <th className={thStyle3}>Change Status</th>
-                            <th className={thStyle3}>Cancel Change Reason</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {changeRequests.map((request) => {
-                            // Parse change_sites from string to array
-                            const changeSites = JSON.parse(request.change_sites);
+            </div>
+        </div>
+            :
+            <div className="flex-1 overflow-auto">
+                <div className="overflow-x-auto h-full">
+                    <table className="w-full border border-gray-300 rounded-lg shadow-md text-sm" style={{ backgroundColor: theme.colors.primary400 }}>
+                        <thead className="sticky top-0 bg-gray-800">
+                            <tr>
+                                <th className={thStyle1}>Change Record</th>
+                                <th className={thStyle1}>Category</th>
+                                <th className={thStyle1}>Reason</th>
+                                <th className={thStyle1}>Impact</th>
+                                <th className={thStyle1}>Priority</th>
+                                <th className={thStyle3}>Change Name</th>
+                                <th className={thStyle2}>Change Sites</th>
+                                <th className={thStyle1}>Request Change</th>
+                                <th className={thStyle1}>FTM Schedule Change</th>
+                                <th className={thStyle1}>AAT Schedule Change</th>
+                                <th className={thStyle1}>FSST Schedule Change</th>
+                                <th className={thStyle1}>Time of Change (Hours)</th>
+                                <th className={thStyle1}>Achieve 2 Weeks Request Change</th>
+                                <th className={thStyle3}>Description</th>
+                                <th className={thStyle3}>Test Plan</th>
+                                <th className={thStyle3}>Rollback Plan</th>
+                                <th className={thStyle2}>FTM Site IT Contact</th>
+                                <th className={thStyle2}>AAT Site IT Contact</th>
+                                <th className={thStyle2}>FSST Site IT Contact</th>
+                                <th className={thStyle2}>Global Team Contact</th>
+                                <th className={thStyle2}>Business Team Contact</th>
+                                <th className={thStyle2}>FTM CRQ</th>
+                                <th className={thStyle2}>AAT CRQ</th>
+                                <th className={thStyle2}>FSST CRQ</th>
+                                <th className={thStyle2}>Common CRQ</th>
+                                <th className="py-2 px-4 border-b border-r">Approval</th>
+                                <th className={thStyle3}>Change Status</th>
+                                <th className={thStyle3}>Cancel Change Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {changeRequests.map((request, index) => {
+                                // Parse change_sites from string to array
+                                const changeSites = JSON.parse(request.change_sites);
 
-                            return (
-                                <tr key={request.id} className="hover:bg-gray-100 hover:text-black">
-                                    <td className="py-2 px-4 border-b border-r text-center">{request.id}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.category}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.reason}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.impact}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.priority}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.change_name}</td>
-                                    <td className="py-2 px-4 border-b border-r text-center">{changeSites.join(", ").toUpperCase()}</td> {/* Join the array into a string */}
-                                    {/* <td className="py-2 px-4 border-b">{request.common_change ? "Yes" : "No"}</td> */}
-                                    <td className="py-2 px-4 border-b border-r">{new Date(request.request_change_date).toLocaleDateString()}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.ftm_schedule_change}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.aat_schedule_change}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.fsst_schedule_change}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.time_of_change == 0 ? "" : request.time_of_change}</td>
-                                    <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.description}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.rollback_plan}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.ftm_it_contact == "null" ? "" : request.ftm_it_contact}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.aat_it_contact == "null" ? "" : request.aat_it_contact}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.fsst_it_contact == "null" ? "" : request.fsst_it_contact}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.global_team_contact == "[]" ? "" : request.global_team_contact}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.business_team_contact == "[]" ? "" : request.business_team_contact}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.ftm_crq}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.aat_crq}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.fsst_crq}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.common_crq}</td>
-                                    <td className="py-2 px-4 border-b border-r text-center">{request.approval ? "Yes" : "-"}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.change_status}</td>
-                                    <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                                return (
+                                    <tr key={request.id} className="hover:bg-gray-100 hover:text-black">
+                                        <td className="py-2 px-4 border-b border-r text-center">{index + 1}</td> {/* Change ID to sequential numbers */}
+                                        <td className="py-2 px-4 border-b border-r">{request.category}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.reason}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.impact}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.priority}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.change_name}</td>
+                                        <td className="py-2 px-4 border-b border-r text-center">{changeSites.join(", ").toUpperCase()}</td>
+                                        <td className="py-2 px-4 border-b border-r">{new Date(request.request_change_date).toLocaleDateString()}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.ftm_schedule_change}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.aat_schedule_change}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.fsst_schedule_change}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.time_of_change == 0 ? "" : request.time_of_change}</td>
+                                        <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.description}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.rollback_plan}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.ftm_it_contact == "null" ? "" : request.ftm_it_contact}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.aat_it_contact == "null" ? "" : request.aat_it_contact}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.fsst_it_contact == "null" ? "" : request.fsst_it_contact}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.global_team_contact == "[]" ? "" : request.global_team_contact}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.business_team_contact == "[]" ? "" : request.business_team_contact}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.ftm_crq}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.aat_crq}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.fsst_crq}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.common_crq}</td>
+                                        <td className="py-2 px-4 border-b border-r text-center">{request.approval ? "Yes" : "-"}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.change_status}</td>
+                                        <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
+                                    </tr>
+                                );
+                            })}
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
 }
         </div>
+
     );
 }
