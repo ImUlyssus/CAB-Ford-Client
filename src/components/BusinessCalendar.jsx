@@ -36,7 +36,7 @@ export default function BusinessCalendar({calendar}) {
             </div>
             <div className="mt-3">
             {/* <Calendar data={filteredCalendarData} /> */}
-            <div style={{ height: "400px", overflowY: "auto" }}>
+            <div style={{ height: "450px", overflowY: "auto", paddingBottom: "10px" }}>
                 {filteredCalendarData.map((monthData, index) => (
                     <div key={index} style={{ paddingTop: "10px" }}>
                         <GridComponent data={monthData} activeYear={activeYear} />
