@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'styled-components';
 import PresentationSlides from '../components/PresentationSlides';
-import axios from 'axios';
 import API_BASE_URL from '../config/apiConfig';
 import BusinessCalendar from '../components/BusinessCalendar';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
 const slides = [
     {
       title: "Slide 1",
@@ -25,12 +25,12 @@ const slides = [
 const Presentation = () => {
     const theme = useTheme();
     const [calendar, setCalendar] = useState([]);
+    const axiosPrivate = useAxiosPrivate();
     useEffect(() => {
         const year = new Date().getFullYear();
-        axios.get(`${API_BASE_URL}/business-calendar/${year}`)
+        axiosPrivate.get(`${API_BASE_URL}/business-calendar/${year}`)
           .then(response => {
             // response.data contains the calendar records for previous, current, and next year.
-            console.log(response.data);
             setCalendar(response.data);
           })
           .catch(err => console.error(err));

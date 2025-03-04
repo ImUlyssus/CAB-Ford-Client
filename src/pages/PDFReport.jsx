@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { jsPDF } from "jspdf";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import API_BASE_URL from "../config/apiConfig";
 
 function PDFReport() {
   const [data, setData] = useState([]);
+  const axiosPrivate = useAxiosPrivate();
 
-  // Fetch change request data
+  // Fetch change request data using axiosPrivate
   useEffect(() => {
-    fetch("http://localhost:3001/api/change-requests")
-      .then((response) => response.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+    const fetchData = async () => {
+      try {
+        const response = await axiosPrivate.get(`${API_BASE_URL}/change-requests`);
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [axiosPrivate]);
 
   // Function to generate PDF with background color
   const generatePDF = () => {

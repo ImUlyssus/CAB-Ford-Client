@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import API_BASE_URL from "../config/apiConfig";
 
 function ExcelFiles() {
   const [data, setData] = useState([]);
+  const axiosPrivate = useAxiosPrivate();
 
-  // Fetch MySQL data from API
+  // Fetch MySQL data from API using axiosPrivate
   useEffect(() => {
-    fetch("http://localhost:3001/api/change-requests") // Change URL as needed
-      .then((response) => response.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+    const fetchData = async () => {
+      try {
+        const response = await axiosPrivate.get(`${API_BASE_URL}/change-requests`);
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [axiosPrivate]);
 
   // Function to generate and download Excel file
   const generateExcel = () => {
