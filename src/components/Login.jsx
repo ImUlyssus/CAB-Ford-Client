@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import API_BASE_URL from '../config/apiConfig';
 import AuthContext from '../context/AuthProvider';
@@ -10,7 +10,9 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState({});
     const [apiError, setApiError] = useState("");  // State to handle API errors
-    const navigate = useNavigate();  // For redirecting after successful login
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
 
     const labelStyle = "text-right pr-20";
     const inputStyle = "w-80 p-2 border rounded bg-gray-800 text-white";
@@ -52,7 +54,7 @@ export default function Login() {
                     console.log(accessToken);
                     // Store accessToken and email (avoid storing passwords)
                     setAuth({ email, accessToken });
-                    navigate("/");  // Redirect to dashboard or another page
+                    navigate(from, { replace: true });
                 } else {
                     setApiError("Login failed. Please check your email and password.");
                 }

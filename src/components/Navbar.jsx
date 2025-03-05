@@ -1,8 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { useTheme } from "styled-components";
-
+import { useContext } from "react";
+import AuthContext from "../context/AuthProvider";
 function Navbar() {
     const theme = useTheme(); // Access theme
+    const { setAuth } = useContext(AuthContext);
 
     return (
         <nav
@@ -59,8 +61,11 @@ function Navbar() {
                     </NavLink>
                 ))}
 
-                <NavLink
-                    to="/login"
+                <button
+                    onClick={() => {
+                        setAuth({});
+                        navigate("/login");
+                    }}
                     style={{
                         color: "red",
                         textDecoration: "none",
@@ -68,10 +73,13 @@ function Navbar() {
                         border: "1px solid red",
                         padding: "8px 13px",
                         borderRadius: "5px",
+                        backgroundColor: "transparent",
+                        cursor: "pointer",
                     }}
                 >
                     Logout
-                </NavLink>
+                </button>
+
             </div>
         </nav>
     );

@@ -5,7 +5,7 @@ const Footer = () => {
     const theme = useTheme();
     return (
         <footer style={{padding: "40px",backgroundColor: theme.colors.primary400}}>
-            <div class="text-center">
+            <div className="text-center">
             <p>&copy; 2025 CAB Company. All rights reserved.</p>
                  <nav>
                      <a href="/privacy" style={{ padding: '10px' }}>Privacy Policy</a> | 

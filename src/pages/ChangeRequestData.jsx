@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import API_BASE_URL from "../config/apiConfig";
 import { useTheme } from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 export default function ChangeRequestData() {
@@ -11,6 +9,7 @@ export default function ChangeRequestData() {
   const [error, setError] = useState(null);
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
@@ -24,6 +23,7 @@ export default function ChangeRequestData() {
       } catch (err) {
         console.error("Error fetching change requests:", err.response ? err.response.data : err.message); // Debugging
         setError(err.response ? err.response.data.message : err.message);
+        navigate('/login', { state: { from: location }, replace: true });
       } finally {
         setLoading(false);
       }

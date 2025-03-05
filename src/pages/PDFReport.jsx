@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { jsPDF } from "jspdf";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import API_BASE_URL from "../config/apiConfig";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function PDFReport() {
   const [data, setData] = useState([]);
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Fetch change request data using axiosPrivate
   useEffect(() => {
@@ -15,6 +18,7 @@ function PDFReport() {
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        navigate('/login', { state: { from: location }, replace: true });
       }
     };
 

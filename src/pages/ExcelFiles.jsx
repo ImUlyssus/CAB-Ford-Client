@@ -3,10 +3,13 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import API_BASE_URL from "../config/apiConfig";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function ExcelFiles() {
   const [data, setData] = useState([]);
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Fetch MySQL data from API using axiosPrivate
   useEffect(() => {
@@ -16,6 +19,7 @@ function ExcelFiles() {
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        navigate('/login', { state: { from: location }, replace: true });
       }
     };
 
