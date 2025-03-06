@@ -6,7 +6,6 @@ import { ThemeProvider } from "styled-components";
 import { theme } from "./theme";
 import { AuthProvider } from './context/AuthProvider';
 
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>

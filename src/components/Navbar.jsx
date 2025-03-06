@@ -1,10 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "styled-components";
 import { useContext } from "react";
 import AuthContext from "../context/AuthProvider";
 function Navbar() {
     const theme = useTheme(); // Access theme
     const { setAuth } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     return (
         <nav
