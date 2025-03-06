@@ -4,6 +4,7 @@ import { CalendarIcon } from "lucide-react";
 import API_BASE_URL from '../config/apiConfig';
 import Dialog from "../components/Dialog";
 import Button from "../components/Button";
+import AddedDatesList from "../components/AddedDatesList";
 import axios from 'axios';
 function ChangeRequest() {
   const theme = useTheme();
@@ -12,22 +13,16 @@ function ChangeRequest() {
   const [requestChangeDate, setRequestChangeDate] = useState("");
   const [scheduleChanges, setScheduleChanges] = useState({
     aat: {
-      dateStart: "",
-      dateEnd: "",
       startDateForRange: "",
       endDateForRange: "",
       duration: "",  // Added duration field
     },
     ftm: {
-      dateStart: "",
-      dateEnd: "",
       startDateForRange: "",
       endDateForRange: "",
       duration: "",  // Added duration field
     },
     fsst: {
-      dateStart: "",
-      dateEnd: "",
       startDateForRange: "",
       endDateForRange: "",
       duration: "",  // Added duration field
@@ -285,8 +280,6 @@ function ChangeRequest() {
           {/* ScheduleChangeSection for AAT */}
           <ScheduleChangeSection
             type="aat"
-            scheduleChangeStartDate={scheduleChanges.aat.dateStart}
-            scheduleChangeEndDate={scheduleChanges.aat.dateEnd}
             startDateForRange={scheduleChanges.aat.startDateForRange}
             endDateForRange={scheduleChanges.aat.endDateForRange}
             duration={scheduleChanges.aat.duration}  // Pass duration
@@ -298,8 +291,6 @@ function ChangeRequest() {
           {/* ScheduleChangeSection for FTM */}
           <ScheduleChangeSection
             type="ftm"
-            scheduleChangeStartDate={scheduleChanges.ftm.dateStart}
-            scheduleChangeEndDate={scheduleChanges.ftm.dateEnd}
             startDateForRange={scheduleChanges.ftm.startDateForRange}
             endDateForRange={scheduleChanges.ftm.endDateForRange}
             duration={scheduleChanges.ftm.duration}  // Pass duration
@@ -311,8 +302,6 @@ function ChangeRequest() {
           {/* ScheduleChangeSection for FSST */}
           <ScheduleChangeSection
             type="fsst"
-            scheduleChangeStartDate={scheduleChanges.fsst.dateStart}
-            scheduleChangeEndDate={scheduleChanges.fsst.dateEnd}
             startDateForRange={scheduleChanges.fsst.startDateForRange}
             endDateForRange={scheduleChanges.fsst.endDateForRange}
             duration={scheduleChanges.fsst.duration}  // Pass duration
@@ -340,8 +329,6 @@ function ChangeRequest() {
 }
 function ScheduleChangeSection({
   type,
-  scheduleChangeStartDate,
-  scheduleChangeEndDate,
   startDateForRange,
   endDateForRange,
   duration,
@@ -354,73 +341,43 @@ function ScheduleChangeSection({
   };
   const label = typeLabels[type] || "Schedule";
   const [openDialog, setOpenDialog] = useState(null);
+  const [addedDates, setAddedDates] = useState([]);  // ➡️ Store added dates here
+
+  // ➡️ Handle adding dates
+  const handleAddDate = () => {
+    if (startDateForRange && endDateForRange && duration) {
+      setAddedDates(prev => [
+        ...prev,
+        { start: startDateForRange, end: endDateForRange, duration }
+      ]);
+    }
+    setOpenDialog(null)
+  };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
-      {/* Label for Schedule Change */}
-      <label
-        htmlFor={`${type}ScheduleChange`}
-        style={{ marginLeft: "auto", marginRight: "10rem" }}
-      >
-        {label} schedule change:
-      </label>
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
+        <label
+          htmlFor={`${type}ScheduleChange`}
+          style={{ marginLeft: "auto", marginRight: "10rem" }}
+        >
+          Choose {label} schedule change date:
+        </label>
 
-      {/* Buttons for Individual Date and Date Range */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 relative">
-      <Button type="button" onClick={() => setOpenDialog("individual")}>Individual Date</Button>
-<Button type="button" onClick={() => setOpenDialog("range")}>Date Range</Button>
-
+        {/* Buttons for Individual Date and Date Range */}
+        <div className="grid grid-cols-1 relative">
+          <Button type="button" onClick={() => setOpenDialog("range")}>
+            Choose date and duration
+          </Button>
+        </div>
       </div>
 
-      {/* Dialog for Individual Date */}
-<Dialog open={openDialog === "individual"} onClose={() => setOpenDialog(null)}>
-  <h4 className="text-md font-semibold mb-2">Select Individual Date</h4>
-  <div className="grid grid-cols-2 gap-4 mb-4">
-    
-    {/* Start Date and Time */}
-    <div className="relative">
-      <label className="block text-sm font-medium text-gray-600 mb-1">
-        Start date and time
-      </label>
-      <input
-        type="datetime-local"
-        value={scheduleChangeStartDate}
-        onChange={(e) => onScheduleChange("dateStart", e.target.value)}
-        className="p-2 border border-gray-300 rounded w-full pr-10"
+      {/* ➡️ Use AddedDatesList component here */}
+      <AddedDatesList
+        addedDates={addedDates}
+        label={label}
+        onRemove={(index) => setAddedDates((prev) => prev.filter((_, i) => i !== index))}
       />
-      <button
-        type="button"
-        className="absolute top-2"
-        onClick={() =>
-          document.getElementById(`${type}ScheduleChangeStartDate`).showPicker()
-        }
-      >
-      </button>
-    </div>
-
-    {/* End Date and Time */}
-    <div className="relative">
-      <label className="block text-sm font-medium text-gray-600 mb-1">
-        End date and time
-      </label>
-      <input
-        type="datetime-local"
-        value={scheduleChangeEndDate}
-        onChange={(e) => onScheduleChange("dateEnd", e.target.value)}
-        className="p-2 border border-gray-300 rounded w-full pr-10"
-      />
-      <button
-        type="button"
-        className="absolute top-2"
-        onClick={() =>
-          document.getElementById(`${type}ScheduleChangeEndDate`).showPicker()
-        }
-      >
-      </button>
-    </div>
-
-  </div>
-</Dialog>
 
 
       {/* Dialog for Date Range */}
@@ -428,188 +385,44 @@ function ScheduleChangeSection({
         <h4 className="text-md font-semibold mb-2">Select Date Range</h4>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="relative">
+            <label className="block text-sm font-medium text-gray-400 mb-1">
+              Start date and time
+            </label>
             <input
-              type="date"
+              type="datetime-local"
               value={startDateForRange}
               onChange={(e) => onScheduleChange("startDateForRange", e.target.value)}
-              className="p-2 border border-gray-300 rounded w-full pr-10"
+              className="p-2 border border-gray-300 rounded w-full"
             />
-            <button
-              type="button"
-              className="absolute right-3 top-2 text-gray-500"
-              onClick={() =>
-                document.getElementById(`${type}StartDate`).showPicker()
-              }
-            >
-              <CalendarIcon size={20} />
-            </button>
           </div>
           <div className="relative">
+            <label className="block text-sm font-medium text-gray-400 mb-1">
+              End date and time
+            </label>
             <input
-              type="date"
+              type="datetime-local"
               value={endDateForRange}
               onChange={(e) => onScheduleChange("endDateForRange", e.target.value)}
-              className="p-2 border border-gray-300 rounded w-full pr-10"
+              className="p-2 border border-gray-300 rounded w-full"
             />
-            <button
-              type="button"
-              className="absolute right-3 top-2 text-gray-500"
-              onClick={() =>
-                document.getElementById(`${type}EndDate`).showPicker()
-              }
-            >
-              <CalendarIcon size={20} />
-            </button>
           </div>
         </div>
 
-        {/* Duration Input */}
         <div className="mb-4">
           <input
-            type="text"
+            type="number"
             value={duration}
             onChange={(e) => onScheduleChange("duration", e.target.value)}
-            pattern="^\d*\.?\d*$"
-            placeholder="Change duration"
+            placeholder="Choose duration in hour"
             className="p-2 border border-gray-300 rounded w-full"
           />
+        </div>
+        <div className='flex'>
+          <Button type="button" onClick={handleAddDate} className='ml-auto'>Add</Button>
         </div>
       </Dialog>
     </div>
   );
 }
-// function ScheduleChangeSection({
-//   type,
-//   scheduleChangeStartDate,
-//   scheduleChangeEndDate,
-//   startDateForRange,
-//   endDateForRange,
-//   duration,
-//   onScheduleChange,
-// }) {
-//   const typeLabels = {
-//     aat: "AAT",
-//     ftm: "FTM",
-//     fsst: "FSST",
-//   };
-//   const label = typeLabels[type] || "Schedule";
-//   const [openDialog, setOpenDialog] = useState(null);
-//   return (
-//     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
-//       {/* Label for Schedule Change */}
-//       <label
-//         htmlFor={`${type}ScheduleChange`}
-//         style={{ marginLeft: "auto", marginRight: "10rem" }}
-//       >
-//         {label} schedule change:
-//       </label>
-
-//       {/* Dialog for Individual Date */}
-//       <Dialog open={openDialog === "individual"} onClose={() => setOpenDialog(null)}>
-//         <h4 className="text-md font-semibold mb-2">Select Individual Date</h4>
-//         <div className="grid grid-cols-2 gap-4 mb-4">
-
-//           {/* Start Date and Time */}
-//           <div className="relative">
-//             <label className="block text-sm font-medium text-gray-600 mb-1">
-//               Start date and time
-//             </label>
-//             <input
-//               type="datetime-local"
-//               value={scheduleChangeStartDate}
-//               onChange={(e) => onScheduleChange("dateStart", e.target.value)}
-//               className="p-2 border border-gray-300 rounded w-full pr-10"
-//             />
-//             <button
-//               type="button"
-//               className="absolute top-2"
-//               onClick={() =>
-//                 document.getElementById(`${type}ScheduleChangeStartDate`).showPicker()
-//               }
-//             >
-//             </button>
-//           </div>
-
-//           {/* End Date and Time */}
-//           <div className="relative">
-//             <label className="block text-sm font-medium text-gray-600 mb-1">
-//               End date and time
-//             </label>
-//             <input
-//               type="datetime-local"
-//               value={scheduleChangeEndDate}
-//               onChange={(e) => onScheduleChange("dateEnd", e.target.value)}
-//               className="p-2 border border-gray-300 rounded w-full pr-10"
-//             />
-//             <button
-//               type="button"
-//               className="absolute top-2"
-//               onClick={() =>
-//                 document.getElementById(`${type}ScheduleChangeEndDate`).showPicker()
-//               }
-//             >
-//             </button>
-//           </div>
-
-//         </div>
-//       </Dialog>
-
-
-
-//       {/* Dialog for Date Range */}
-//       <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
-//         <h4 className="text-md font-semibold mb-2">Select Date Range</h4>
-//         <div className="grid grid-cols-2 gap-4 mb-4">
-//           <div className="relative">
-//             <input
-//               type="date"
-//               value={startDateForRange}
-//               onChange={(e) => onScheduleChange("startDateForRange", e.target.value)}
-//               className="p-2 border border-gray-300 rounded w-full pr-10"
-//             />
-//             <button
-//               type="button"
-//               className="absolute right-3 top-2 text-gray-500"
-//               onClick={() =>
-//                 document.getElementById(`${type}StartDate`).showPicker()
-//               }
-//             >
-//               <CalendarIcon size={20} />
-//             </button>
-//           </div>
-//           <div className="relative">
-//             <input
-//               type="date"
-//               value={endDateForRange}
-//               onChange={(e) => onScheduleChange("endDateForRange", e.target.value)}
-//               className="p-2 border border-gray-300 rounded w-full pr-10"
-//             />
-//             <button
-//               type="button"
-//               className="absolute right-3 top-2 text-gray-500"
-//               onClick={() =>
-//                 document.getElementById(`${type}EndDate`).showPicker()
-//               }
-//             >
-//               <CalendarIcon size={20} />
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* Duration Input */}
-//         <div className="mb-4">
-//           <input
-//             type="text"
-//             value={duration}
-//             onChange={(e) => onScheduleChange("duration", e.target.value)}
-//             pattern="^\d*\.?\d*$"
-//             placeholder="Change duration"
-//             className="p-2 border border-gray-300 rounded w-full"
-//           />
-//         </div>
-//       </Dialog>
-//     </div>
-//   );
-// }
 
 export default ChangeRequest;
