@@ -76,7 +76,7 @@ const GlobalTeamContact = () => {
                             onClick={() => setShowGlobalDialog(true)}
                             className={`p-2 cursor-pointer border border-gray-300 rounded w-full hover:bg-white hover:text-black`}
                         >
-                            Global contact
+                            Global team contact
                         </button>
                     </div>
                 </>

@@ -18,6 +18,7 @@ function ChangeRequest() {
     const [changeNameContent, setChangeNameContent] = useState('');
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
+    const [approval, setApproval] = useState(""); 
     const [crqs, setCrqs] = useState({
         aat: [],
         ftm: [],
@@ -46,12 +47,12 @@ function ChangeRequest() {
             [type]: updatedCRQs,
         }));
     };
-    const handleChangeContent = (contentInHTML) => {
-        setChangeNameContent(contentInHTML); // Update the state with the HTML content
-    };
 
     const toggleSyntaxInfo = (textareaId) => {
         setOpenDialog(openDialog === textareaId ? null : textareaId);
+    };
+    const handleApprovalChange = (selection) => {
+        setApproval(selection);  // Update the approval state with either "YES" or "NO"
     };
     // Common dialog box component
     const SyntaxInfoBox = ({ isVisible, onClose }) => (
@@ -86,6 +87,7 @@ function ChangeRequest() {
         const impact = document.getElementById("impact").value;
         const priority = document.getElementById("priority").value;
         const change_name = document.getElementById("changeName").value;
+        const change_status = document.getElementById("changeStatus").value;
 
         if (!category || !reason || !impact || !priority || !change_name) {
             alert("❌ Please fill out all fields.");
@@ -510,19 +512,172 @@ function ChangeRequest() {
 
                     {/* AAT CRQ */}
                     <CRQSection
-                type="aat"
-                onCRQChange={(updatedCRQs) => handleCRQChange("aat", updatedCRQs)}
-            />
-            {/* FTM CRQ */}
-            <CRQSection
-                type="ftm"
-                onCRQChange={(updatedCRQs) => handleCRQChange("ftm", updatedCRQs)}
-            />
-            {/* FSST CRQ */}
-            <CRQSection
-                type="fsst"
-                onCRQChange={(updatedCRQs) => handleCRQChange("fsst", updatedCRQs)}
-            />
+                        type="aat"
+                        onCRQChange={(updatedCRQs) => handleCRQChange("aat", updatedCRQs)}
+                    />
+                    {/* FTM CRQ */}
+                    <CRQSection
+                        type="ftm"
+                        onCRQChange={(updatedCRQs) => handleCRQChange("ftm", updatedCRQs)}
+                    />
+                    {/* FSST CRQ */}
+                    <CRQSection
+                        type="fsst"
+                        onCRQChange={(updatedCRQs) => handleCRQChange("fsst", updatedCRQs)}
+                    />
+                    {/* Approval */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
+                        <label htmlFor="changeSite" style={labelStyle}>
+                            Approval:
+                        </label>
+                        <div className="flex space-x-4">
+                            {/* YES Option */}
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="approval"  // Same name ensures only one selection
+                                    value="YES"
+                                    checked={approval === "YES"}  // Check if the approval value is "YES"
+                                    onChange={() => handleApprovalChange("YES")}  // Handle change to "YES"
+                                    className="mr-2"
+                                />
+                                YES
+                            </label>
+
+                            {/* NO Option */}
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="approval"  // Same name ensures only one selection
+                                    value="NO"
+                                    checked={approval === "NO"}  // Check if the approval value is "NO"
+                                    onChange={() => handleApprovalChange("NO")}  // Handle change to "NO"
+                                    className="mr-2"
+                                />
+                                NO
+                            </label>
+                            {/* Waiting Option */}
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="approval"  // Same name ensures only one selection
+                                    value="Waiting"
+                                    checked={approval === "Waiting"}  // Check if the approval value is "NO"
+                                    onChange={() => handleApprovalChange("Waiting")}  // Handle change to "NO"
+                                    className="mr-2"
+                                />
+                                Waiting
+                            </label>
+                        </div>
+                    </div>
+                    {/* Change Status */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
+                        <label htmlFor="changeStatus" style={labelStyle}>Change status:</label>
+                        <select
+                            id="changeStatus"
+                            style={{ backgroundColor: theme.colors.primary400 }}
+                            className="p-2 border border-gray-300 rounded text-white"
+                        >
+                            <option value=""></option>
+                            <option value="Completed with no issue">Completed with no issue</option>
+                            <option value="Cancel change request">Cancel change request</option>
+                            <option value="AAT change cancel">AAT change cancel</option>
+                            <option value="FTM change cancel">FTM change cancel</option>
+                            <option value="FSST change cancel">FSST change cancel</option>
+                            <option value="Common change cancel">Common change cancel</option>
+                        </select>
+                    </div>
+                    {/* Cancel Change Plan Field */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                        <label htmlFor="cancelChangeReason" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Cancel change reason:</label>
+                        <div className="relative w-full">
+                            <textarea
+                                id="cancelChangeReason"
+                                style={{ backgroundColor: theme.colors.primary400 }}
+                                className="p-2 border border-gray-300 rounded text-white w-full"
+                                placeholder="Enter value"
+                                rows={4}
+                            />
+
+                            {/* Style your text dialog button */}
+                            <button
+                                type='button'
+                                onClick={() => toggleSyntaxInfo("cancelChangeReason")}
+                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                            >
+                                Style your text
+                                <HelpCircle className="w-4 h-4 ml-1" />
+                            </button>
+
+                            {/* Syntax Info Box */}
+                            <SyntaxInfoBox
+                                isVisible={openDialog === "cancelChangeReason"}
+                                onClose={() => setOpenDialog(null)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Lesson Learnt Field */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                        <label htmlFor="lessonLearnt" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Lesson learnt:</label>
+                        <div className="relative w-full">
+                            <textarea
+                                id="lessonLearnt"
+                                style={{ backgroundColor: theme.colors.primary400 }}
+                                className="p-2 border border-gray-300 rounded text-white w-full"
+                                placeholder="Enter value"
+                                rows={4}
+                            />
+
+                            {/* Style your text dialog button */}
+                            <button
+                                type='button'
+                                onClick={() => toggleSyntaxInfo("lessonLearnt")}
+                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                            >
+                                Style your text
+                                <HelpCircle className="w-4 h-4 ml-1" />
+                            </button>
+
+                            {/* Syntax Info Box */}
+                            <SyntaxInfoBox
+                                isVisible={openDialog === "lessonLearnt"}
+                                onClose={() => setOpenDialog(null)}
+                            />
+                        </div>
+                    </div>
+                    {/* Reschedule Reason */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                        <label htmlFor="rescheduleReason" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Reschedule reason:</label>
+                        <div className="relative w-full">
+                            <textarea
+                                id="rescheduleReason"
+                                style={{ backgroundColor: theme.colors.primary400 }}
+                                className="p-2 border border-gray-300 rounded text-white w-full"
+                                placeholder="Enter value"
+                                rows={4}
+                            />
+
+                            {/* Style your text dialog button */}
+                            <button
+                                type='button'
+                                onClick={() => toggleSyntaxInfo("rescheduleReason")}
+                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                            >
+                                Style your text
+                                <HelpCircle className="w-4 h-4 ml-1" />
+                            </button>
+
+                            {/* Syntax Info Box */}
+                            <SyntaxInfoBox
+                                isVisible={openDialog === "rescheduleReason"}
+                                onClose={() => setOpenDialog(null)}
+                            />
+                        </div>
+                    </div>
 
                     {/* Submit Button */}
                     <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>

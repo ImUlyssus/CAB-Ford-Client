@@ -71,13 +71,13 @@ const BusinessTeamContact = () => {
                             Person contact
                         </button>
 
-                        {/* Button for Global Contact */}
+                        {/* Button for Business Contact */}
                         <button
                             type="button"
                             onClick={() => setShowGlobalDialog(true)}
                             className={`p-2 cursor-pointer border border-gray-300 rounded w-full hover:bg-white hover:text-black`}
                         >
-                            Global contact
+                            Business team contact
                         </button>
                     </div>
                 </>
