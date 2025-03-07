@@ -7,6 +7,8 @@ import Button from "../components/Button";
 import AddedDatesList from "../components/AddedDatesList";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { HelpCircle } from "lucide-react";
+import BusinessTeamContact from "./BusinessTeamContact";
+import GlobalTeamContact from "./GlobalTeamContact";
 function ChangeRequest() {
     const theme = useTheme();
     const [isCommonChange, setIsCommonChange] = useState(false);
@@ -60,7 +62,6 @@ function ChangeRequest() {
             </div>
         )
     );
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -427,7 +428,7 @@ function ChangeRequest() {
                     {/* AAT Site IT Contact */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
                         <label htmlFor="aatSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
-                            AAT Site IT Contact:
+                            AAT site IT contact:
                         </label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input
@@ -449,7 +450,7 @@ function ChangeRequest() {
                     {/* FTM Site IT Contact */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
                         <label htmlFor="ftmSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
-                            FTM Site IT Contact:
+                            FTM site IT contact:
                         </label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input
@@ -472,7 +473,7 @@ function ChangeRequest() {
                     {/* FSST Site IT Contact */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
                         <label htmlFor="fsstSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
-                            FSST Site IT Contact:
+                            FSST site IT contact:
                         </label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input
@@ -491,6 +492,10 @@ function ChangeRequest() {
                             />
                         </div>
                     </div>
+                    {/* Global Team Contact */}
+                    <GlobalTeamContact />
+                    {/* Business Team Contact */}
+                    <BusinessTeamContact />
 
                     {/* Submit Button */}
                     <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>

@@ -9,7 +9,7 @@ const Layout = () => {
   return (
     <div style={{color: theme.colors.secondary500}}>
       <NavBar />
-      <main style={{ minHeight: "80vh", padding: "40px", backgroundColor: theme.colors.primary500,marginTop: "40px" }}>
+      <main style={{ minHeight: "80vh", padding: "40px", backgroundColor: theme.colors.primary500,marginTop: "60px" }}>
         <Outlet /> {/* This renders the child components */}
       </main>
       <Footer />
