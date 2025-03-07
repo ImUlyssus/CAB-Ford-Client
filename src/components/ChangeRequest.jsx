@@ -9,6 +9,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { HelpCircle } from "lucide-react";
 import BusinessTeamContact from "./BusinessTeamContact";
 import GlobalTeamContact from "./GlobalTeamContact";
+import CRQSection from "./CRQInputs";
 function ChangeRequest() {
     const theme = useTheme();
     const [isCommonChange, setIsCommonChange] = useState(false);
@@ -17,6 +18,11 @@ function ChangeRequest() {
     const [changeNameContent, setChangeNameContent] = useState('');
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
+    const [crqs, setCrqs] = useState({
+        aat: [],
+        ftm: [],
+        fsst: [],
+    });
     const [scheduleChanges, setScheduleChanges] = useState({
         aat: {
             startDateForRange: "",
@@ -34,7 +40,12 @@ function ChangeRequest() {
             duration: "",  // Added duration field
         },
     });
-
+    const handleCRQChange = (type, updatedCRQs) => {
+        setCrqs((prev) => ({
+            ...prev,
+            [type]: updatedCRQs,
+        }));
+    };
     const handleChangeContent = (contentInHTML) => {
         setChangeNameContent(contentInHTML); // Update the state with the HTML content
     };
@@ -496,6 +507,22 @@ function ChangeRequest() {
                     <GlobalTeamContact />
                     {/* Business Team Contact */}
                     <BusinessTeamContact />
+
+                    {/* AAT CRQ */}
+                    <CRQSection
+                type="aat"
+                onCRQChange={(updatedCRQs) => handleCRQChange("aat", updatedCRQs)}
+            />
+            {/* FTM CRQ */}
+            <CRQSection
+                type="ftm"
+                onCRQChange={(updatedCRQs) => handleCRQChange("ftm", updatedCRQs)}
+            />
+            {/* FSST CRQ */}
+            <CRQSection
+                type="fsst"
+                onCRQChange={(updatedCRQs) => handleCRQChange("fsst", updatedCRQs)}
+            />
 
                     {/* Submit Button */}
                     <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>

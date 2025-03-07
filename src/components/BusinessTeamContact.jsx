@@ -18,15 +18,28 @@ const BusinessTeamContact = () => {
 
     // Handle saving person contact
     const savePersonContact = () => {
-        const contact = `Position: ${position}, Name: ${personName}, CDSID: ${personCdsid}`;
-        setBusinessTeamContact(contact);
-        setContactType("person");
+        // Check if all input fields have non-empty values after trimming spaces
+        if (position.trim() !== "" || personName.trim() !== "" || personCdsid.trim() !== "") {
+            const contact = `Position: ${position.trim()}, Name: ${personName.trim()}, CDSID: ${personCdsid.trim()}`;
+            setBusinessTeamContact(contact);
+            setContactType("person");
+        } else {
+            // Show an error message or handle the empty input scenario
+            alert("Please fill in all fields before saving.");
+        }
     };
 
     // Handle saving global contact
     const saveBusinessContact = () => {
-        setBusinessTeamContact(`Team CDSID: ${teamCdsid}`);
-        setContactType("team");
+        // Check if all input fields have non-empty values after trimming spaces
+        if (teamCdsid.trim() !== "") {
+            setBusinessTeamContact(`Team CDSID: ${teamCdsid}`);
+            setContactType("team");
+        } else {
+            // Show an error message or handle the empty input scenario
+            alert("Please fill in all fields before saving.");
+        }
+
     };
 
     // Handle remove contact
