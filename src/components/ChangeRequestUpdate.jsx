@@ -10,7 +10,7 @@ import { HelpCircle } from "lucide-react";
 import BusinessTeamContact from "./BusinessTeamContact";
 import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
-function ChangeRequest() {
+function ChangeRequestUpdate() {
     const theme = useTheme();
     const [isCommonChange, setIsCommonChange] = useState(false);
     const [selectedSites, setSelectedSites] = useState([]);
@@ -18,6 +18,7 @@ function ChangeRequest() {
     const [changeNameContent, setChangeNameContent] = useState('');
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
+    const [approval, setApproval] = useState(""); 
     const [crqs, setCrqs] = useState({
         aat: [],
         ftm: [],
@@ -50,7 +51,9 @@ function ChangeRequest() {
     const toggleSyntaxInfo = (textareaId) => {
         setOpenDialog(openDialog === textareaId ? null : textareaId);
     };
-
+    const handleApprovalChange = (selection) => {
+        setApproval(selection);  // Update the approval state with either "YES" or "NO"
+    };
     // Common dialog box component
     const SyntaxInfoBox = ({ isVisible, onClose }) => (
         isVisible && (
@@ -84,6 +87,7 @@ function ChangeRequest() {
         const impact = document.getElementById("impact").value;
         const priority = document.getElementById("priority").value;
         const change_name = document.getElementById("changeName").value;
+        const change_status = document.getElementById("changeStatus").value;
 
         if (!category || !reason || !impact || !priority || !change_name) {
             alert("❌ Please fill out all fields.");
@@ -272,7 +276,7 @@ function ChangeRequest() {
                             Change site:
                         </label>
                         <div className="flex space-x-4">
-                            {["aat", "ftm", "fsst"].map((site) => (
+                            {["ftm", "fsst", "aat"].map((site) => (
                                 <label key={site} className="flex items-center">
                                     <input
                                         type="checkbox"
@@ -311,16 +315,38 @@ function ChangeRequest() {
                         </div>
                     </div>
 
-                    {selectedSites.map((site) => (
-                        <ScheduleChangeSection
-                            key={site}
-                            type={site}
-                            startDateForRange={scheduleChanges[site].startDateForRange}
-                            endDateForRange={scheduleChanges[site].endDateForRange}
-                            duration={scheduleChanges[site].duration}
-                            onScheduleChange={(field, value) => handleScheduleChange(site, field, value)}
-                        />
-                    ))}
+                    {/* ScheduleChangeSection for AAT */}
+                    <ScheduleChangeSection
+                        type="aat"
+                        startDateForRange={scheduleChanges.aat.startDateForRange}
+                        endDateForRange={scheduleChanges.aat.endDateForRange}
+                        duration={scheduleChanges.aat.duration}  // Pass duration
+                        onScheduleChange={(field, value) =>
+                            handleScheduleChange("aat", field, value)
+                        }
+                    />
+
+                    {/* ScheduleChangeSection for FTM */}
+                    <ScheduleChangeSection
+                        type="ftm"
+                        startDateForRange={scheduleChanges.ftm.startDateForRange}
+                        endDateForRange={scheduleChanges.ftm.endDateForRange}
+                        duration={scheduleChanges.ftm.duration}  // Pass duration
+                        onScheduleChange={(field, value) =>
+                            handleScheduleChange("ftm", field, value)
+                        }
+                    />
+
+                    {/* ScheduleChangeSection for FSST */}
+                    <ScheduleChangeSection
+                        type="fsst"
+                        startDateForRange={scheduleChanges.fsst.startDateForRange}
+                        endDateForRange={scheduleChanges.fsst.endDateForRange}
+                        duration={scheduleChanges.fsst.duration}  // Pass duration
+                        onScheduleChange={(field, value) =>
+                            handleScheduleChange("fsst", field, value)
+                        }
+                    />
 
                     {/* Change Description Field */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
@@ -412,29 +438,73 @@ function ChangeRequest() {
                             />
                         </div>
                     </div>
-                    {selectedSites.map((site)=>(
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
+                    {/* AAT Site IT Contact */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
                         <label htmlFor="aatSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
-                            {site.toUpperCase()} site IT contact:
+                            AAT site IT contact:
                         </label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input
                                 type="text"
-                                id={`${site}ContactName`}
-                                name={`${site}ContactName`}
+                                id="aatContactName"
+                                name="aatContactName"
                                 placeholder="Enter name"
                                 className="p-2 border border-gray-300 rounded w-full"
                             />
                             <input
                                 type="text"
-                                id={`${site}ContactCdsid`}
-                                name={`${site}ContactCdsid`}
+                                id="aatContactCdsid"
+                                name="aatContactCdsid"
                                 placeholder="Enter CDSID"
                                 className="p-2 border border-gray-300 rounded w-full"
                             />
                         </div>
                     </div>
-                    ))}
+                    {/* FTM Site IT Contact */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
+                        <label htmlFor="ftmSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
+                            FTM site IT contact:
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                                type="text"
+                                id="ftmContactName"
+                                name="ftmContactName"
+                                placeholder="Enter name"
+                                className="p-2 border border-gray-300 rounded w-full"
+                            />
+                            <input
+                                type="text"
+                                id="ftmContactCdsid"
+                                name="ftmContactCdsid"
+                                placeholder="Enter CDSID"
+                                className="p-2 border border-gray-300 rounded w-full"
+                            />
+                        </div>
+                    </div>
+
+                    {/* FSST Site IT Contact */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
+                        <label htmlFor="fsstSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
+                            FSST site IT contact:
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                                type="text"
+                                id="fsstContactName"
+                                name="fsstContactName"
+                                placeholder="Enter name"
+                                className="p-2 border border-gray-300 rounded w-full"
+                            />
+                            <input
+                                type="text"
+                                id="fsstContactCdsid"
+                                name="fsstContactCdsid"
+                                placeholder="Enter CDSID"
+                                className="p-2 border border-gray-300 rounded w-full"
+                            />
+                        </div>
+                    </div>
                     {/* Global Team Contact */}
                     <GlobalTeamContact />
                     {/* Business Team Contact */}
@@ -455,6 +525,159 @@ function ChangeRequest() {
                         type="fsst"
                         onCRQChange={(updatedCRQs) => handleCRQChange("fsst", updatedCRQs)}
                     />
+                    {/* Approval */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
+                        <label htmlFor="changeSite" style={labelStyle}>
+                            Approval:
+                        </label>
+                        <div className="flex space-x-4">
+                            {/* YES Option */}
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="approval"  // Same name ensures only one selection
+                                    value="YES"
+                                    checked={approval === "YES"}  // Check if the approval value is "YES"
+                                    onChange={() => handleApprovalChange("YES")}  // Handle change to "YES"
+                                    className="mr-2"
+                                />
+                                YES
+                            </label>
+
+                            {/* NO Option */}
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="approval"  // Same name ensures only one selection
+                                    value="NO"
+                                    checked={approval === "NO"}  // Check if the approval value is "NO"
+                                    onChange={() => handleApprovalChange("NO")}  // Handle change to "NO"
+                                    className="mr-2"
+                                />
+                                NO
+                            </label>
+                            {/* Waiting Option */}
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    name="approval"  // Same name ensures only one selection
+                                    value="Waiting"
+                                    checked={approval === "Waiting"}  // Check if the approval value is "NO"
+                                    onChange={() => handleApprovalChange("Waiting")}  // Handle change to "NO"
+                                    className="mr-2"
+                                />
+                                Waiting
+                            </label>
+                        </div>
+                    </div>
+                    {/* Change Status */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
+                        <label htmlFor="changeStatus" style={labelStyle}>Change status:</label>
+                        <select
+                            id="changeStatus"
+                            style={{ backgroundColor: theme.colors.primary400 }}
+                            className="p-2 border border-gray-300 rounded text-white"
+                        >
+                            <option value=""></option>
+                            <option value="Completed with no issue">Completed with no issue</option>
+                            <option value="Cancel change request">Cancel change request</option>
+                            <option value="AAT change cancel">AAT change cancel</option>
+                            <option value="FTM change cancel">FTM change cancel</option>
+                            <option value="FSST change cancel">FSST change cancel</option>
+                            <option value="Common change cancel">Common change cancel</option>
+                        </select>
+                    </div>
+                    {/* Cancel Change Plan Field */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                        <label htmlFor="cancelChangeReason" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Cancel change reason:</label>
+                        <div className="relative w-full">
+                            <textarea
+                                id="cancelChangeReason"
+                                style={{ backgroundColor: theme.colors.primary400 }}
+                                className="p-2 border border-gray-300 rounded text-white w-full"
+                                placeholder="Enter value"
+                                rows={4}
+                            />
+
+                            {/* Style your text dialog button */}
+                            <button
+                                type='button'
+                                onClick={() => toggleSyntaxInfo("cancelChangeReason")}
+                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                            >
+                                Style your text
+                                <HelpCircle className="w-4 h-4 ml-1" />
+                            </button>
+
+                            {/* Syntax Info Box */}
+                            <SyntaxInfoBox
+                                isVisible={openDialog === "cancelChangeReason"}
+                                onClose={() => setOpenDialog(null)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Lesson Learnt Field */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                        <label htmlFor="lessonLearnt" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Lesson learnt:</label>
+                        <div className="relative w-full">
+                            <textarea
+                                id="lessonLearnt"
+                                style={{ backgroundColor: theme.colors.primary400 }}
+                                className="p-2 border border-gray-300 rounded text-white w-full"
+                                placeholder="Enter value"
+                                rows={4}
+                            />
+
+                            {/* Style your text dialog button */}
+                            <button
+                                type='button'
+                                onClick={() => toggleSyntaxInfo("lessonLearnt")}
+                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                            >
+                                Style your text
+                                <HelpCircle className="w-4 h-4 ml-1" />
+                            </button>
+
+                            {/* Syntax Info Box */}
+                            <SyntaxInfoBox
+                                isVisible={openDialog === "lessonLearnt"}
+                                onClose={() => setOpenDialog(null)}
+                            />
+                        </div>
+                    </div>
+                    {/* Reschedule Reason */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                        <label htmlFor="rescheduleReason" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Reschedule reason:</label>
+                        <div className="relative w-full">
+                            <textarea
+                                id="rescheduleReason"
+                                style={{ backgroundColor: theme.colors.primary400 }}
+                                className="p-2 border border-gray-300 rounded text-white w-full"
+                                placeholder="Enter value"
+                                rows={4}
+                            />
+
+                            {/* Style your text dialog button */}
+                            <button
+                                type='button'
+                                onClick={() => toggleSyntaxInfo("rescheduleReason")}
+                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                            >
+                                Style your text
+                                <HelpCircle className="w-4 h-4 ml-1" />
+                            </button>
+
+                            {/* Syntax Info Box */}
+                            <SyntaxInfoBox
+                                isVisible={openDialog === "rescheduleReason"}
+                                onClose={() => setOpenDialog(null)}
+                            />
+                        </div>
+                    </div>
 
                     {/* Submit Button */}
                     <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
@@ -572,4 +795,4 @@ function ScheduleChangeSection({
     );
 }
 
-export default ChangeRequest;
+export default ChangeRequestUpdate;

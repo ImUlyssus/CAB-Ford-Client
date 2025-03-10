@@ -35,7 +35,6 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();  // Prevents page reload
         setApiError("");      // Clear previous API error
-    
         if (validateForm()) {
             try {
                 const response = await axios.post(

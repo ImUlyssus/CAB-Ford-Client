@@ -1,9 +1,8 @@
 import React from 'react';
-function Home() {
+import Home from '../components/Home';
+function HomePage() {
     return (
-        <div className="font-bold text-white text-center mt-50" style={{fontSize:"4rem"}}>
-        <h1>Welcome To <span style={{color: '#beef00'}}>CAB</span></h1>
-        </div>
+        <Home />
     )
   }
-  export default Home;
+  export default HomePage;

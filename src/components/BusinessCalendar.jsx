@@ -100,7 +100,7 @@ function DaysOfWeek() {
     );
 }
 function GridComponent({ data, activeYear }) {
-    const monthName = data['month']; // e.g., "March"
+    const monthName = data["month"];
     const year = activeYear;
     const theme = useTheme();
 
@@ -120,37 +120,33 @@ function GridComponent({ data, activeYear }) {
         December: 11,
     };
 
-    // Get the zero-indexed month value
     const month = monthMap[monthName];
-
-    // Get the number of days in the month
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    // Get the day of the week for the first day of the month (0 = Sunday, 1 = Monday, etc.)
     const firstDayOfMonth = new Date(year, month, 1).getDay();
 
-    // Create an array of days in the month
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    const emptyCells = Array.from({ length: firstDayOfMonth }, () => null);
 
-    // Create an array for empty cells before the first day of the month
-    const emptyCells = Array.from({ length: firstDayOfMonth }, (_, i) => null);
+    // Extract weekend data from the provided strings
+    const weekendInfo = data.aat.slice(0, daysInMonth); // Replace `aat` if another field holds the correct data
+
+    // Function to determine if a day is a weekend based on the `1`s in the string
+    const isWeekend = (index) => weekendInfo[index] === "1";
+
     return (
         <div
             className="grid grid-rows-4 border"
             style={{ gridTemplateColumns: "90px 60px repeat(37, 1fr)" }}
         >
-            {/* First column merged across all rows */}
             <div className="row-span-4 flex items-center text-center justify-center border p-2 text-xs bg-transparent font-bold">
                 {activeYear || "Loading..."} <br />
                 {monthName || "Loading..."}
             </div>
 
-            {/* Second column merged across all rows */}
             <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
                 Site
             </div>
 
-            {/* Render empty cells for days before the first day of the month */}
             {emptyCells.map((_, index) => (
                 <div
                     key={`empty-${index}`}
@@ -158,18 +154,22 @@ function GridComponent({ data, activeYear }) {
                 ></div>
             ))}
 
-            {/* Render days of the month */}
-            {daysArray.map((day) => (
+            {daysArray.map((day, index) => (
                 <div
                     key={day}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                    style={{color: theme.colors.primary500, borderColor: theme.colors.secondary500}}
+                    className="flex items-center justify-center border py-2 text-xs"
+                    style={{
+                        backgroundColor: isWeekend(index)
+                            ? theme.colors.secondary500 // Weekend color
+                            : "#003478", // Weekday color
+                        color: isWeekend(index) ? "black" : theme.colors.secondary500,
+                        borderColor: theme.colors.secondary500,
+                    }}
                 >
                     {day}
                 </div>
             ))}
 
-            {/* Render remaining cells for the rest of the grid */}
             {Array.from({ length: 37 - (emptyCells.length + daysArray.length) }, (_, index) => (
                 <div
                     key={`remaining-${index}`}
@@ -177,43 +177,39 @@ function GridComponent({ data, activeYear }) {
                 ></div>
             ))}
 
-            {/* Repeat for other sections (AAT, FTM, FSST) */}
             <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
                 AAT
             </div>
 
-            {/* Remaining 36 columns * 4 rows = 144 cells */}
             {Array.from({ length: 1 * 37 }, (_, index) => (
                 <div
                     key={index}
                     className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                >
-                </div>
+                ></div>
             ))}
+
             <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
                 FTM
             </div>
 
-            {/* Remaining 36 columns * 4 rows = 144 cells */}
             {Array.from({ length: 1 * 37 }, (_, index) => (
                 <div
                     key={index}
                     className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                >
-                </div>
+                ></div>
             ))}
+
             <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
                 FSST
             </div>
 
-            {/* Remaining 36 columns * 4 rows = 144 cells */}
             {Array.from({ length: 1 * 37 }, (_, index) => (
                 <div
                     key={index}
                     className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                >
-                </div>
+                ></div>
             ))}
         </div>
     );
 }
+

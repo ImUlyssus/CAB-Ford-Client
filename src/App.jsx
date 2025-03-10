@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
-import Home from "./pages/Home";
+import HomePage from "./pages/Home";
 import ChangeRequest from "./pages/ChangeRequest";
 import PDFReport from "./pages/PDFReport";
 import Presentation from "./pages/Presentation";
@@ -22,7 +22,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verification-page" element={<VerificationPage />} />
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
+          <Route index element={<HomePage />} />
           <Route path="/change-request-data" element={<ChangeRequestData />} />
           <Route path="/change-request" element={<ChangeRequest />} />
           <Route path="/excel-files" element={<ExcelFiles />} />
