@@ -15,8 +15,8 @@ function ChangeRequest() {
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
     const [startDateForRange, setStartDateForRange] = useState('');
-const [endDateForRange, setEndDateForRange] = useState('');
-const [duration, setDuration] = useState('');
+    const [endDateForRange, setEndDateForRange] = useState('');
+    const [duration, setDuration] = useState('');
 
 
     const [crqs, setCrqs] = useState({
@@ -25,36 +25,17 @@ const [duration, setDuration] = useState('');
         fsst: [],
     });
     const [scheduleChanges, setScheduleChanges] = useState({
-        aat: { addedDates: [] },  // Store an array of dates for AAT
-        ftm: { addedDates: [] },
-        fsst: { addedDates: [] },
+        aat: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
+        ftm: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
+        fsst: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
     });
-    
+
     const handleScheduleChange = (type, field, value) => {
         setScheduleChanges((prev) => ({
             ...prev,
             [type]: {
                 ...prev[type],
                 [field]: value,  // Update the single value fields like startDate, endDate, duration
-            },
-        }));
-    };
-    
-    const handleAddedDate = (site, addedDate) => {
-        setScheduleChanges((prev) => ({
-            ...prev,
-            [site]: {
-                ...prev[site],
-                addedDates: [...prev[site].addedDates, addedDate], // Add the new date to the site’s array
-            },
-        }));
-    };
-    const handleRemoveDate = (site, index) => {
-        setScheduleChanges((prev) => ({
-            ...prev,
-            [site]: {
-                ...prev[site],
-                addedDates: prev[site].addedDates.filter((_, i) => i !== index), // Remove date at the specified index
             },
         }));
     };
@@ -107,7 +88,20 @@ const [duration, setDuration] = useState('');
             alert("❌ Please fill out all fields.");
             return;
         }
+        // Transform scheduleChanges into space-separated strings for each site
+        const aat_schedule_change = scheduleChanges.aat?.addedDates
+            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            .join(' ') || '';
 
+        const ftm_schedule_change = scheduleChanges.ftm?.addedDates
+            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            .join(' ') || '';
+
+        const fsst_schedule_change = scheduleChanges.fsst?.addedDates
+            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            .join(' ') || '';
+
+        // Create the request payload
         const requestData = {
             category,
             reason,
@@ -118,9 +112,10 @@ const [duration, setDuration] = useState('');
             common_change: isCommonChange,
             description: change_description,
             test_plan,
-
+            aat_schedule_change,
+            ftm_schedule_change,
+            fsst_schedule_change,  // Add transformed schedule changes here
         };
-        console.log(scheduleChanges);
 
         // try {
         //     const response = await axiosPrivate.post(`/change-requests`, requestData, {
@@ -286,17 +281,34 @@ const [duration, setDuration] = useState('');
                     </div>
                     {/* schedule change section */}
                     {selectedSites.map((site) => (
-            <ScheduleChangeSection
-                key={site}
-                type={site}
-                startDateForRange={scheduleChanges[site].startDateForRange}
-                endDateForRange={scheduleChanges[site].endDateForRange}
-                duration={scheduleChanges[site].duration}
-                addedDates={scheduleChanges[site].addedDates}  // Pass the addedDates array
-                onScheduleChange={(field, value) => handleScheduleChange(site, field, value)}
-                onAddDate={(addedDate) => handleAddedDate(site, addedDate)}  // Handle the date addition
-            />
-        ))}
+                        <ScheduleChangeSection
+                            key={site}
+                            type={site}
+                            startDateForRange={scheduleChanges[site].startDateForRange}
+                            endDateForRange={scheduleChanges[site].endDateForRange}
+                            duration={scheduleChanges[site].duration}
+                            addedDates={scheduleChanges[site].addedDates}
+                            onScheduleChange={(field, value) => setScheduleChanges((prev) => ({
+                                ...prev,
+                                [site]: { ...prev[site], [field]: value },
+                            }))}
+                            onAddDate={(newDate) => setScheduleChanges((prev) => ({
+                                ...prev,
+                                [site]: {
+                                    ...prev[site],
+                                    addedDates: [...prev[site].addedDates, newDate],
+                                },
+                            }))}
+                            onRemoveDate={(index) => setScheduleChanges((prev) => ({
+                                ...prev,
+                                [site]: {
+                                    ...prev[site],
+                                    addedDates: prev[site].addedDates.filter((_, i) => i !== index),
+                                },
+                            }))}  // Handle removing dates dynamically
+                        />
+                    ))}
+
 
                     {/* Change Description Field */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
@@ -449,6 +461,7 @@ function ScheduleChangeSection({
     addedDates,
     onScheduleChange,
     onAddDate,
+    onRemoveDate
 }) {
     const typeLabels = {
         aat: "AAT",
@@ -492,9 +505,7 @@ function ScheduleChangeSection({
             <AddedDatesList
                 addedDates={addedDates}
                 label={label}
-                onRemove={(index) =>
-                    onAddDate((prev) => prev.filter((_, i) => i !== index))  // Update addedDates
-                }
+                onRemove={(index) => onRemoveDate(index)}  // Use the new prop
             />
 
             <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
@@ -506,7 +517,7 @@ function ScheduleChangeSection({
                         </label>
                         <input
                             type="datetime-local"
-                            value={startDateForRange}
+                            value={startDateForRange || ""}
                             onChange={(e) => onScheduleChange("startDateForRange", e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full"
                         />
@@ -517,17 +528,18 @@ function ScheduleChangeSection({
                         </label>
                         <input
                             type="datetime-local"
-                            value={endDateForRange}
+                            value={endDateForRange || ""}
                             onChange={(e) => onScheduleChange("endDateForRange", e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full"
                         />
+
                     </div>
                 </div>
 
                 <div className="mb-4">
                     <input
                         type="number"
-                        value={duration}
+                        value={duration || ""}
                         onChange={(e) => onScheduleChange("duration", e.target.value)}
                         placeholder="Choose duration in hour"
                         className="p-2 border border-gray-300 rounded w-full"
