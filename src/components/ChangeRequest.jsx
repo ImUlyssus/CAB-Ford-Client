@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { useTheme } from "styled-components";
-import { CalendarIcon } from "lucide-react";
-import API_BASE_URL from '../config/apiConfig';
 import Dialog from "../components/Dialog";
 import Button from "../components/Button";
 import AddedDatesList from "../components/AddedDatesList";
@@ -12,34 +10,54 @@ import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
 function ChangeRequest() {
     const theme = useTheme();
-    const [isCommonChange, setIsCommonChange] = useState(false);
     const [selectedSites, setSelectedSites] = useState([]);
-    const [requestChangeDate, setRequestChangeDate] = useState("");
     const [changeNameContent, setChangeNameContent] = useState('');
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
+    const [startDateForRange, setStartDateForRange] = useState('');
+const [endDateForRange, setEndDateForRange] = useState('');
+const [duration, setDuration] = useState('');
+
+
     const [crqs, setCrqs] = useState({
         aat: [],
         ftm: [],
         fsst: [],
     });
     const [scheduleChanges, setScheduleChanges] = useState({
-        aat: {
-            startDateForRange: "",
-            endDateForRange: "",
-            duration: "",  // Added duration field
-        },
-        ftm: {
-            startDateForRange: "",
-            endDateForRange: "",
-            duration: "",  // Added duration field
-        },
-        fsst: {
-            startDateForRange: "",
-            endDateForRange: "",
-            duration: "",  // Added duration field
-        },
+        aat: { addedDates: [] },  // Store an array of dates for AAT
+        ftm: { addedDates: [] },
+        fsst: { addedDates: [] },
     });
+    
+    const handleScheduleChange = (type, field, value) => {
+        setScheduleChanges((prev) => ({
+            ...prev,
+            [type]: {
+                ...prev[type],
+                [field]: value,  // Update the single value fields like startDate, endDate, duration
+            },
+        }));
+    };
+    
+    const handleAddedDate = (site, addedDate) => {
+        setScheduleChanges((prev) => ({
+            ...prev,
+            [site]: {
+                ...prev[site],
+                addedDates: [...prev[site].addedDates, addedDate], // Add the new date to the site’s array
+            },
+        }));
+    };
+    const handleRemoveDate = (site, index) => {
+        setScheduleChanges((prev) => ({
+            ...prev,
+            [site]: {
+                ...prev[site],
+                addedDates: prev[site].addedDates.filter((_, i) => i !== index), // Remove date at the specified index
+            },
+        }));
+    };
     const handleCRQChange = (type, updatedCRQs) => {
         setCrqs((prev) => ({
             ...prev,
@@ -74,16 +92,16 @@ function ChangeRequest() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (isCommonChange && selectedSites.length < 2) {
-            alert("❌ Please select at least two sites for a common change.");
-            return;
-        }
-
         const category = document.getElementById("category").value;
         const reason = document.getElementById("reason").value;
         const impact = document.getElementById("impact").value;
         const priority = document.getElementById("priority").value;
         const change_name = document.getElementById("changeName").value;
+        const selectedSitesString = selectedSites.join(' ');
+        const isCommonChange = selectedSites.length > 1;
+        const change_description = document.getElementById("changeDescription").value;
+        const test_plan = document.getElementById("testPlan").value;
+
 
         if (!category || !reason || !impact || !priority || !change_name) {
             alert("❌ Please fill out all fields.");
@@ -96,54 +114,43 @@ function ChangeRequest() {
             impact,
             priority,
             change_name,
-            change_sites: selectedSites,
+            change_sites: selectedSitesString,
             common_change: isCommonChange,
-            request_change_date: requestChangeDate,
+            description: change_description,
+            test_plan,
+
         };
+        console.log(scheduleChanges);
 
-        try {
-            // Using Axios to send a POST request
-            const response = await axiosPrivate.post(`/change-requests`, requestData, {
-                headers: { "Content-Type": "application/json" }
-            });
+        // try {
+        //     const response = await axiosPrivate.post(`/change-requests`, requestData, {
+        //         headers: { "Content-Type": "application/json" },
+        //     });
 
-            // If the request is successful
-            console.log("✅ Change Request submitted successfully", response.data);
-            // Reset the form fields
-            setIsCommonChange(false);
-            setSelectedSites([]);
-            setRequestChangeDate("");
-            document.getElementById("category").value = "";
-            document.getElementById("reason").value = "";
-            document.getElementById("impact").value = "";
-            document.getElementById("priority").value = "";
-            document.getElementById("changeName").value = "";
-        } catch (error) {
-            // Handle error responses
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
-            } else if (error.request) {
-                // The request was made but no response was received
-                alert("❌ No response received. Please try again later.");
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.error("❌ Error submitting Change Request", error.message);
-                alert("❌ Something went wrong. Please try again later.");
-            }
-        }
+        //     console.log("✅ Change Request submitted successfully", response.data);
+
+        //     setSelectedSites([]);
+        //     document.getElementById("category").value = "";
+        //     document.getElementById("reason").value = "";
+        //     document.getElementById("impact").value = "";
+        //     document.getElementById("priority").value = "";
+        //     document.getElementById("changeName").value = "";
+        // } catch (error) {
+        //     if (error.response) {
+        //         alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
+        //     } else if (error.request) {
+        //         alert("❌ No response received. Please try again later.");
+        //     } else {
+        //         console.error("❌ Error submitting Change Request", error.message);
+        //         alert("❌ Something went wrong. Please try again later.");
+        //     }
+        // }
     };
 
 
     const labelStyle = {
         marginLeft: "auto", marginRight: "10rem"
     }
-
-    const handleCommonChange = (e) => {
-        const value = e.target.value === "yes";
-        setIsCommonChange(value);
-        setSelectedSites([]); // Reset selection when toggling
-    };
 
     const handleSiteSelection = (e) => {
         const { value, checked } = e.target;
@@ -156,18 +163,6 @@ function ChangeRequest() {
             }
         });
     };
-
-    const handleScheduleChange = (type, field, value) => {
-        setScheduleChanges((prev) => ({
-            ...prev,
-            [type]: {
-                ...prev[type],
-                [field]: value,
-            },
-        }));
-    };
-
-
     return (
         <div>
             <div className="px-8 py-4 border-1 rounded-lg" style={{ borderColor: theme.colors.secondary500 }}>
@@ -244,8 +239,9 @@ function ChangeRequest() {
                                 id="changeName"
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value"
+                                placeholder="Enter value (1500 characters max)"
                                 rows={4}
+                                maxLength={1500}
                             />
 
                             {/* Style your text dialog button */}
@@ -266,6 +262,7 @@ function ChangeRequest() {
                             />
                         </div>
                     </div>
+
                     {/* Change Sites */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
                         <label htmlFor="changeSite" style={labelStyle}>
@@ -287,40 +284,19 @@ function ChangeRequest() {
                             ))}
                         </div>
                     </div>
-                    {/* Request change */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
-                        <label htmlFor="requestChange" style={{ marginLeft: "auto", marginRight: "10rem" }}>
-                            Request change:
-                        </label>
-                        <div className="relative">
-                            <input
-                                type="date"
-                                id="requestChange"
-                                name="requestChange"
-                                value={requestChangeDate}
-                                onChange={(e) => setRequestChangeDate(e.target.value)}
-                                className="p-2 border border-gray-300 rounded w-full pr-10"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => document.getElementById("requestChange").showPicker()} // Show date picker on click
-                                className="absolute right-3 top-2 text-gray-500"
-                            >
-                                <CalendarIcon size={20} />
-                            </button>
-                        </div>
-                    </div>
-
+                    {/* schedule change section */}
                     {selectedSites.map((site) => (
-                        <ScheduleChangeSection
-                            key={site}
-                            type={site}
-                            startDateForRange={scheduleChanges[site].startDateForRange}
-                            endDateForRange={scheduleChanges[site].endDateForRange}
-                            duration={scheduleChanges[site].duration}
-                            onScheduleChange={(field, value) => handleScheduleChange(site, field, value)}
-                        />
-                    ))}
+            <ScheduleChangeSection
+                key={site}
+                type={site}
+                startDateForRange={scheduleChanges[site].startDateForRange}
+                endDateForRange={scheduleChanges[site].endDateForRange}
+                duration={scheduleChanges[site].duration}
+                addedDates={scheduleChanges[site].addedDates}  // Pass the addedDates array
+                onScheduleChange={(field, value) => handleScheduleChange(site, field, value)}
+                onAddDate={(addedDate) => handleAddedDate(site, addedDate)}  // Handle the date addition
+            />
+        ))}
 
                     {/* Change Description Field */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
@@ -330,8 +306,9 @@ function ChangeRequest() {
                                 id="changeDescription"
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value"
+                                placeholder="Enter value (1500 characters max)"
                                 rows={4}
+                                maxLength={1500}
                             />
 
                             {/* Style your text dialog button */}
@@ -360,8 +337,9 @@ function ChangeRequest() {
                                 id="testPlan"
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value"
+                                placeholder="Enter value (1500 characters max)"
                                 rows={4}
+                                maxLength={1500}
                             />
 
                             {/* Style your text dialog button */}
@@ -412,49 +390,37 @@ function ChangeRequest() {
                             />
                         </div>
                     </div>
-                    {selectedSites.map((site)=>(
+                    {selectedSites.map((site) => (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
-                        <label htmlFor="aatSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
-                            {site.toUpperCase()} site IT contact:
-                        </label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input
-                                type="text"
-                                id={`${site}ContactName`}
-                                name={`${site}ContactName`}
-                                placeholder="Enter name"
-                                className="p-2 border border-gray-300 rounded w-full"
-                            />
-                            <input
-                                type="text"
-                                id={`${site}ContactCdsid`}
-                                name={`${site}ContactCdsid`}
-                                placeholder="Enter CDSID"
-                                className="p-2 border border-gray-300 rounded w-full"
-                            />
+                            <label htmlFor="aatSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
+                                {site.toUpperCase()} site IT contact:
+                            </label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input
+                                    type="text"
+                                    id={`${site}ContactName`}
+                                    name={`${site}ContactName`}
+                                    placeholder="Enter name"
+                                    className="p-2 border border-gray-300 rounded w-full"
+                                />
+                                <input
+                                    type="text"
+                                    id={`${site}ContactCdsid`}
+                                    name={`${site}ContactCdsid`}
+                                    placeholder="Enter CDSID"
+                                    className="p-2 border border-gray-300 rounded w-full"
+                                />
+                            </div>
                         </div>
-                    </div>
                     ))}
                     {/* Global Team Contact */}
                     <GlobalTeamContact />
                     {/* Business Team Contact */}
                     <BusinessTeamContact />
-
-                    {/* AAT CRQ */}
-                    <CRQSection
-                        type="aat"
-                        onCRQChange={(updatedCRQs) => handleCRQChange("aat", updatedCRQs)}
-                    />
-                    {/* FTM CRQ */}
-                    <CRQSection
-                        type="ftm"
-                        onCRQChange={(updatedCRQs) => handleCRQChange("ftm", updatedCRQs)}
-                    />
-                    {/* FSST CRQ */}
-                    <CRQSection
-                        type="fsst"
-                        onCRQChange={(updatedCRQs) => handleCRQChange("fsst", updatedCRQs)}
-                    />
+                    {/* CRQ fields */}
+                    {selectedSites.map((site) => (
+                        <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} />
+                    ))}
 
                     {/* Submit Button */}
                     <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
@@ -474,12 +440,15 @@ function ChangeRequest() {
         </div>
     );
 }
+
 function ScheduleChangeSection({
     type,
     startDateForRange,
     endDateForRange,
     duration,
+    addedDates,
     onScheduleChange,
+    onAddDate,
 }) {
     const typeLabels = {
         aat: "AAT",
@@ -488,17 +457,18 @@ function ScheduleChangeSection({
     };
     const label = typeLabels[type] || "Schedule";
     const [openDialog, setOpenDialog] = useState(null);
-    const [addedDates, setAddedDates] = useState([]);  // ➡️ Store added dates here
 
-    // ➡️ Handle adding dates
+    // Handle adding a date
     const handleAddDate = () => {
         if (startDateForRange && endDateForRange && duration) {
-            setAddedDates(prev => [
-                ...prev,
-                { start: startDateForRange, end: endDateForRange, duration }
-            ]);
+            const newDate = { start: startDateForRange, end: endDateForRange, duration };
+            if (addedDates.length < 5) {
+                onAddDate(newDate);  // Pass the added date to the parent
+            } else {
+                alert("You can only add up to 5 date ranges.");
+            }
         }
-        setOpenDialog(null)
+        setOpenDialog(null);
     };
 
     return (
@@ -511,7 +481,6 @@ function ScheduleChangeSection({
                     Choose {label} schedule change date:
                 </label>
 
-                {/* Buttons for Individual Date and Date Range */}
                 <div className="grid grid-cols-1 relative">
                     <Button type="button" onClick={() => setOpenDialog("range")}>
                         Choose date and duration
@@ -519,15 +488,15 @@ function ScheduleChangeSection({
                 </div>
             </div>
 
-            {/* ➡️ Use AddedDatesList component here */}
+            {/* Display the list of added dates */}
             <AddedDatesList
                 addedDates={addedDates}
                 label={label}
-                onRemove={(index) => setAddedDates((prev) => prev.filter((_, i) => i !== index))}
+                onRemove={(index) =>
+                    onAddDate((prev) => prev.filter((_, i) => i !== index))  // Update addedDates
+                }
             />
 
-
-            {/* Dialog for Date Range */}
             <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
                 <h4 className="text-md font-semibold mb-2">Select Date Range</h4>
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -564,12 +533,15 @@ function ScheduleChangeSection({
                         className="p-2 border border-gray-300 rounded w-full"
                     />
                 </div>
-                <div className='flex'>
-                    <Button type="button" onClick={handleAddDate} className='ml-auto'>Add</Button>
+                <div className="flex">
+                    <Button type="button" onClick={handleAddDate} className="ml-auto">
+                        Add
+                    </Button>
                 </div>
             </Dialog>
         </div>
     );
 }
+
 
 export default ChangeRequest;
