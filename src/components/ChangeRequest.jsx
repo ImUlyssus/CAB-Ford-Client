@@ -114,14 +114,6 @@ function ChangeRequest() {
         const fsst_schedule_change = scheduleChanges.fsst?.addedDates
             ?.map(date => `${date.start} ${date.end} ${date.duration}`)
             .join(' ') || '';
-        // console.log("AAT Contact: ", aat_it_contact)
-        // console.log("FTM Contact: ", ftm_it_contact)
-        // console.log("FTM Contact: ", fsst_it_contact)
-        // console.log("Business contact: ", businessContact)
-        // console.log("Global contact: ", globalContact)
-        // console.log("aat CRQs: ", aat_crq)
-        // console.log("ftm CRQs: ", ftm_crq)
-        // console.log("fsst CRQs: ", fsst_crq)
 
         // Create the request payload
         const requestData = {
@@ -133,6 +125,7 @@ function ChangeRequest() {
             change_sites: selectedSitesString,
             common_change: isCommonChange,
             description: change_description,
+            request_change_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
             test_plan,
             rollback_plan,
             aat_schedule_change,
@@ -148,29 +141,29 @@ function ChangeRequest() {
             fsst_crq
         };
 
-        // try {
-        //     const response = await axiosPrivate.post(`/change-requests`, requestData, {
-        //         headers: { "Content-Type": "application/json" },
-        //     });
+        try {
+            const response = await axiosPrivate.post(`/change-requests`, requestData, {
+                headers: { "Content-Type": "application/json" },
+            });
 
-        //     console.log("✅ Change Request submitted successfully", response.data);
+            console.log("✅ Change Request submitted successfully", response.data);
 
-        //     setSelectedSites([]);
-        //     document.getElementById("category").value = "";
-        //     document.getElementById("reason").value = "";
-        //     document.getElementById("impact").value = "";
-        //     document.getElementById("priority").value = "";
-        //     document.getElementById("changeName").value = "";
-        // } catch (error) {
-        //     if (error.response) {
-        //         alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
-        //     } else if (error.request) {
-        //         alert("❌ No response received. Please try again later.");
-        //     } else {
-        //         console.error("❌ Error submitting Change Request", error.message);
-        //         alert("❌ Something went wrong. Please try again later.");
-        //     }
-        // }
+            setSelectedSites([]);
+            document.getElementById("category").value = "";
+            document.getElementById("reason").value = "";
+            document.getElementById("impact").value = "";
+            document.getElementById("priority").value = "";
+            document.getElementById("changeName").value = "";
+        } catch (error) {
+            if (error.response) {
+                alert(`❌ Error: ${error.response.data || "An error occurred"}`);
+            } else if (error.request) {
+                alert("❌ No response received. Please try again later.");
+            } else {
+                console.error("❌ Error submitting Change Request", error.message);
+                alert("❌ Something went wrong. Please try again later.");
+            }
+        }
     };
 
 
