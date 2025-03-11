@@ -17,7 +17,8 @@ function ChangeRequest() {
     const [startDateForRange, setStartDateForRange] = useState('');
     const [endDateForRange, setEndDateForRange] = useState('');
     const [duration, setDuration] = useState('');
-
+    const [businessContact, setBusinessContact] = useState({});
+    const [globalContact, setGlobalContact] = useState({});
 
     const [crqs, setCrqs] = useState({
         aat: [],
@@ -78,10 +79,23 @@ function ChangeRequest() {
         const impact = document.getElementById("impact").value;
         const priority = document.getElementById("priority").value;
         const change_name = document.getElementById("changeName").value;
-        const selectedSitesString = selectedSites.join(' ');
+        const selectedSitesString = selectedSites.join(',');
         const isCommonChange = selectedSites.length > 1;
-        const change_description = document.getElementById("changeDescription").value;
-        const test_plan = document.getElementById("testPlan").value;
+        const change_description = document.getElementById("changeDescription").value || "";
+        const test_plan = document.getElementById("testPlan").value || "";
+        const rollback_plan = document.getElementById("rollbackPlan")?.value || "";
+        const aat_contact_name = document.getElementById("aatContactName")?.value || "";
+        const aat_contact_cdsid = document.getElementById("aatContactCdsid")?.value || "";
+        const ftm_contact_name = document.getElementById("ftmContactName")?.value || "";
+        const ftm_contact_cdsid = document.getElementById("ftmContactCdsid")?.value || "";
+        const fsst_contact_name = document.getElementById("fsstContactName")?.value || "";
+        const fsst_contact_cdsid = document.getElementById("fsstContactCdsid")?.value || "";
+        const aat_it_contact = aat_contact_name.trim() + "," + aat_contact_cdsid.trim();
+        const ftm_it_contact = ftm_contact_name.trim() + "," + ftm_contact_cdsid.trim();
+        const fsst_it_contact = fsst_contact_name.trim() + "," + fsst_contact_cdsid.trim();
+        const aat_crq = crqs['aat'].join(',') || '';
+        const ftm_crq = crqs['ftm'].join(',') || '';
+        const fsst_crq = crqs['fsst'].join(',') || '';
 
 
         if (!category || !reason || !impact || !priority || !change_name) {
@@ -100,6 +114,14 @@ function ChangeRequest() {
         const fsst_schedule_change = scheduleChanges.fsst?.addedDates
             ?.map(date => `${date.start} ${date.end} ${date.duration}`)
             .join(' ') || '';
+        // console.log("AAT Contact: ", aat_it_contact)
+        // console.log("FTM Contact: ", ftm_it_contact)
+        // console.log("FTM Contact: ", fsst_it_contact)
+        // console.log("Business contact: ", businessContact)
+        // console.log("Global contact: ", globalContact)
+        // console.log("aat CRQs: ", aat_crq)
+        // console.log("ftm CRQs: ", ftm_crq)
+        // console.log("fsst CRQs: ", fsst_crq)
 
         // Create the request payload
         const requestData = {
@@ -112,9 +134,18 @@ function ChangeRequest() {
             common_change: isCommonChange,
             description: change_description,
             test_plan,
+            rollback_plan,
             aat_schedule_change,
             ftm_schedule_change,
-            fsst_schedule_change,  // Add transformed schedule changes here
+            fsst_schedule_change,
+            aat_it_contact,
+            ftm_it_contact,
+            fsst_it_contact,
+            business_team_contact: businessContact,
+            global_team_contact: globalContact,
+            aat_crq,
+            ftm_crq,
+            fsst_crq
         };
 
         // try {
@@ -412,23 +443,28 @@ function ChangeRequest() {
                                     type="text"
                                     id={`${site}ContactName`}
                                     name={`${site}ContactName`}
-                                    placeholder="Enter name"
+                                    placeholder="Enter name (50 char max)"
                                     className="p-2 border border-gray-300 rounded w-full"
+                                    maxLength={50}
+                                    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
                                 />
+
                                 <input
                                     type="text"
                                     id={`${site}ContactCdsid`}
                                     name={`${site}ContactCdsid`}
-                                    placeholder="Enter CDSID"
+                                    placeholder="Enter CDSID (50 char max)"
                                     className="p-2 border border-gray-300 rounded w-full"
+                                    maxLength={50}
+                                    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
                                 />
                             </div>
                         </div>
                     ))}
                     {/* Global Team Contact */}
-                    <GlobalTeamContact />
+                    <GlobalTeamContact onContactChange={setGlobalContact} />
                     {/* Business Team Contact */}
-                    <BusinessTeamContact />
+                    <BusinessTeamContact onContactChange={setBusinessContact} />
                     {/* CRQ fields */}
                     {selectedSites.map((site) => (
                         <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} />

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTheme } from "styled-components";
 
-const BusinessTeamContact = () => {
+const BusinessTeamContact = ({onContactChange}) => {
     const theme = useTheme();
     const [showPersonDialog, setShowPersonDialog] = useState(false);
 
@@ -16,10 +16,11 @@ const BusinessTeamContact = () => {
     // Handle saving person contact
     const savePersonContact = () => {
         if (position.trim() !== "" || personName.trim() !== "" || personCdsid.trim() !== "") {
-            const contact = `Position: ${position.trim()}, Name: ${personName.trim()}, CDSID: ${personCdsid.trim()}`;
+            const contact = position.trim() +","+ personName.trim() +","+ personCdsid.trim();
             setBusinessTeamContact(contact);
+            onContactChange(contact);
         } else {
-            alert("Please fill in all fields before saving.");
+            alert("Please fill in at least one field before saving.");
         }
     };
 
@@ -29,6 +30,7 @@ const BusinessTeamContact = () => {
         setPosition("");
         setPersonName("");
         setPersonCdsid("");
+        onContactChange("");
     };
 
     return (
@@ -43,7 +45,7 @@ const BusinessTeamContact = () => {
                     onClick={() => setShowPersonDialog(true)}
                     className={`p-2 cursor-pointer border border-gray-300 rounded w-full hover:bg-white hover:text-black`}
                 >
-                    Person Contact
+                    Add Contact
                 </button>
             ) : (
                 <div className="grid grid-cols-1 gap-4" style={{ color: theme.colors.primary500 }}>
@@ -87,27 +89,33 @@ const BusinessTeamContact = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-opacity-90">
                     <div className={`p-6 rounded shadow-lg relative w-11/12 md:w-1/2`}
                         style={{ backgroundColor: theme.colors.primary400 }}>
-                        <h2 className="text-xl mb-4">Enter Person Contact</h2>
+                        <h2 className="text-xl mb-4">Enter Contact</h2>
                         <input
                             type="text"
-                            placeholder="Position"
+                            placeholder="Position (50 characters max)"
                             value={position}
                             onChange={(e) => setPosition(e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full mb-2"
+                            maxLength={50}
+                            onKeyDown={(e) => e.key === ',' && e.preventDefault()}
                         />
                         <input
                             type="text"
-                            placeholder="Name"
+                            placeholder="Name (50 characters max)"
                             value={personName}
                             onChange={(e) => setPersonName(e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full mb-2"
+                            maxLength={50}
+                            onKeyDown={(e) => e.key === ',' && e.preventDefault()}
                         />
                         <input
                             type="text"
-                            placeholder="CDSID"
+                            placeholder="CDSID (50 characters max)"
                             value={personCdsid}
                             onChange={(e) => setPersonCdsid(e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full mb-2"
+                            maxLength={50}
+                            onKeyDown={(e) => e.key === ',' && e.preventDefault()}
                         />
                         <div className="flex justify-end gap-2">
                             <button

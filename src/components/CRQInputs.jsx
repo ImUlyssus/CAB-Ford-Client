@@ -17,11 +17,15 @@ function CRQSection({ type, onCRQChange }) {
 
     // Handle adding CRQ
     const handleAddCRQ = () => {
-        if (crqInput.trim() !== "") {
-            const updatedCRQs = [...addedCRQs, crqInput.trim()];
-            setAddedCRQs(updatedCRQs);
-            setCrqInput("");  // Clear input after adding
-            onCRQChange(updatedCRQs); // Send updated CRQs to parent
+        if(addedCRQs.length == 5){
+            alert("You can only add up to 5 CRQs.")
+        }else{
+            if (crqInput.trim() !== "") {
+                const updatedCRQs = [...addedCRQs, crqInput.trim()];
+                setAddedCRQs(updatedCRQs);
+                setCrqInput("");  // Clear input after adding
+                onCRQChange(updatedCRQs); // Send updated CRQs to parent
+            }
         }
         setOpenDialog(false);
     };
@@ -65,10 +69,12 @@ function CRQSection({ type, onCRQChange }) {
                     <h2 className="text-xl mb-4">Enter {label} CRQ</h2>
                     <input
                         type="text"
-                        placeholder="Enter CRQ"
+                        placeholder="Enter CRQ (15 char max)"
                         value={crqInput}
                         onChange={(e) => setCrqInput(e.target.value)}
                         className="p-2 border border-gray-300 rounded w-full mb-4"
+                        maxLength={15}
+                        onKeyDown={(e) => e.key === ',' && e.preventDefault()}
                     />
                     <div className="flex justify-end gap-2">
                         <button
