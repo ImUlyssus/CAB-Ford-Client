@@ -50,7 +50,7 @@ export default function ChangeRequestData() {
   };
 
   return (
-    <div className="h-150 flex flex-col">
+    <div className="h-170 flex flex-col">
       <h1 className="text-2xl font-bold text-center my-4">Change Request Data</h1>
 
       <div className="flex items-center p-2" style={{ border: '1px solid', borderColor: theme.colors.secondary400, borderTopLeftRadius: '5px', borderTopRightRadius: '5px' }}>
@@ -106,7 +106,7 @@ export default function ChangeRequestData() {
                   <th className={thStyle2}>FTM CRQ</th>
                   <th className={thStyle2}>AAT CRQ</th>
                   <th className={thStyle2}>FSST CRQ</th>
-                  <th className={thStyle2}>Common CRQ</th>
+                  {/* <th className={thStyle2}>Common CRQ</th> */}
                   <th className="py-2 px-4 border-b border-r">Approval</th>
                   <th className={thStyle3}>Change Status</th>
                   <th className={thStyle3}>Cancel Change Reason</th>
@@ -115,6 +115,24 @@ export default function ChangeRequestData() {
               <tbody>
                 {changeRequests.map((request, index) => {
                   const changeSites = Array.isArray(request.change_sites) ? request.change_sites : [];
+                  const processSchedule = (scheduleString) => {
+                    if (!scheduleString) return []; // Handle empty cases
+                    const parts = scheduleString.split(" "); // Split by space
+                    const scheduleArray = [];
+
+                    for (let i = 0; i < parts.length; i += 3) {
+                      if (i + 1 < parts.length) { // Ensure there's a valid start and end time
+                        let start = parts[i].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
+                        let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
+                        scheduleArray.push(`${start} TO ${end}`);
+                      }
+                    }
+                    return scheduleArray;
+                  };
+                  const ftmSchedule = processSchedule(request.ftm_schedule_change);
+                  const aatSchedule = processSchedule(request.aat_schedule_change);
+                  const fsstSchedule = processSchedule(request.fsst_schedule_change);
+
                   return (
                     <tr key={request.id} className="hover:bg-gray-100 hover:text-black">
                       <td className="py-2 px-4 border-b border-r text-center">{index + 1}</td>
@@ -125,24 +143,80 @@ export default function ChangeRequestData() {
                       <td className="py-2 px-4 border-b border-r">{request.change_name}</td>
                       <td className="py-2 px-4 border-b border-r text-center">{changeSites.join(", ").toUpperCase()}</td>
                       <td className="py-2 px-4 border-b border-r">{new Date(request.request_change_date).toLocaleDateString()}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.ftm_schedule_change}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.aat_schedule_change}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.fsst_schedule_change}</td>
+                      <td className="py-2 px-4 border-b border-r text-center">
+                        {ftmSchedule.map((item, i) => (
+                          <div key={i} className="mb-1">
+                            <p className="p-1 border border-white rounded-md text-xs">{item}</p>
+                          </div>
+                        ))}
+                      </td>
+                      <td className="py-2 px-4 border-b border-r text-center">
+                        {aatSchedule.map((item, i) => (
+                          <div key={i} className="mb-1">
+                            <p className="p-1 border border-white rounded-md text-xs">{item}</p>
+                          </div>
+                        ))}
+                      </td>
+                      <td className="py-2 px-4 border text-center">
+                        {fsstSchedule.map((item, i) => (
+                          <div key={i} className="mb-1">
+                            <p className="p-1 border border-white rounded-md text-xs">{item}</p>
+                          </div>
+                        ))}
+                      </td>
                       <td className="py-2 px-4 border-b border-r">{request.time_of_change == 0 ? "" : request.time_of_change}</td>
                       <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
                       <td className="py-2 px-4 border-b border-r">{request.description}</td>
                       <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>
                       <td className="py-2 px-4 border-b border-r">{request.rollback_plan}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.ftm_it_contact == "null" ? "" : request.ftm_it_contact}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.aat_it_contact == "null" ? "" : request.aat_it_contact}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.fsst_it_contact == "null" ? "" : request.fsst_it_contact}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.global_team_contact == "[]" ? "" : request.global_team_contact}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.business_team_contact == "[]" ? "" : request.business_team_contact}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.ftm_crq}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.aat_crq}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.fsst_crq}</td>
-                      <td className="py-2 px-4 border-b border-r">{request.common_crq}</td>
-                      <td className="py-2 px-4 border-b border-r text-center">{request.approval ? "Yes" : "-"}</td>
+                      <td className="py-2 px-4 border-b border-r">
+                        {request.ftm_it_contact == "null" ? "" :
+                        request.ftm_it_contact.split(',').map((item, i)=>(
+                          <div key={i} className="mb-1">{item.trim()}</div>
+                        ))}</td>
+                      <td className="py-2 px-4 border-b border-r">
+                        {request.aat_it_contact == "null" ? "" :
+                        request.aat_it_contact.split(",").map((item, i)=>(
+                          <div key={i} className='mb-1'>{item.trim()}</div>
+                        ))}</td>
+                      <td className="py-2 px-4 border-b border-r text-center">
+                        {request.fsst_it_contact == "null" ? "" :
+                          request.fsst_it_contact.split(",").map((item, i) => (
+                            <div key={i} className="mb-1">{item.trim()}</div>
+                          ))}
+                      </td>
+                      <td className="py-2 px-4 border-b border-r">
+                        {request.global_team_contact == null ? "" :
+                        request.global_team_contact.split(',').map((item, i)=>(
+                          <div key={i} className="mb-1">{item.trim()}</div>
+                        ))}</td>
+                      <td className="py-2 px-4 border-b border-r">
+                        {request.business_team_contact == null ? "" : 
+                        request.business_team_contact.split(',').map((item, i)=>(
+                          <div key={i} className="mb-1">{item.trim()}</div>
+                        ))}</td>
+                      <td className="py-2 px-4 border-b border-r text-center">
+  {request.ftm_crq &&
+    request.ftm_crq.split(",").map((item, i) => (
+      <div key={i} className="mb-1">{item.trim()}</div>
+    ))}
+</td>
+
+<td className="py-2 px-4 border-b border-r text-center">
+  {request.aat_crq &&
+    request.aat_crq.split(",").map((item, i) => (
+      <div key={i} className="mb-1">{item.trim()}</div>
+    ))}
+</td>
+
+<td className="py-2 px-4 border-b border-r text-center">
+  {request.fsst_crq &&
+    request.fsst_crq.split(",").map((item, i) => (
+      <div key={i} className="mb-1">{item.trim()}</div>
+    ))}
+</td>
+                      {/* <td className="py-2 px-4 border-b border-r">{request.common_crq}</td> */}
+                      <td className="py-2 px-4 border-b border-r text-center">{request.approval}</td>
                       <td className="py-2 px-4 border-b border-r">{request.change_status}</td>
                       <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
                     </tr>

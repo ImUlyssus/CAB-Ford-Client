@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"; // Import the missing hooks
 import { useTheme } from "styled-components";
 
 const GlobalTeamContact = ({onContactChange}) => {
@@ -32,7 +32,6 @@ const GlobalTeamContact = ({onContactChange}) => {
         setPersonCdsid("");
         onContactChange("");
     };
-
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
             <label htmlFor="fsstSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>

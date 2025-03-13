@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useTheme } from "styled-components";
 import Dialog from "../components/Dialog";
 import Button from "../components/Button";
@@ -8,17 +8,22 @@ import { HelpCircle } from "lucide-react";
 import BusinessTeamContact from "./BusinessTeamContact";
 import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
+import { useNavigate } from "react-router-dom";
 function ChangeRequest() {
     const theme = useTheme();
     const [selectedSites, setSelectedSites] = useState([]);
-    const [changeNameContent, setChangeNameContent] = useState('');
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
-    const [startDateForRange, setStartDateForRange] = useState('');
-    const [endDateForRange, setEndDateForRange] = useState('');
-    const [duration, setDuration] = useState('');
     const [businessContact, setBusinessContact] = useState({});
     const [globalContact, setGlobalContact] = useState({});
+    const globalTeamContactRef = useRef(null);
+    const navigate = useNavigate();
+
+    const handleRemoveContact = () => {
+        if (globalTeamContactRef.current) {
+            globalTeamContactRef.current.removeContact();
+        }
+    };
 
     const [crqs, setCrqs] = useState({
         aat: [],
@@ -30,16 +35,6 @@ function ChangeRequest() {
         ftm: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
         fsst: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
     });
-
-    const handleScheduleChange = (type, field, value) => {
-        setScheduleChanges((prev) => ({
-            ...prev,
-            [type]: {
-                ...prev[type],
-                [field]: value,  // Update the single value fields like startDate, endDate, duration
-            },
-        }));
-    };
     const handleCRQChange = (type, updatedCRQs) => {
         setCrqs((prev) => ({
             ...prev,
@@ -98,8 +93,8 @@ function ChangeRequest() {
         const fsst_crq = crqs['fsst'].join(',') || '';
 
 
-        if (!category || !reason || !impact || !priority || !change_name) {
-            alert("❌ Please fill out all fields.");
+        if (!category || !reason || !impact || !priority || !change_name || selectedSitesString.length < 1) {
+            alert("❌ A change request must include those fields: category, reason, impact, priority, change name and change site to submit.");
             return;
         }
         // Transform scheduleChanges into space-separated strings for each site
@@ -114,7 +109,36 @@ function ChangeRequest() {
         const fsst_schedule_change = scheduleChanges.fsst?.addedDates
             ?.map(date => `${date.start} ${date.end} ${date.duration}`)
             .join(' ') || '';
+        // Convert request_change_date to a Date object
+        const requestChangeDate = new Date();
+        const twoWeeksLater = new Date(requestChangeDate);
+        twoWeeksLater.setDate(requestChangeDate.getDate() + 14); // Add 14 days
 
+        /**
+         * Extracts 'end' dates from the schedule change string.
+         * @param {string} scheduleStr - The space-separated schedule string.
+         * @returns {Date[]} - Array of end dates as Date objects.
+         */
+        const extractEndDates = (scheduleStr) => {
+            if (!scheduleStr) return [];
+
+            return scheduleStr
+                .split(' ') // Split by space
+                .filter((_, index) => index % 3 === 1) // Extract every second value (end date)
+                .map(dateStr => new Date(dateStr)) // Convert to Date objects
+                .filter(date => !isNaN(date)); // Remove invalid dates
+        };
+
+        // Extract end dates
+        const aatEndDates = extractEndDates(aat_schedule_change);
+        const ftmEndDates = extractEndDates(ftm_schedule_change);
+        const fsstEndDates = extractEndDates(fsst_schedule_change);
+
+        const hasEarlyEndDate = [...aatEndDates, ...ftmEndDates, ...fsstEndDates]
+            .some(endDate => endDate < twoWeeksLater);
+
+        const achieve_2_week_change_request = !hasEarlyEndDate;
+        console.log(achieve_2_week_change_request);
         // Create the request payload
         const requestData = {
             category,
@@ -128,6 +152,7 @@ function ChangeRequest() {
             request_change_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
             test_plan,
             rollback_plan,
+            achieve_2_week_change_request,
             aat_schedule_change,
             ftm_schedule_change,
             fsst_schedule_change,
@@ -146,17 +171,12 @@ function ChangeRequest() {
                 headers: { "Content-Type": "application/json" },
             });
 
-            console.log("✅ Change Request submitted successfully", response.data);
-
-            setSelectedSites([]);
-            document.getElementById("category").value = "";
-            document.getElementById("reason").value = "";
-            document.getElementById("impact").value = "";
-            document.getElementById("priority").value = "";
-            document.getElementById("changeName").value = "";
+            alert("✅ Change Request submitted successfully");
+            // there will be an error in the console every time you make a change request bc of this refresh, related to access and refresh token. Don't worry about it.
+            navigate(0);
         } catch (error) {
             if (error.response) {
-                alert(`❌ Error: ${error.response.data || "An error occurred"}`);
+                alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
             } else if (error.request) {
                 alert("❌ No response received. Please try again later.");
             } else {
@@ -404,7 +424,7 @@ function ChangeRequest() {
                                 id="rollbackPlan"
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value"
+                                placeholder="Enter value (1500 characters max)"
                                 rows={4}
                             />
 
@@ -455,9 +475,10 @@ function ChangeRequest() {
                         </div>
                     ))}
                     {/* Global Team Contact */}
-                    <GlobalTeamContact onContactChange={setGlobalContact} />
+                    <GlobalTeamContact onContactChange={setGlobalContact} ref={globalTeamContactRef} />
                     {/* Business Team Contact */}
                     <BusinessTeamContact onContactChange={setBusinessContact} />
+
                     {/* CRQ fields */}
                     {selectedSites.map((site) => (
                         <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} />

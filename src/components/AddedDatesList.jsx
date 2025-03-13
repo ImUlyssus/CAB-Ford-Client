@@ -34,6 +34,7 @@ function AddedDatesList({ addedDates, label, onRemove }) {
 
                             {/* Cross Icon for Removing Date */}
                             <button
+                                type="button"
                                 onClick={() => onRemove(index)}
                                 className="bg-red-500 hover:bg-red-600 text-white p-1 rounded ml-2"
                                 title="Remove date"
