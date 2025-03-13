@@ -475,9 +475,9 @@ function ChangeRequest() {
                         </div>
                     ))}
                     {/* Global Team Contact */}
-                    <GlobalTeamContact onContactChange={setGlobalContact} ref={globalTeamContactRef} />
+                    <GlobalTeamContact onContactChange={setGlobalContact} globalContact={globalContact} update={0}/>
                     {/* Business Team Contact */}
-                    <BusinessTeamContact onContactChange={setBusinessContact} />
+                    <BusinessTeamContact onContactChange={setBusinessContact} businessContact={businessContact} update={0}/>
 
                     {/* CRQ fields */}
                     {selectedSites.map((site) => (

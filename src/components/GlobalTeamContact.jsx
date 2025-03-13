@@ -1,18 +1,17 @@
-import { useState } from "react"; // Import the missing hooks
+import { useState, useEffect } from "react"; // Import the missing hooks
 import { useTheme } from "styled-components";
 
-const GlobalTeamContact = ({onContactChange}) => {
+const GlobalTeamContact = ({onContactChange, globalContact, isUpdate}) => {
     const theme = useTheme();
     const [showPersonDialog, setShowPersonDialog] = useState(false);
 
-    // State to store input values for person contact
+    // Initialize state based on globalContact
     const [position, setPosition] = useState("");
     const [personName, setPersonName] = useState("");
     const [personCdsid, setPersonCdsid] = useState("");
 
-    // State to store the contact as a single string
+    // State for storing the contact as a string
     const [globalTeamContact, setGlobalTeamContact] = useState("");
-
     // Handle saving person contact
     const savePersonContact = () => {
         if (position.trim() !== "" || personName.trim() !== "" || personCdsid.trim() !== "") {
@@ -23,6 +22,14 @@ const GlobalTeamContact = ({onContactChange}) => {
             alert("Please fill in all fields before saving.");
         }
     };
+    // Update state when globalContact changes
+    useEffect(() => {
+        if (Array.isArray(globalContact) && globalContact.length > 0 && isUpdate) {
+            setPosition(globalContact[0] ?? "");  // If exists, use it; otherwise, set to empty string
+            setPersonName(globalContact[1] ?? "");
+            setPersonCdsid(globalContact[2] ?? "");
+        }
+    }, [globalContact]);
 
     // Handle remove contact
     const removeContact = () => {
@@ -38,7 +45,7 @@ const GlobalTeamContact = ({onContactChange}) => {
                 Global Team Contact:
             </label>
 
-            {!globalTeamContact ? (
+            {!globalTeamContact && !(position || personName || personCdsid) ? (
                 <button
                     type="button"
                     onClick={() => setShowPersonDialog(true)}

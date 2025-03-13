@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "styled-components";
 
-const BusinessTeamContact = ({onContactChange}) => {
+const BusinessTeamContact = ({onContactChange, businessContact, isUpdate}) => {
     const theme = useTheme();
     const [showPersonDialog, setShowPersonDialog] = useState(false);
 
@@ -12,6 +12,14 @@ const BusinessTeamContact = ({onContactChange}) => {
 
     // State to store the contact as a single string
     const [businessTeamContact, setBusinessTeamContact] = useState("");
+
+    useEffect(() => {
+        if (Array.isArray(businessContact) && businessContact.length > 0 && isUpdate) {
+            setPosition(businessContact[0] ?? "");  // If exists, use it; otherwise, set to empty string
+            setPersonName(businessContact[1] ?? "");
+            setPersonCdsid(businessContact[2] ?? "");
+        }
+    }, [businessContact]);
 
     // Handle saving person contact
     const savePersonContact = () => {
@@ -39,7 +47,8 @@ const BusinessTeamContact = ({onContactChange}) => {
                 Business Team Contact:
             </label>
 
-            {!businessTeamContact ? (
+            { !businessTeamContact && !(position || personName || personCdsid) ? (
+                
                 <button
                     type="button"
                     onClick={() => setShowPersonDialog(true)}
@@ -49,39 +58,39 @@ const BusinessTeamContact = ({onContactChange}) => {
                 </button>
             ) : (
                 <div className="grid grid-cols-1 gap-4" style={{ color: theme.colors.primary500 }}>
-                    <div className="grid grid-cols-4 gap-2 items-center">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={position}
-                                readOnly
-                                className="p-2 border border-gray-300 rounded w-full bg-gray-100"
-                            />
-                        </div>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={personName}
-                                readOnly
-                                className="p-2 border border-gray-300 rounded w-full bg-gray-100"
-                            />
-                        </div>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={personCdsid}
-                                readOnly
-                                className="p-2 border border-gray-300 rounded w-full bg-gray-100"
-                            />
-                        </div>
-                        <button
-                            onClick={removeContact}
-                            className="p-2 border border-red-500 text-red-500 rounded hover:bg-red-600 hover:text-white"
-                        >
-                            Remove
-                        </button>
+                <div className="grid grid-cols-4 gap-2 items-center">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={position}
+                            readOnly
+                            className="p-2 border border-gray-300 rounded w-full bg-gray-100"
+                        />
                     </div>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={personName}
+                            readOnly
+                            className="p-2 border border-gray-300 rounded w-full bg-gray-100"
+                        />
+                    </div>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={personCdsid}
+                            readOnly
+                            className="p-2 border border-gray-300 rounded w-full bg-gray-100"
+                        />
+                    </div>
+                    <button
+                        onClick={removeContact}
+                        className="p-2 border border-red-500 text-red-500 rounded hover:bg-red-600 hover:text-white"
+                    >
+                        Remove
+                    </button>
                 </div>
+            </div>
             )}
 
             {/* Dialog for Person Contact */}

@@ -2,6 +2,7 @@ import React from "react";
 import { X } from "lucide-react";  // Import cross icon
 
 function AddedDatesList({ addedDates, label, onRemove }) {
+    
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
             <label
