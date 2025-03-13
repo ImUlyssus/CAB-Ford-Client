@@ -153,17 +153,17 @@ function ChangeRequest() {
             test_plan,
             rollback_plan,
             achieve_2_week_change_request,
-            aat_schedule_change,
-            ftm_schedule_change,
-            fsst_schedule_change,
-            aat_it_contact,
-            ftm_it_contact,
-            fsst_it_contact,
+            aat_schedule_change: selectedSitesString.includes('aat') ? aat_schedule_change : "",
+            ftm_schedule_change: selectedSitesString.includes('ftm') ? ftm_schedule_change : "",
+            fsst_schedule_change: selectedSitesString.includes('fsst') ? fsst_schedule_change : "",
+            aat_it_contact: selectedSitesString.includes('aat') ? aat_it_contact : "",
+            ftm_it_contact: selectedSitesString.includes('ftm') ? ftm_it_contact : "",
+            fsst_it_contact: selectedSitesString.includes('fsst') ? fsst_it_contact : "",
             business_team_contact: businessContact,
             global_team_contact: globalContact,
-            aat_crq,
-            ftm_crq,
-            fsst_crq
+            aat_crq: selectedSitesString.includes('aat') ? aat_crq : "",
+            ftm_crq: selectedSitesString.includes('ftm') ? ftm_crq : "",
+            fsst_crq: selectedSitesString.includes('fsst') ? fsst_crq : "",
         };
 
         try {
