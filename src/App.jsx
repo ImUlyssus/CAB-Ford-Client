@@ -9,7 +9,8 @@ import ExcelFiles from "./pages/ExcelFiles";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import VerificationPage from "./pages/VerificationPage";
-import ChangeRequestData from "./pages/ChangeRequestData";
+import ChangeRequestData from "./pages/ChangeRequestDataPage";
+import ChangeRequestUpdate from "./components/ChangeRequestUpdate";
 
 // import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="/change-request-data" element={<ChangeRequestData />} />
           <Route path="/change-request" element={<ChangeRequest />} />
+          <Route path="/change-request-update" element={<ChangeRequestUpdate />} />
           <Route path="/excel-files" element={<ExcelFiles />} />
           <Route path="/pdf-report" element={<PDFReport />} />
           <Route path="/presentation" element={<Presentation />} />

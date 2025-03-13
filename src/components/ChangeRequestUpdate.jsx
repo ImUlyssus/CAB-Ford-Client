@@ -10,6 +10,7 @@ import { HelpCircle } from "lucide-react";
 import BusinessTeamContact from "./BusinessTeamContact";
 import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
+import { useLocation } from "react-router-dom";
 function ChangeRequestUpdate() {
     const theme = useTheme();
     const [isCommonChange, setIsCommonChange] = useState(false);
@@ -18,7 +19,9 @@ function ChangeRequestUpdate() {
     const [changeNameContent, setChangeNameContent] = useState('');
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
-    const [approval, setApproval] = useState(""); 
+    const [approval, setApproval] = useState("");
+    const location = useLocation();
+    const request = location.state?.request;
     const [crqs, setCrqs] = useState({
         aat: [],
         ftm: [],
@@ -176,7 +179,7 @@ function ChangeRequestUpdate() {
         <div>
             <div className="px-8 py-4 border-1 rounded-lg" style={{ borderColor: theme.colors.secondary500 }}>
                 <div className="flex justify-center">
-                    <h1 className="text-2xl font-bold text-center mb-3">Add Change Request</h1>
+                    <h1 className="text-2xl font-bold text-center mb-3">Update Change Request</h1>
                 </div>
                 <form onSubmit={handleSubmit}>
                     {/* Category Field */}
@@ -249,6 +252,7 @@ function ChangeRequestUpdate() {
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
                                 placeholder="Enter value"
+                                value={request.change_name}
                                 rows={4}
                             />
 
