@@ -105,6 +105,7 @@ export default function ChangeRequestData() {
                                     <th className={thStyle1}>Priority</th>
                                     <th className={thStyle3}>Change Name</th>
                                     <th className={thStyle2}>Change Sites</th>
+                                    <th className={thStyle2}>Common Change</th>
                                     <th className={thStyle1}>Request Change</th>
                                     <th className={thStyle1}>FTM Schedule Change</th>
                                     <th className={thStyle1}>AAT Schedule Change</th>
@@ -130,21 +131,27 @@ export default function ChangeRequestData() {
                             </thead>
                             <tbody>
                                 {changeRequests.map((request, index) => {
-                                    const changeSites = Array.isArray(request.change_sites) ? request.change_sites : [];
                                     const processSchedule = (scheduleString) => {
-                                        if (!scheduleString) return []; // Handle empty cases
+                                        if (!scheduleString) return { scheduleArray: [], totalDuration: 0 }; // Return empty array if no schedule
                                         const parts = scheduleString.split(" "); // Split by space
                                         const scheduleArray = [];
-
+                                        let duration = 0;
+                                    
                                         for (let i = 0; i < parts.length; i += 3) {
-                                            if (i + 1 < parts.length) { // Ensure there's a valid start and end time
+                                            if (i + 2 < parts.length) { // Ensure there's a valid start, end, and duration
                                                 let start = parts[i].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
                                                 let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
+                                                let currentDuration = parseInt(parts[i + 2], 10) || 0; // Convert to integer safely
+                                    
                                                 scheduleArray.push(`${start} TO ${end}`);
+                                                duration += currentDuration; // Accumulate total duration
                                             }
                                         }
-                                        return scheduleArray;
+                                    
+                                        return { scheduleArray, totalDuration: duration }; // Always return an object
                                     };
+                                    
+
                                     const ftmSchedule = processSchedule(request.ftm_schedule_change);
                                     const aatSchedule = processSchedule(request.aat_schedule_change);
                                     const fsstSchedule = processSchedule(request.fsst_schedule_change);
@@ -152,7 +159,7 @@ export default function ChangeRequestData() {
                                     return (
                                         <>
                                             <tr
-                                                onClick={() => {handleOpenDialog(request); setCurrentRow(index+1)}}
+                                                onClick={() => { handleOpenDialog(request); setCurrentRow(index + 1) }}
                                                 key={request.id}
                                                 className="hover:bg-gray-100 hover:text-black">
                                                 <td className="py-2 px-4 border-b border-r text-center">{index + 1}</td>
@@ -161,30 +168,37 @@ export default function ChangeRequestData() {
                                                 <td className="py-2 px-4 border-b border-r">{request.impact}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.priority}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.change_name}</td>
-                                                <td className="py-2 px-4 border-b border-r text-center">{changeSites.join(", ").toUpperCase()}</td>
+                                                <td className="py-2 px-4 border-b border-r text-center">
+                                                    {String(request.change_sites || "")
+                                                        .split(",")
+                                                        .join(", ")
+                                                        .toUpperCase()}
+                                                </td>
+                                                <td className="py-2 px-4 border-b border-r text-center">{request.common_change ? "YES" : "NO"}</td>
                                                 <td className="py-2 px-4 border-b border-r">{new Date(request.request_change_date).toLocaleDateString()}</td>
                                                 <td className="py-2 px-4 border-b border-r text-center">
-                                                    {ftmSchedule.map((item, i) => (
+                                                    {ftmSchedule.scheduleArray.map((item, i) => (
                                                         <div key={i} className="mb-1">
                                                             <p className="p-1 border border-white rounded-md text-xs">{item}</p>
                                                         </div>
                                                     ))}
+
                                                 </td>
                                                 <td className="py-2 px-4 border-b border-r text-center">
-                                                    {aatSchedule.map((item, i) => (
+                                                    {aatSchedule.scheduleArray.map((item, i) => (
                                                         <div key={i} className="mb-1">
                                                             <p className="p-1 border border-white rounded-md text-xs">{item}</p>
                                                         </div>
                                                     ))}
                                                 </td>
                                                 <td className="py-2 px-4 border text-center">
-                                                    {fsstSchedule.map((item, i) => (
+                                                    {fsstSchedule.scheduleArray.map((item, i) => (
                                                         <div key={i} className="mb-1">
                                                             <p className="p-1 border border-white rounded-md text-xs">{item}</p>
                                                         </div>
                                                     ))}
                                                 </td>
-                                                <td className="py-2 px-4 border-b border-r">{request.time_of_change == 0 ? "" : request.time_of_change}</td>
+                                                <td className="py-2 px-4 border-b border-r">{aatSchedule.totalDuration + ftmSchedule.totalDuration + fsstSchedule.totalDuration}</td>
                                                 <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.description}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>
@@ -246,23 +260,23 @@ export default function ChangeRequestData() {
                             </tbody>
                         </table>
                         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-                                <h2 className="text-lg font-semibold mb-4">Update or Delete row {currentRow}</h2>
-                                <div className="flex justify-end gap-4">
-                                    <button
-                                        className="px-4 py-2 cursor-pointer rounded hover:bg-blue-700"
-                                        style={{ color: theme.colors.primary500, backgroundColor: theme.colors.primaryButton }}
-                                        onClick={handleUpdate}
-                                    >
-                                        Update
-                                    </button>
-                                    <button
-                                        className="px-4 py-2 bg-red-500 cursor-pointer rounded hover:bg-red-700"
-                                        onClick={() => setDialogOpen(false)}
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </Dialog>
+                            <h2 className="text-lg font-semibold mb-4">Update or Delete row {currentRow}</h2>
+                            <div className="flex justify-end gap-4">
+                                <button
+                                    className="px-4 py-2 cursor-pointer rounded hover:bg-blue-700"
+                                    style={{ color: theme.colors.primary500, backgroundColor: theme.colors.primaryButton }}
+                                    onClick={handleUpdate}
+                                >
+                                    Update
+                                </button>
+                                <button
+                                    className="px-4 py-2 bg-red-500 cursor-pointer rounded hover:bg-red-700"
+                                    onClick={() => setDialogOpen(false)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </Dialog>
                     </div>
                 </div>
             )}

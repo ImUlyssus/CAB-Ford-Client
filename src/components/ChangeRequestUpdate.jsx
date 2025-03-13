@@ -13,11 +13,14 @@ function ChangeRequestUpdate() {
     const location = useLocation();
     const request = location.state?.request;
     const theme = useTheme();
+    const [changeStatus, setChangeStatus] = useState(request.change_status ?? "");
+    // const [cancelChangeCategory, setCancelChangeCategory] = useState(request.cancel_change_category??"");
     const [selectedSites, setSelectedSites] = useState(request.change_sites.split(','));
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
-    const [businessContact, setBusinessContact] = useState(request.business_team_contact!==null ? request.business_team_contact.split(','):{});
-    const [globalContact, setGlobalContact] = useState(request.global_team_contact!==null ? request.global_team_contact.split(','):{});
+    const [approval, setApproval] = useState(request.approval);
+    const [businessContact, setBusinessContact] = useState(request.business_team_contact !== null ? request.business_team_contact.split(',') : {});
+    const [globalContact, setGlobalContact] = useState(request.global_team_contact !== null ? request.global_team_contact.split(',') : {});
     const globalTeamContactRef = useRef(null);
     const navigate = useNavigate();
     console.log("From update", request);
@@ -37,6 +40,9 @@ function ChangeRequestUpdate() {
         ftm: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
         fsst: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
     });
+    const handleApprovalChange = (status) => {
+        setApproval(status)
+    }
     // Structuring schedule change START
     // Function to parse the schedule change string into the desired format
     const parseSchedule = (scheduleString) => {
@@ -78,7 +84,7 @@ function ChangeRequestUpdate() {
             },
         }));
     };
-    // the following two useEffect are required for rendering each site date properly
+    // keep the following 4 useEffect in order or it will mess up change site, schedule date, crq. Idk why
     // Automatically check and set the selectedSites based on the request
     useEffect(() => {
         if (request) {
@@ -91,6 +97,18 @@ function ChangeRequestUpdate() {
             (site) => scheduleChanges[site]?.addedDates.length > 0
         );
         setSelectedSites(sitesWithScheduleChanges);
+    }, [scheduleChanges])
+    // Update crqs state when request data is available
+    useEffect(() => {
+        // Set crqs by splitting the comma-separated string into arrays
+        setCrqs({
+            aat: request.aat_crq ? request.aat_crq.split(",") : [],
+            ftm: request.ftm_crq ? request.ftm_crq.split(",") : [],
+            fsst: request.fsst_crq ? request.fsst_crq.split(",") : [],
+        });
+    }, [request]);
+    useEffect(() => {
+        setSelectedSites(request.change_sites.split(','));
     }, [scheduleChanges])
     // Structuring schedule change END
     const handleCRQChange = (type, updatedCRQs) => {
@@ -518,16 +536,16 @@ function ChangeRequestUpdate() {
                                 {site.toUpperCase()} site IT contact:
                             </label>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input
-    type="text"
-    id={`${site}ContactName`}
-    name={`${site}ContactName`}
-    placeholder="Enter name (50 char max)"
-    className="p-2 border border-gray-300 rounded w-full"
-    maxLength={50}
-    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
-    value={request?.[`${site}_it_contact`]?.split(',')[0] || ""} 
-/>
+                                <input
+                                    type="text"
+                                    id={`${site}ContactName`}
+                                    name={`${site}ContactName`}
+                                    placeholder="Enter name (50 char max)"
+                                    className="p-2 border border-gray-300 rounded w-full"
+                                    maxLength={50}
+                                    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
+                                    value={request?.[`${site}_it_contact`]?.split(',')[0] || ""}
+                                />
 
 
                                 <input
@@ -538,19 +556,19 @@ function ChangeRequestUpdate() {
                                     className="p-2 border border-gray-300 rounded w-full"
                                     maxLength={50}
                                     onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
-                                    value={request?.[`${site}_it_contact`]?.split(',')[1] || ""} 
+                                    value={request?.[`${site}_it_contact`]?.split(',')[1] || ""}
                                 />
                             </div>
                         </div>
                     ))}
                     {/* Global Team Contact */}
-                    <GlobalTeamContact onContactChange={setGlobalContact} globalContact={globalContact} isUpdate={1}/>
+                    <GlobalTeamContact onContactChange={setGlobalContact} globalContact={globalContact} isUpdate={1} />
                     {/* Business Team Contact */}
-                    <BusinessTeamContact onContactChange={setBusinessContact} businessContact={businessContact}  isUpdate={1}/>
+                    <BusinessTeamContact onContactChange={setBusinessContact} businessContact={businessContact} isUpdate={1} />
 
                     {/* CRQ fields */}
                     {selectedSites.map((site) => (
-                        <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} />
+                        <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} crqs={crqs[site]} />
                     ))}
 
                     {/* Approval */}
@@ -565,7 +583,7 @@ function ChangeRequestUpdate() {
                                     type="radio"
                                     name="approval"  // Same name ensures only one selection
                                     value="YES"
-                                    // checked={approval === "YES"}  // Check if the approval value is "YES"
+                                    checked={approval === "YES"}  // Check if the approval value is "YES"
                                     onChange={() => handleApprovalChange("YES")}  // Handle change to "YES"
                                     className="mr-2"
                                 />
@@ -578,7 +596,7 @@ function ChangeRequestUpdate() {
                                     type="radio"
                                     name="approval"  // Same name ensures only one selection
                                     value="NO"
-                                    // checked={approval === "NO"}  // Check if the approval value is "NO"
+                                    checked={approval === "NO"}  // Check if the approval value is "NO"
                                     onChange={() => handleApprovalChange("NO")}  // Handle change to "NO"
                                     className="mr-2"
                                 />
@@ -590,7 +608,7 @@ function ChangeRequestUpdate() {
                                     type="radio"
                                     name="approval"  // Same name ensures only one selection
                                     value="Waiting"
-                                    // checked={approval === "Waiting"}  // Check if the approval value is "NO"
+                                    checked={approval === "Waiting"}  // Check if the approval value is "NO"
                                     onChange={() => handleApprovalChange("Waiting")}  // Handle change to "NO"
                                     className="mr-2"
                                 />
@@ -603,6 +621,8 @@ function ChangeRequestUpdate() {
                         <label htmlFor="changeStatus" style={labelStyle}>Change status:</label>
                         <select
                             id="changeStatus"
+                            value={changeStatus} // Controlled component
+                            onChange={(e) => setChangeStatus(e.target.value)} // Update state
                             style={{ backgroundColor: theme.colors.primary400 }}
                             className="p-2 border border-gray-300 rounded text-white"
                         >
@@ -615,36 +635,37 @@ function ChangeRequestUpdate() {
                             <option value="Common change cancel">Common change cancel</option>
                         </select>
                     </div>
-                    {/* Cancel Change Plan Field */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
-                        <label htmlFor="cancelChangeReason" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Cancel change reason:</label>
-                        <div className="relative w-full">
-                            <textarea
-                                id="cancelChangeReason"
-                                style={{ backgroundColor: theme.colors.primary400 }}
-                                className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value"
-                                rows={4}
-                            />
+                    {/* Change cancel category */}
+                    {changeStatus == "Completed with no issue" || changeStatus != "" && (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
+                                <label htmlFor="cancelChangeCategory" style={labelStyle}>Cancel change category:</label>
+                                <select
+                                    id="cancelChangeCategory"
+                                    style={{ backgroundColor: theme.colors.primary400 }}
+                                    className="p-2 border border-gray-300 rounded text-white"
+                                >
+                                    <option value="Reason 1">Reason 1</option>
+                                    <option value="Reason 2">Reason 2</option>
+                                    <option value="Reason 3">Reason 3</option>
+                                </select>
+                            </div>
 
-                            {/* Style your text dialog button */}
-                            <button
-                                type='button'
-                                onClick={() => toggleSyntaxInfo("cancelChangeReason")}
-                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
-                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
-                            >
-                                Style your text
-                                <HelpCircle className="w-4 h-4 ml-1" />
-                            </button>
-
-                            {/* Syntax Info Box */}
-                            <SyntaxInfoBox
-                                isVisible={openDialog === "cancelChangeReason"}
-                                onClose={() => setOpenDialog(null)}
-                            />
-                        </div>
-                    </div>
+                            {/* Cancel Change Plan Field */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                                <label htmlFor="cancelChangeReason" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Cancel change reason:</label>
+                                <div className="relative w-full">
+                                    <textarea
+                                        id="cancelChangeReason"
+                                        style={{ backgroundColor: theme.colors.primary400 }}
+                                        className="p-2 border border-gray-300 rounded text-white w-full"
+                                        placeholder="Enter value"
+                                        rows={4}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     {/* Lesson Learnt Field */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">

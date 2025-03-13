@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { X } from "lucide-react"; // Import cross icon
 
 function AddedCRQsList({ addedCRQs, label, onRemove }) {

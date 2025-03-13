@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Dialog from "./Dialog";
 import { X } from "lucide-react";  // Import cross icon
 import { useTheme } from "styled-components";
 import AddedCRQsList from "./AddedCRQsList";
-function CRQSection({ type, onCRQChange }) {
+function CRQSection({ type, onCRQChange, crqs }) {
     const theme = useTheme();
     const typeLabels = {
         aat: "AAT",
@@ -13,8 +13,7 @@ function CRQSection({ type, onCRQChange }) {
     const label = typeLabels[type] || "CRQ";
     const [openDialog, setOpenDialog] = useState(false);
     const [crqInput, setCrqInput] = useState("");
-    const [addedCRQs, setAddedCRQs] = useState([]); // Store added CRQs
-
+    const [addedCRQs, setAddedCRQs] = useState(crqs || []);
     // Handle adding CRQ
     const handleAddCRQ = () => {
         if(addedCRQs.length == 5){
@@ -29,7 +28,9 @@ function CRQSection({ type, onCRQChange }) {
         }
         setOpenDialog(false);
     };
-
+    useEffect(()=>{
+        setAddedCRQs(crqs || []);
+    })
     // Handle removing CRQ
     const handleRemoveCRQ = (index) => {
         const updatedCRQs = addedCRQs.filter((_, i) => i !== index);

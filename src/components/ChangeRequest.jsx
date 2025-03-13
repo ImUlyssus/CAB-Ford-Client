@@ -481,7 +481,7 @@ function ChangeRequest() {
 
                     {/* CRQ fields */}
                     {selectedSites.map((site) => (
-                        <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} />
+                        <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} crqs={crqs[site]} />
                     ))}
 
                     {/* Submit Button */}
