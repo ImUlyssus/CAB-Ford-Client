@@ -209,6 +209,14 @@ function ChangeRequestUpdate() {
         const aat_crq = crqs['aat'].join(',') || '';
         const ftm_crq = crqs['ftm'].join(',') || '';
         const fsst_crq = crqs['fsst'].join(',') || '';
+        const isCommonChange = selectedSites.length > 1;
+        const aat_it_contact = changeRequestData.aat_it_contact_person.trim() + "," + changeRequestData.aat_it_contact_cdsid.trim();
+        const ftm_it_contact = changeRequestData.ftm_it_contact_person.trim() + "," + changeRequestData.ftm_it_contact_cdsid.trim();
+        const fsst_it_contact = changeRequestData.fsst_it_contact_person.trim() + "," + changeRequestData.fsst_it_contact_cdsid.trim();
+        if (!changeRequestData.category || !changeRequestData.reason || !changeRequestData.impact || !changeRequestData.priority || !changeRequestData.change_name || selectedSitesString.length < 1) {
+            alert("❌ A change request must include those fields: category, reason, impact, priority, change name and change site to submit.");
+            return;
+        }
         // Transform scheduleChanges into space-separated strings for each site
         const aat_schedule_change = scheduleChanges.aat?.addedDates
             ?.map(date => `${date.start} ${date.end} ${date.duration}`)
@@ -221,32 +229,90 @@ function ChangeRequestUpdate() {
         const fsst_schedule_change = scheduleChanges.fsst?.addedDates
             ?.map(date => `${date.start} ${date.end} ${date.duration}`)
             .join(' ') || '';
-        console.log(aat_schedule_change,ftm_schedule_change, fsst_schedule_change)
-        const requestBody = {
+        // Convert request_change_date to a Date object
+        const requestChangeDate = new Date();
+        const twoWeeksLater = new Date(requestChangeDate);
+        twoWeeksLater.setDate(requestChangeDate.getDate() + 14); // Add 14 days
+
+        /**
+         * Extracts 'end' dates from the schedule change string.
+         * @param {string} scheduleStr - The space-separated schedule string.
+         * @returns {Date[]} - Array of end dates as Date objects.
+         */
+        const extractEndDates = (scheduleStr) => {
+            if (!scheduleStr) return [];
+
+            return scheduleStr
+                .split(' ') // Split by space
+                .filter((_, index) => index % 3 === 1) // Extract every second value (end date)
+                .map(dateStr => new Date(dateStr)) // Convert to Date objects
+                .filter(date => !isNaN(date)); // Remove invalid dates
+        };
+
+        // Extract end dates
+        const aatEndDates = extractEndDates(aat_schedule_change);
+        const ftmEndDates = extractEndDates(ftm_schedule_change);
+        const fsstEndDates = extractEndDates(fsst_schedule_change);
+        // if no date to compare
+        const allEmpty = !aatEndDates.length && !ftmEndDates.length && !fsstEndDates.length;
+
+        const hasEarlyEndDate = allEmpty || [...aatEndDates, ...ftmEndDates, ...fsstEndDates]
+            .some(endDate => endDate < twoWeeksLater);
+
+
+        const achieve_2_week_change_request = !hasEarlyEndDate;
+        console.log(achieve_2_week_change_request);
+        const requestData = {
+            id: request.id,
             category: changeRequestData.category,
             reason: changeRequestData.reason,
             impact: changeRequestData.impact,
             priority: changeRequestData.priority,
+            common_change: isCommonChange,
+            change_sites: selectedSitesString,
             change_name: changeRequestData.change_name,
+            request_change_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+            aat_schedule_change: selectedSitesString.includes('aat') ? aat_schedule_change : "",
+            ftm_schedule_change: selectedSitesString.includes('ftm') ? ftm_schedule_change : "",
+            fsst_schedule_change: selectedSitesString.includes('fsst') ? fsst_schedule_change : "",
             description: changeRequestData.description,
             test_plan: changeRequestData.test_plan,
             rollback_plan: changeRequestData.rollback_plan,
-            aat_it_contact: changeRequestData.aat_it_contact_person+","+changeRequestData.aat_it_contact_cdsid,
-            ftm_it_contact: changeRequestData.ftm_it_contact_person+","+changeRequestData.ftm_it_contact_cdsid,
-            fsst_it_contact: changeRequestData.fsst_it_contact_person+","+changeRequestData.fsst_it_contact_cdsid,
+            achieve_2_week_change_request,
+            aat_it_contact: selectedSitesString.includes('aat') ? aat_it_contact : "",
+            ftm_it_contact: selectedSitesString.includes('ftm') ? ftm_it_contact : "",
+            fsst_it_contact: selectedSitesString.includes('fsst') ? fsst_it_contact : "",
             business_team_contact: businessContact,
             global_team_contact: globalContact,
             aat_crq: selectedSitesString.includes('aat') ? aat_crq : "",
             ftm_crq: selectedSitesString.includes('ftm') ? ftm_crq : "",
             fsst_crq: selectedSitesString.includes('fsst') ? fsst_crq : "",
             approval,
-            changeStatus,
+            change_status: changeStatus,
             cancel_change_category: changeStatus == "Completed with no issue" || changeStatus == "" ?"":changeRequestData.cancel_change_category,
             cancel_change_reason: changeStatus == "Completed with no issue" || changeStatus == "" ?"":changeRequestData.cancel_change_reason,
             lesson_learnt: changeRequestData.lesson_learnt,
             reschedule_reason: changeRequestData.reschedule_reason
         }
-        console.log(requestBody);
+        try {
+            const response = await axiosPrivate.put(`/change-requests`, requestData, {
+                headers: { "Content-Type": "application/json" },
+            });
+
+            alert("✅ Change Request updated successfully");
+            // there will be an error in the console every time you make a change request bc of this refresh, related to access and refresh token. Don't worry about it.
+            navigate(-1);
+        } catch (error) {
+            if (error.response) {
+                console.error("❌ Error submitting Change Request", error.message);
+                alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
+            } else if (error.request) {
+                alert("❌ No response received. Please try again later.");
+            } else {
+                console.error("❌ Error submitting Change Request", error.message);
+                alert("❌ Something went wrong. Please try again later.");
+            }
+        }
     };
 
 
@@ -552,7 +618,7 @@ function ChangeRequestUpdate() {
                                     placeholder="Enter name (50 char max)"
                                     className="p-2 border border-gray-300 rounded w-full"
                                     maxLength={50}
-                                    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
+                                    onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()}
                                     value={changeRequestData?.[`${site}_it_contact_person`] || ""}
                                     onChange={handleChange}
                                 />
@@ -759,9 +825,9 @@ function ChangeRequestUpdate() {
                                 backgroundColor: theme.colors.primaryButton,
                                 color: theme.colors.primary500,
                             }}
-                            className="hover:bg-blue-700 font-bold py-2 px-4 rounded"
+                            className="hover:bg-blue-700 font-bold py-2 px-4 rounded cursor-pointer"
                         >
-                            Add Change Request
+                            Update Change Request
                         </button>
                     </div>
                 </form>

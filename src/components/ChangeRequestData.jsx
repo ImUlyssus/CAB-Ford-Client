@@ -126,7 +126,9 @@ export default function ChangeRequestData() {
                                     {/* <th className={thStyle2}>Common CRQ</th> */}
                                     <th className="py-2 px-4 border-b border-r">Approval</th>
                                     <th className={thStyle3}>Change Status</th>
-                                    <th className={thStyle3}>Cancel Change Reason</th>
+                                    <th className={thStyle2}>Cancel Change Reason Category</th>
+                                    <th className={thStyle3}>Cancel Change Reason Description</th>
+                                    <th className={thStyle3}>Reschedule Reason</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -150,8 +152,6 @@ export default function ChangeRequestData() {
                                     
                                         return { scheduleArray, totalDuration: duration }; // Always return an object
                                     };
-                                    
-
                                     const ftmSchedule = processSchedule(request.ftm_schedule_change);
                                     const aatSchedule = processSchedule(request.aat_schedule_change);
                                     const fsstSchedule = processSchedule(request.fsst_schedule_change);
@@ -203,12 +203,12 @@ export default function ChangeRequestData() {
                                                 <td className="py-2 px-4 border-b border-r">{request.description}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.rollback_plan}</td>
-                                                <td className="py-2 px-4 border-b border-r">
+                                                <td className="py-2 px-4 border-b border-r text-center">
                                                     {request.ftm_it_contact == null ? "" :
                                                         request.ftm_it_contact.split(',').map((item, i) => (
                                                             <div key={i} className="mb-1">{item.trim()}</div>
                                                         ))}</td>
-                                                <td className="py-2 px-4 border-b border-r">
+                                                <td className="py-2 px-4 border-b border-r text-center">
                                                     {request.aat_it_contact == null ? "" :
                                                         request.aat_it_contact.split(",").map((item, i) => (
                                                             <div key={i} className='mb-1'>{item.trim()}</div>
@@ -219,12 +219,12 @@ export default function ChangeRequestData() {
                                                             <div key={i} className="mb-1">{item.trim()}</div>
                                                         ))}
                                                 </td>
-                                                <td className="py-2 px-4 border-b border-r">
+                                                <td className="py-2 px-4 border-b border-r text-center">
                                                     {request.global_team_contact == null ? "" :
                                                         request.global_team_contact.split(',').map((item, i) => (
                                                             <div key={i} className="mb-1">{item.trim()}</div>
                                                         ))}</td>
-                                                <td className="py-2 px-4 border-b border-r">
+                                                <td className="py-2 px-4 border-b border-r text-center">
                                                     {request.business_team_contact == null ? "" :
                                                         request.business_team_contact.split(',').map((item, i) => (
                                                             <div key={i} className="mb-1">{item.trim()}</div>
@@ -252,7 +252,9 @@ export default function ChangeRequestData() {
                                                 {/* <td className="py-2 px-4 border-b border-r">{request.common_crq}</td> */}
                                                 <td className="py-2 px-4 border-b border-r text-center">{request.approval}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.change_status}</td>
+                                                <td className="py-2 px-4 border-b border-r text-center">{request.cancel_change_category}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
+                                                <td className="py-2 px-4 border-b border-r">{request.reschedule_reason}</td>
                                             </tr>
                                         </>
                                     );

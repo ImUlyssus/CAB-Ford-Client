@@ -78,7 +78,7 @@ function CRQSection({ type, onCRQChange, crqs }) {
                         onChange={(e) => setCrqInput(e.target.value)}
                         className="p-2 border border-gray-300 rounded w-full mb-4"
                         maxLength={15}
-                        onKeyDown={(e) => e.key === ',' && e.preventDefault()}
+                        onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()}
                     />
                     <div className="flex justify-end gap-2">
                         <button
