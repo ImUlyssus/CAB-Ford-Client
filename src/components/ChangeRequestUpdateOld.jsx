@@ -17,8 +17,8 @@ function ChangeRequestUpdate() {
         reason: request.reason,
         impact: request.impact,
         priority: request.priority,
-        change_name: request.change_name || "",
-        description: request.description || "",
+        change_name: request.change_name||"",
+        description: request.description||"",
         test_plan: request.test_plan || "",
         rollback_plan: request.rollback_plan || "",
         aat_it_contact_person: request?.aat_it_contact?.split(',')[0] || "",
@@ -29,13 +29,13 @@ function ChangeRequestUpdate() {
         fsst_it_contact_cdsid: request?.fsst_it_contact?.split(',')[1] || "",
         cancel_change_category: request.cancel_change_category || "",
         cancel_change_reason: request.cancel_change_reason || "",
-        lesson_learnt: request.lesson_learnt == null ? "" : request.lesson_learnt,
-        reschedule_reason: request.reschedule_reason == null ? "" : request.reschedule_reason,
+        lesson_learnt: request.lesson_learnt == null ? "":request.lesson_learnt,
+        reschedule_reason: request.reschedule_reason == null ? "":request.reschedule_reason,
     });
     const theme = useTheme();
     const [changeStatus, setChangeStatus] = useState(request.change_status ?? "");
     // const [cancelChangeCategory, setCancelChangeCategory] = useState(request.cancel_change_category??"");
-    const [selectedSites, setSelectedSites] = useState(request.change_sites.includes(',') ? request.change_sites.split(',') : []);
+    const [selectedSites, setSelectedSites] = useState(request.change_sites.includes(',')?request.change_sites.split(','):[]);
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
     const [approval, setApproval] = useState(request.approval);
@@ -44,27 +44,32 @@ function ChangeRequestUpdate() {
     const globalTeamContactRef = useRef(null);
     const navigate = useNavigate();
     console.log("From update", request);
-    // Function to handle change in select fields
-    const handleChange = (event) => {
-        const { name, value } = event.target; // Destructure name and value from the event
-
-        setChangeRequestData({
-            ...changeRequestData,
-            [name]: value, // Dynamically set the correct field based on the name
-        });
-        if (name == "change_status" && (value == "Completed with no issue" || value == "")) {
-            setChangeRequestData({
-                ...changeRequestData,
-                cancel_change_category: "",
-                cancel_change_reason: ""
-            });
+    const handleRemoveContact = () => {
+        if (globalTeamContactRef.current) {
+            globalTeamContactRef.current.removeContact();
         }
     };
+    // Function to handle change in select fields
+const handleChange = (event) => {
+    const { name, value } = event.target; // Destructure name and value from the event
+
+    setChangeRequestData({
+        ...changeRequestData,
+        [name]: value, // Dynamically set the correct field based on the name
+    });
+    if(name == "change_status" && (value=="Completed with no issue"||value=="")){
+        setChangeRequestData({
+            ...changeRequestData,
+            cancel_change_category: "",
+            cancel_change_reason: ""
+        });
+    }
+};
 
     // the following useEffect is required when there is only one site in request.change_sites with no comma
     // or it will cause bug
-    useEffect(() => {
-        if (!selectedSites.length) {
+    useEffect(() =>{
+        if (!selectedSites.length){
             setSelectedSites([request.change_sites])
         }
     })
@@ -82,16 +87,8 @@ function ChangeRequestUpdate() {
     const handleApprovalChange = (status) => {
         setApproval(status)
     }
-    const handleCRQChange = (type, updatedCRQs) => {
-        setCrqs((prev) => ({
-            ...prev,
-            [type]: updatedCRQs,
-        }));
-    };
-
-    const toggleSyntaxInfo = (textareaId) => {
-        setOpenDialog(openDialog === textareaId ? null : textareaId);
-    };
+    // Structuring schedule change START
+    // Function to parse the schedule change string into the desired format
     const parseSchedule = (scheduleString) => {
         if (!scheduleString) return [];
         const parts = scheduleString.split(" "); // Split by space
@@ -112,48 +109,60 @@ function ChangeRequestUpdate() {
         }
         return scheduleArray;
     };
-    useEffect((prev) => {
+    const extractIntegers = (duration) => {
+        if (!duration) return null; // Handle null or undefined cases
+    
+        return duration
+            .match(/\d+/g) // Extract all numbers using regex
+            ?.map(Number) || []; // Convert to numbers and return an array
+    };
+
+    // Function to update the schedule data based on the request object
+    const getRandomDate = () => {
+        const randomTimestamp = Date.now() + Math.floor(Math.random() * 1e9); // Random future timestamp
+        return new Date(randomTimestamp).toISOString().slice(0, 16); // Format as 'YYYY-MM-DDTHH:mm'
+    };
+    
+    const getRandomDuration = () => {
+        return `${Math.floor(Math.random() * 10) + 1}`; // Random duration between 1-10 hours
+    };
+    
+    // Function to update the schedule data based on the request object
+    const updateScheduleChanges = (request) => {
         setScheduleChanges((prevState) => ({
             ...prevState,
             aat: {
                 ...prevState.aat,
                 addedDates: parseSchedule(request.aat_schedule_change),
-                startDateForRange: prevState.aat.startDateForRange ?? null,
-                endDateForRange: prevState.aat.endDateForRange ?? null,
-                duration: prevState.aat.duration ?? null,
+                startDateForRange: prevState.aat.startDateForRange ?? getRandomDate(),
+                endDateForRange: prevState.aat.endDateForRange ?? getRandomDate(),
+                duration: prevState.aat.duration ?? getRandomDuration(),
             },
             ftm: {
                 ...prevState.ftm,
                 addedDates: parseSchedule(request.ftm_schedule_change),
-                startDateForRange: prevState.ftm.startDateForRange ?? null,
-                endDateForRange: prevState.ftm.endDateForRange ?? null,
-                duration: prevState.ftm.duration ?? null,
+                startDateForRange: prevState.ftm.startDateForRange ?? getRandomDate(),
+                endDateForRange: prevState.ftm.endDateForRange ?? getRandomDate(),
+                duration: prevState.ftm.duration ?? getRandomDuration(),
             },
             fsst: {
                 ...prevState.fsst,
                 addedDates: parseSchedule(request.fsst_schedule_change),
-                startDateForRange: prevState.fsst.startDateForRange ?? null,
-                endDateForRange: prevState.fsst.endDateForRange ?? null,
-                duration: prevState.fsst.duration ?? null,
+                startDateForRange: prevState.fsst.startDateForRange ?? getRandomDate(),
+                endDateForRange: prevState.fsst.endDateForRange ?? getRandomDate(),
+                duration: prevState.fsst.duration ?? getRandomDuration(),
             },
         }));
         updateDurations();
-    }, [request])
-    console.log(request)
-    const extractIntegers = (duration) => {
-        if (!duration) return null; // Handle null or undefined cases
-
-        return duration
-            .match(/\d+/g) // Extract all numbers using regex
-            ?.map(Number) || []; // Convert to numbers and return an array
     };
+    
     // Function to update the duration and date format
     const updateDurations = () => {
         const sites = ["aat", "ftm", "fsst"]; // Define site keys
-
+    
         setScheduleChanges((prevState) => {
             let updatedState = { ...prevState };
-
+    
             sites.forEach((site) => {
                 updatedState[site] = {
                     ...prevState[site],
@@ -166,15 +175,30 @@ function ChangeRequestUpdate() {
                         duration: extractIntegers(entry.duration).join(" ") || getRandomDuration(),
                     })),
                     // Ensure site-level start, end, and duration are assigned if null
-                    startDateForRange: prevState[site].startDateForRange ?? null,
-                    endDateForRange: prevState[site].endDateForRange ?? null,
-                    duration: prevState[site].duration ?? null,
+                    startDateForRange: prevState[site].startDateForRange ?? getRandomDate(),
+                    endDateForRange: prevState[site].endDateForRange ?? getRandomDate(),
+                    duration: prevState[site].duration ?? getRandomDuration(),
                 };
             });
-
+    
             return updatedState;
         });
     };
+    // keep the following 4 useEffect in order or it will mess up change site, schedule date, crq. Idk why
+    // Automatically check and set the selectedSites based on the request
+    useEffect(() => {
+        if (request) {
+            updateScheduleChanges(request);
+        }
+    }, [request]);
+    useEffect(() => {
+        // Automatically check the sites that have schedule changes
+        const sitesWithScheduleChanges = ["aat", "ftm", "fsst"].filter(
+            (site) => scheduleChanges[site]?.addedDates.length > 0
+        );
+        setSelectedSites(sitesWithScheduleChanges);
+    }, [scheduleChanges])
+    // Update crqs state when request data is available
     useEffect(() => {
         // Set crqs by splitting the comma-separated string into arrays
         setCrqs({
@@ -183,6 +207,27 @@ function ChangeRequestUpdate() {
             fsst: request.fsst_crq ? request.fsst_crq.split(",") : [],
         });
     }, [request]);
+    console.log(scheduleChanges['ftm'].startDateForRange)
+    console.log(scheduleChanges['ftm'].endDateForRange)
+    console.log(scheduleChanges['ftm'].duration)
+    console.log(scheduleChanges['aat'].startDateForRange)
+    console.log(scheduleChanges['aat'].endDateForRange)
+    console.log(scheduleChanges['aat'].duration)
+    // useEffect(() => {
+    //     setSelectedSites(request.change_sites.split(','));
+    // }, [scheduleChanges])
+    // Structuring schedule change END
+    const handleCRQChange = (type, updatedCRQs) => {
+        setCrqs((prev) => ({
+            ...prev,
+            [type]: updatedCRQs,
+        }));
+    };
+
+    const toggleSyntaxInfo = (textareaId) => {
+        setOpenDialog(openDialog === textareaId ? null : textareaId);
+    };
+
     // Common dialog box component
     const SyntaxInfoBox = ({ isVisible, onClose }) => (
         isVisible && (
@@ -267,7 +312,7 @@ function ChangeRequestUpdate() {
     };
     return (
         <div>
-            <button
+            <button 
                 onClick={() => navigate(-1)} // Go back to the previous page
                 className="px-4 py-2 bg-gray-500 text-white rounded-lg mb-4 hover:bg-gray-600"
             >
@@ -275,7 +320,7 @@ function ChangeRequestUpdate() {
             </button>
             <div className="px-8 py-4 border-1 rounded-lg" style={{ borderColor: theme.colors.secondary500 }}>
                 <div className="flex justify-center">
-                    <h1 className="text-2xl font-bold text-center mb-3">Add Change Request</h1>
+                    <h1 className="text-2xl font-bold text-center mb-3">Update Change Request</h1>
                 </div>
                 <form onSubmit={handleSubmit}>
                     {/* Category Field */}
@@ -287,7 +332,7 @@ function ChangeRequestUpdate() {
                             style={{ backgroundColor: theme.colors.primary400 }}
                             className="p-2 border border-gray-300 rounded text-white"
                             value={changeRequestData.category} // Bind the value to state
-                            onChange={handleChange}
+                    onChange={handleChange}
                         >
                             <option value="Hardware">Hardware</option>
                             <option value="Application">Application</option>
@@ -305,7 +350,7 @@ function ChangeRequestUpdate() {
                             style={{ backgroundColor: theme.colors.primary400 }}
                             className="p-2 border border-gray-300 rounded text-white"
                             value={changeRequestData.reason} // Bind the value to state
-                            onChange={handleChange}
+                    onChange={handleChange}
                         >
                             <option value="Fix/Repair">Fix/Repair</option>
                             <option value="New functionality">New functionality</option>
@@ -325,7 +370,7 @@ function ChangeRequestUpdate() {
                             style={{ backgroundColor: theme.colors.primary400 }}
                             className="p-2 border border-gray-300 rounded text-white"
                             value={changeRequestData.impact} // Bind the value to state
-                            onChange={handleChange}
+                    onChange={handleChange}
                         >
                             <option value="Extensive">Extensive</option>
                             <option value="Significant">Significant</option>
@@ -353,38 +398,38 @@ function ChangeRequestUpdate() {
                     </div>
                     {/* Change Name Field */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
-                        <label htmlFor="change_name" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Change name:</label>
-                        <div className="relative w-full">
-                            <textarea
-                                id="change_name"
-                                name="change_name"
-                                style={{ backgroundColor: theme.colors.primary400 }}
-                                className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value (1500 characters max)"
-                                rows={4}
-                                maxLength={1500}
-                                value={changeRequestData.change_name} // Bind the value to state
-                                onChange={handleChange} // Add the onChange handler
-                            />
+            <label htmlFor="change_name" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Change name:</label>
+            <div className="relative w-full">
+                <textarea
+                    id="change_name"
+                    name="change_name"
+                    style={{ backgroundColor: theme.colors.primary400 }}
+                    className="p-2 border border-gray-300 rounded text-white w-full"
+                    placeholder="Enter value (1500 characters max)"
+                    rows={4}
+                    maxLength={1500}
+                    value={changeRequestData.change_name} // Bind the value to state
+                    onChange={handleChange} // Add the onChange handler
+                />
 
-                            {/* Style your text dialog button */}
-                            <button
-                                type="button"
-                                onClick={() => toggleSyntaxInfo("change_name")}
-                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
-                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
-                            >
-                                Style your text
-                                <HelpCircle className="w-4 h-4 ml-1" />
-                            </button>
+                {/* Style your text dialog button */}
+                <button
+                    type="button"
+                    onClick={() => toggleSyntaxInfo("change_name")}
+                    className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                    style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                >
+                    Style your text
+                    <HelpCircle className="w-4 h-4 ml-1" />
+                </button>
 
-                            {/* Syntax Info Box */}
-                            <SyntaxInfoBox
-                                isVisible={openDialog === "change_name"}
-                                onClose={() => setOpenDialog(null)}
-                            />
-                        </div>
-                    </div>
+                {/* Syntax Info Box */}
+                <SyntaxInfoBox
+                    isVisible={openDialog === "change_name"}
+                    onClose={() => setOpenDialog(null)}
+                />
+            </div>
+        </div>
 
                     {/* Change Sites */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
@@ -392,7 +437,7 @@ function ChangeRequestUpdate() {
                             Change site:
                         </label>
                         <div className="flex space-x-4">
-                            {["aat", "ftm", "fsst"].map((site) => (
+                            {request.change_sites ? ["aat", "ftm", "fsst"].map((site) => (
                                 <label key={site} className="flex items-center">
                                     <input
                                         type="checkbox"
@@ -404,7 +449,7 @@ function ChangeRequestUpdate() {
                                     />
                                     {site.toUpperCase()}
                                 </label>
-                            ))}
+                            )):<></>}
                         </div>
                     </div>
                     {/* schedule change section */}
@@ -415,7 +460,7 @@ function ChangeRequestUpdate() {
                             startDateForRange={scheduleChanges[site].startDateForRange}
                             endDateForRange={scheduleChanges[site].endDateForRange}
                             duration={scheduleChanges[site].duration}
-                            addedDates={scheduleChanges[site].addedDates}
+                            dates={scheduleChanges[site].addedDates}
                             onScheduleChange={(field, value) => setScheduleChanges((prev) => ({
                                 ...prev,
                                 [site]: { ...prev[site], [field]: value },
@@ -581,6 +626,7 @@ function ChangeRequestUpdate() {
                     {selectedSites.map((site) => (
                         <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} crqs={crqs[site]} />
                     ))}
+
                     {/* Approval */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
                         <label htmlFor="changeSite" style={labelStyle}>
@@ -775,10 +821,10 @@ function ScheduleChangeSection({
     startDateForRange,
     endDateForRange,
     duration,
-    addedDates,
-    onScheduleChange,
     onAddDate,
-    onRemoveDate
+    onRemoveDate,
+    onScheduleChange,
+    dates
 }) {
     const typeLabels = {
         aat: "AAT",
@@ -787,12 +833,13 @@ function ScheduleChangeSection({
     };
     const label = typeLabels[type] || "Schedule";
     const [openDialog, setOpenDialog] = useState(null);
-
-    // Handle adding a date
+    // const [addedDates, setAddedDates] = useState(dates);  // ➡️ Store added dates here
+    
+    // ➡️ Handle adding dates
     const handleAddDate = () => {
         if (startDateForRange && endDateForRange && duration) {
             const newDate = { start: startDateForRange, end: endDateForRange, duration };
-            if (addedDates.length < 5) {
+            if (dates.length < 5) {
                 onAddDate(newDate);  // Pass the added date to the parent
             } else {
                 alert("You can only add up to 5 date ranges.");
@@ -811,6 +858,7 @@ function ScheduleChangeSection({
                     Choose {label} schedule change date:
                 </label>
 
+                {/* Buttons for Individual Date and Date Range */}
                 <div className="grid grid-cols-1 relative">
                     <Button type="button" onClick={() => setOpenDialog("range")}>
                         Choose date and duration
@@ -818,13 +866,24 @@ function ScheduleChangeSection({
                 </div>
             </div>
 
-            {/* Display the list of added dates */}
+            {/* ➡️ Use AddedDatesList component here */}
+            {/* <AddedDatesList
+    addedDates={dates}
+    label={label}
+    onRemove={(index) => {
+        setAddedDates((prev) => prev.filter((_, i) => i !== index)); // Fix filtering logic
+        onRemoveDate(index); // Call onRemoveDate correctly
+    }}
+/> */}
+
             <AddedDatesList
-                addedDates={addedDates}
+                addedDates={dates}
                 label={label}
                 onRemove={(index) => onRemoveDate(index)}  // Use the new prop
             />
 
+
+            {/* Dialog for Date Range */}
             <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
                 <h4 className="text-md font-semibold mb-2">Select Date Range</h4>
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -834,7 +893,7 @@ function ScheduleChangeSection({
                         </label>
                         <input
                             type="datetime-local"
-                            value={startDateForRange || ""}
+                            value={startDateForRange}
                             onChange={(e) => onScheduleChange("startDateForRange", e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full"
                         />
@@ -845,32 +904,28 @@ function ScheduleChangeSection({
                         </label>
                         <input
                             type="datetime-local"
-                            value={endDateForRange || ""}
+                            value={endDateForRange}
                             onChange={(e) => onScheduleChange("endDateForRange", e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full"
                         />
-
                     </div>
                 </div>
 
                 <div className="mb-4">
                     <input
                         type="number"
-                        value={duration || ""}
+                        value={duration}
                         onChange={(e) => onScheduleChange("duration", e.target.value)}
                         placeholder="Choose duration in hour"
                         className="p-2 border border-gray-300 rounded w-full"
                     />
                 </div>
-                <div className="flex">
-                    <Button type="button" onClick={handleAddDate} className="ml-auto">
-                        Add
-                    </Button>
+                <div className='flex'>
+                    <Button type="button" onClick={handleAddDate} className='ml-auto'>Add</Button>
                 </div>
             </Dialog>
         </div>
     );
 }
-
 
 export default ChangeRequestUpdate;
