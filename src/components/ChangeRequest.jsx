@@ -133,9 +133,12 @@ function ChangeRequest() {
         const aatEndDates = extractEndDates(aat_schedule_change);
         const ftmEndDates = extractEndDates(ftm_schedule_change);
         const fsstEndDates = extractEndDates(fsst_schedule_change);
+        // if no date to compare
+        const allEmpty = !aatEndDates.length && !ftmEndDates.length && !fsstEndDates.length;
 
-        const hasEarlyEndDate = [...aatEndDates, ...ftmEndDates, ...fsstEndDates]
-            .some(endDate => endDate < twoWeeksLater);
+const hasEarlyEndDate = allEmpty || [...aatEndDates, ...ftmEndDates, ...fsstEndDates]
+    .some(endDate => endDate < twoWeeksLater);
+
 
         const achieve_2_week_change_request = !hasEarlyEndDate;
         console.log(achieve_2_week_change_request);
