@@ -204,17 +204,17 @@ export default function ChangeRequestData() {
                                                 <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.rollback_plan}</td>
                                                 <td className="py-2 px-4 border-b border-r">
-                                                    {request.ftm_it_contact == "null" ? "" :
+                                                    {request.ftm_it_contact == null ? "" :
                                                         request.ftm_it_contact.split(',').map((item, i) => (
                                                             <div key={i} className="mb-1">{item.trim()}</div>
                                                         ))}</td>
                                                 <td className="py-2 px-4 border-b border-r">
-                                                    {request.aat_it_contact == "null" ? "" :
+                                                    {request.aat_it_contact == null ? "" :
                                                         request.aat_it_contact.split(",").map((item, i) => (
                                                             <div key={i} className='mb-1'>{item.trim()}</div>
                                                         ))}</td>
                                                 <td className="py-2 px-4 border-b border-r text-center">
-                                                    {request.fsst_it_contact == "null" ? "" :
+                                                    {request.fsst_it_contact == null ? "" :
                                                         request.fsst_it_contact.split(",").map((item, i) => (
                                                             <div key={i} className="mb-1">{item.trim()}</div>
                                                         ))}

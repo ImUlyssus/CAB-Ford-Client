@@ -28,6 +28,9 @@ function CRQSection({ type, onCRQChange, crqs }) {
         }
         setOpenDialog(false);
     };
+    // useEffect(() => {
+    //         setSelectedSites(request.change_sites.split(','));
+    //     }, [scheduleChanges])
     useEffect(()=>{
         setAddedCRQs(crqs || []);
     })

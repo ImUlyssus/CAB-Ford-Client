@@ -15,7 +15,7 @@ function ChangeRequestUpdate() {
     const theme = useTheme();
     const [changeStatus, setChangeStatus] = useState(request.change_status ?? "");
     // const [cancelChangeCategory, setCancelChangeCategory] = useState(request.cancel_change_category??"");
-    const [selectedSites, setSelectedSites] = useState(request.change_sites.split(','));
+    const [selectedSites, setSelectedSites] = useState(request.change_sites.includes(',')?request.change_sites.split(','):[]);
     const [openDialog, setOpenDialog] = useState(null);
     const axiosPrivate = useAxiosPrivate();
     const [approval, setApproval] = useState(request.approval);
@@ -29,6 +29,13 @@ function ChangeRequestUpdate() {
             globalTeamContactRef.current.removeContact();
         }
     };
+    // the following useEffect is required when there is only one site in request.change_sites with no comma
+    // or it will cause bug
+    useEffect(() =>{
+        if (!selectedSites.length){
+            setSelectedSites([request.change_sites])
+        }
+    })
 
     const [crqs, setCrqs] = useState({
         aat: [],
@@ -107,9 +114,10 @@ function ChangeRequestUpdate() {
             fsst: request.fsst_crq ? request.fsst_crq.split(",") : [],
         });
     }, [request]);
-    useEffect(() => {
-        setSelectedSites(request.change_sites.split(','));
-    }, [scheduleChanges])
+    
+    // useEffect(() => {
+    //     setSelectedSites(request.change_sites.split(','));
+    // }, [scheduleChanges])
     // Structuring schedule change END
     const handleCRQChange = (type, updatedCRQs) => {
         setCrqs((prev) => ({
@@ -389,7 +397,7 @@ function ChangeRequestUpdate() {
                             Change site:
                         </label>
                         <div className="flex space-x-4">
-                            {["aat", "ftm", "fsst"].map((site) => (
+                            {request.change_sites ? ["aat", "ftm", "fsst"].map((site) => (
                                 <label key={site} className="flex items-center">
                                     <input
                                         type="checkbox"
@@ -401,7 +409,7 @@ function ChangeRequestUpdate() {
                                     />
                                     {site.toUpperCase()}
                                 </label>
-                            ))}
+                            )):<></>}
                         </div>
                     </div>
                     {/* schedule change section */}
@@ -763,7 +771,7 @@ function ScheduleChangeSection({
     const label = typeLabels[type] || "Schedule";
     const [openDialog, setOpenDialog] = useState(null);
     const [addedDates, setAddedDates] = useState(dates);  // ➡️ Store added dates here
-
+    
     // ➡️ Handle adding dates
     const handleAddDate = () => {
         if (startDateForRange && endDateForRange && duration) {
