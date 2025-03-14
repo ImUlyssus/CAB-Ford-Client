@@ -136,8 +136,8 @@ function ChangeRequest() {
         // if no date to compare
         const allEmpty = !aatEndDates.length && !ftmEndDates.length && !fsstEndDates.length;
 
-const hasEarlyEndDate = allEmpty || [...aatEndDates, ...ftmEndDates, ...fsstEndDates]
-    .some(endDate => endDate < twoWeeksLater);
+        const hasEarlyEndDate = allEmpty || [...aatEndDates, ...ftmEndDates, ...fsstEndDates]
+            .some(endDate => endDate < twoWeeksLater);
 
 
         const achieve_2_week_change_request = !hasEarlyEndDate;
@@ -478,9 +478,9 @@ const hasEarlyEndDate = allEmpty || [...aatEndDates, ...ftmEndDates, ...fsstEndD
                         </div>
                     ))}
                     {/* Global Team Contact */}
-                    <GlobalTeamContact onContactChange={setGlobalContact} globalContact={globalContact} update={0}/>
+                    <GlobalTeamContact onContactChange={setGlobalContact} globalContact={globalContact} update={0} />
                     {/* Business Team Contact */}
-                    <BusinessTeamContact onContactChange={setBusinessContact} businessContact={businessContact} update={0}/>
+                    <BusinessTeamContact onContactChange={setBusinessContact} businessContact={businessContact} update={0} />
 
                     {/* CRQ fields */}
                     {selectedSites.map((site) => (
