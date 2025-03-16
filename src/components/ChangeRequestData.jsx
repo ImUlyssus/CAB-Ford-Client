@@ -27,6 +27,23 @@ export default function ChangeRequestData() {
         }
         setDialogOpen(false);
     };
+    const handleDelete = async () => {
+        if(!selectedRequest){
+            alert("Please select a data row to delete.");
+            return;
+        }
+        const confirmDelete = window.confirm("Are you sure you want to delete this data row?");
+        if(!confirmDelete) return;
+        try{
+            const response = await axiosPrivate.delete(`/change-requests/${selectedRequest.id}`);
+            alert("✅ Change Request deleted successfully")
+            setChangeRequests(prev => prev.filter(request => request.id !== selectedRequest.id));
+            setDialogOpen(false);
+        }catch (error) {
+            console.error("❌ Error deleting Change Request", error.message);
+            alert(`❌ Error: ${error.response?.data?.message || "An error occurred"}`);
+        }
+    }
 
     useEffect(() => {
         const fetchChangeRequests = async () => {
@@ -165,8 +182,8 @@ export default function ChangeRequestData() {
                                                 <td className="py-2 px-4 border-b border-r text-center">{index + 1}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.category}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.reason}</td>
-                                                <td className="py-2 px-4 border-b border-r">{request.impact}</td>
-                                                <td className="py-2 px-4 border-b border-r">{request.priority}</td>
+                                                <td className="py-2 px-4 border-b border-r text-center">{request.impact}</td>
+                                                <td className="py-2 px-4 border-b border-r text-center">{request.priority}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.change_name}</td>
                                                 <td className="py-2 px-4 border-b border-r text-center">
                                                     {String(request.change_sites || "")
@@ -198,7 +215,7 @@ export default function ChangeRequestData() {
                                                         </div>
                                                     ))}
                                                 </td>
-                                                <td className="py-2 px-4 border-b border-r">{aatSchedule.totalDuration + ftmSchedule.totalDuration + fsstSchedule.totalDuration}</td>
+                                                <td className="py-2 px-4 border-b border-r text-center">{aatSchedule.totalDuration + ftmSchedule.totalDuration + fsstSchedule.totalDuration}</td>
                                                 <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.description}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>
@@ -273,7 +290,7 @@ export default function ChangeRequestData() {
                                 </button>
                                 <button
                                     className="px-4 py-2 bg-red-500 cursor-pointer rounded hover:bg-red-700"
-                                    onClick={() => setDialogOpen(false)}
+                                    onClick={handleDelete}
                                 >
                                     Delete
                                 </button>

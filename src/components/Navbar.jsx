@@ -64,8 +64,11 @@ function Navbar() {
 
                 <button
                     onClick={() => {
-                        setAuth({});
+                        const confirmLogout = window.confirm("Are you sure you want to log out?")
+                        if(confirmLogout){
+                            setAuth({});
                         navigate("/login");
+                        }
                     }}
                     style={{
                         color: "red",
