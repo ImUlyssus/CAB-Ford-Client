@@ -146,6 +146,7 @@ export default function ChangeRequestData() {
                                     <th className={thStyle2}>Cancel Change Reason Category</th>
                                     <th className={thStyle3}>Cancel Change Reason Description</th>
                                     <th className={thStyle3}>Reschedule Reason</th>
+                                    <th className={thStyle3}>Lesson Learnt</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -272,6 +273,7 @@ export default function ChangeRequestData() {
                                                 <td className="py-2 px-4 border-b border-r text-center">{request.cancel_change_category}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.reschedule_reason}</td>
+                                                <td className="py-2 px-4 border-b border-r">{request.lesson_learnt}</td>
                                             </tr>
                                         </>
                                     );
