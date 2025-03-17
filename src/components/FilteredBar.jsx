@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useTheme } from 'styled-components';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from 'react-router-dom';
-
+import AuthContext from '../context/AuthProvider';
 export default function FilteredBar() {
     const [year, setYear] = useState(new Date().getFullYear());
-    const [month, setMonth] = useState(); // Default to "All"
+    const [month, setMonth] = useState(new Date().getMonth()); // Default to "All"
     const [week, setWeek] = useState("All"); // Default to "All"
-
+    const { setAuth } = useContext(AuthContext);
     const startYear = new Date().getFullYear() - 10;
     const years = Array.from({ length: 11 }, (_, i) => startYear + i);
     const [changeRequests, setChangeRequests] = useState([]);
@@ -292,6 +292,7 @@ export default function FilteredBar() {
 
         console.log("Filtered Data Count:", filteredData.length);
         setFilteredChangeRequests(filteredData);
+        setAuth({ filteredData });
     }, [year, quarter, month, week, changeRequests]);
 
 
@@ -326,27 +327,27 @@ export default function FilteredBar() {
 
                 {/* Quarter Dropdown */}
                 <select
-    value={quarter}
-    onChange={(e) => {
-        const selectedQuarter = e.target.value;
-        setQuarter(selectedQuarter);
-        setWeek("All");
+                    value={quarter}
+                    onChange={(e) => {
+                        const selectedQuarter = e.target.value;
+                        setQuarter(selectedQuarter);
+                        setWeek("All");
 
-        if (selectedQuarter !== "All Quarters") {
-            // Ensure quarterMonths[selectedQuarter] exists
-            if (quarterMonths[selectedQuarter]) {
-                setMonth(quarterMonths[selectedQuarter][0]);
-            }
-        }
-    }}
-    className="p-2 border rounded"
->
-    {quarters.map((q) => (
-        <option key={q} value={q}>
-            {q === "All" ? "All Quarters" : `Q${q}`}
-        </option>
-    ))}
-</select>
+                        if (selectedQuarter !== "All Quarters") {
+                            // Ensure quarterMonths[selectedQuarter] exists
+                            if (quarterMonths[selectedQuarter]) {
+                                setMonth(quarterMonths[selectedQuarter][0]);
+                            }
+                        }
+                    }}
+                    className="p-2 border rounded"
+                >
+                    {quarters.map((q) => (
+                        <option key={q} value={q}>
+                            {q === "All" ? "All Quarters" : `Q${q}`}
+                        </option>
+                    ))}
+                </select>
 
                 {/* Month Dropdown */}
                 <select

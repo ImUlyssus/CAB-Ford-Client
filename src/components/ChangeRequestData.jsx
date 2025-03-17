@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useTheme } from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Dialog from "./Dialog";
-
+import FilteredBar from "./FilteredBar";
+import AuthContext from '../context/AuthProvider';
 export default function ChangeRequestData() {
     const [changeRequests, setChangeRequests] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const { auth } = useContext(AuthContext);
     const [error, setError] = useState(null);
     const theme = useTheme();
     const navigate = useNavigate();
@@ -46,25 +48,8 @@ export default function ChangeRequestData() {
     }
 
     useEffect(() => {
-        const fetchChangeRequests = async () => {
-            try {
-                // Make the API request with the token included in the Authorization header
-                const response = await axiosPrivate.get(`/change-requests`);
-
-                console.log("API Response:", response.data); // Debugging
-                setChangeRequests(response.data);
-            } catch (err) {
-                console.error("Error fetching change requests:", err.response ? err.response.data : err.message); // Debugging
-                setError(err.response ? err.response.data.message : err.message);
-                navigate('/login', { state: { from: location }, replace: true });
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchChangeRequests();
-    }, []);
-
+        setChangeRequests(auth.filteredData)
+    }, [auth]);
 
     if (loading) {
         return <div className="text-center py-4">Loading...</div>;
@@ -83,6 +68,8 @@ export default function ChangeRequestData() {
     };
 
     return (
+        <>
+        <FilteredBar />
         <div className="h-170 flex flex-col">
             <h1 className="text-2xl font-bold text-center my-4">Change Request Data</h1>
 
@@ -302,5 +289,6 @@ export default function ChangeRequestData() {
                 </div>
             )}
         </div>
+        </>
     );
 }

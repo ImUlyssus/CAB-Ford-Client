@@ -22,7 +22,7 @@ function Navbar() {
                 zIndex: 1000,
                 paddingTop: "10px",
                 paddingBottom: "10px",
-                borderBottomColor: theme.colors.primary200,
+                borderBottomColor: theme.colors.secondary300,
                 borderBottomStyle: "solid",
                 borderBottomWidth: "1px",
             }}
