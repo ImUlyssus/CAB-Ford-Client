@@ -6,11 +6,17 @@ function Dialog({ open, onClose, children }) {
     const theme = useTheme();
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-opacity-90">
+        <div className="fixed inset-0 z-1000 flex items-center justify-center backdrop-blur-sm bg-opacity-90">
             <div
-                className={`p-6 rounded shadow-lg relative w-11/12 md:w-1/2`}
-                style={{ backgroundColor: theme.colors.primary400 }}
-            >
+    className={`p-6 rounded shadow-lg relative w-11/12 md:w-1/2`}
+    style={{
+        backgroundColor: theme.colors.primary400,
+        maxHeight: '70vh', // Set max height to 80% of the viewport height
+        maxWidth: '70vw',
+        overflowY: 'auto', // Allow scrolling if content exceeds max height
+    }}
+>
+
                 {/* Close Button */}
                 <button
                     onClick={onClose}

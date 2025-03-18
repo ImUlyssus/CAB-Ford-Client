@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import { useTheme } from 'styled-components';
-
+import Dialog from "../Dialog";
+import DataDetail from './DataDetail';
 const FirstSheet = () => {
     const [weeklyData, setWeeklyData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -11,6 +12,7 @@ const FirstSheet = () => {
     const [week2, setWeek2] = useState([]);
     const [week3, setWeek3] = useState([]);
     const [week4, setWeek4] = useState([]);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedData, setSelectedData] = useState(null);
     const theme = useTheme();
 
@@ -33,96 +35,82 @@ const FirstSheet = () => {
     }, []);
     useEffect(() => {
         if (weeklyData.length === 0) return;
-
+    
         const processWeekData = (weekData) => {
             let result = {
                 aat_total: 0, aat_ongoing: 0, aat_rejected: 0, aat_completed: 0,
                 ftm_total: 0, ftm_ongoing: 0, ftm_rejected: 0, ftm_completed: 0,
                 fsst_total: 0, fsst_ongoing: 0, fsst_rejected: 0, fsst_completed: 0,
-                aat_total_id: [], aat_ongoing_id: [], aat_rejected_id: [], aat_completed_id: [],
-                ftm_total_id: [], ftm_ongoing_id: [], ftm_rejected_id: [], ftm_completed_id: [],
-                fsst_total_id: [], fsst_ongoing_id: [], fsst_rejected_id: [], fsst_completed_id: [],
-                date: "", // Add a new field for the formatted date range
+                aat_ongoing_data: [], aat_completed_data: [], aat_rejected_data: [],
+                ftm_ongoing_data: [], ftm_completed_data: [], ftm_rejected_data: [],
+                fsst_ongoing_data: [], fsst_completed_data: [], fsst_rejected_data: [],
+                date: "", // Formatted date range
             };
-
+    
             // Process the start and end dates
             const startDate = new Date(weekData.week.start);
             const endDate = new Date(weekData.week.end);
-
-            // Format the dates as "Feb 21 - Feb 27"
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const startMonth = monthNames[startDate.getMonth()];
-            const startDay = startDate.getDate();
-            const endMonth = monthNames[endDate.getMonth()];
-            const endDay = endDate.getDate();
-
-            result.date = `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
-
-            // Process the data entries
+            result.date = `${monthNames[startDate.getMonth()]} ${startDate.getDate()} - ${monthNames[endDate.getMonth()]} ${endDate.getDate()}`;
+    
+            // Process data entries and store the full objects
             weekData.data.forEach((entry) => {
-                const { change_sites, change_status, id } = entry;
-
+                const { change_sites, change_status } = entry;
+    
                 if (change_sites.includes("aat")) {
                     result.aat_total++;
-                    result.aat_total_id.push(id);
                     if (change_status === "") {
                         result.aat_ongoing++;
-                        result.aat_ongoing_id.push(id);
+                        result.aat_ongoing_data.push(entry);
                     } else if (change_status === "Completed with no issue") {
                         result.aat_completed++;
-                        result.aat_completed_id.push(id);
+                        result.aat_completed_data.push(entry);
                     } else {
                         result.aat_rejected++;
-                        result.aat_rejected_id.push(id);
+                        result.aat_rejected_data.push(entry);
                     }
                 }
-
+    
                 if (change_sites.includes("ftm")) {
                     result.ftm_total++;
-                    result.ftm_total_id.push(id);
                     if (change_status === "") {
                         result.ftm_ongoing++;
-                        result.ftm_ongoing_id.push(id);
+                        result.ftm_ongoing_data.push(entry);
                     } else if (change_status === "Completed with no issue") {
                         result.ftm_completed++;
-                        result.ftm_completed_id.push(id);
+                        result.ftm_completed_data.push(entry);
                     } else {
                         result.ftm_rejected++;
-                        result.ftm_rejected_id.push(id);
+                        result.ftm_rejected_data.push(entry);
                     }
                 }
-
+    
                 if (change_sites.includes("fsst")) {
                     result.fsst_total++;
-                    result.fsst_total_id.push(id);
                     if (change_status === "") {
                         result.fsst_ongoing++;
-                        result.fsst_ongoing_id.push(id);
+                        result.fsst_ongoing_data.push(entry);
                     } else if (change_status === "Completed with no issue") {
                         result.fsst_completed++;
-                        result.fsst_completed_id.push(id);
+                        result.fsst_completed_data.push(entry);
                     } else {
                         result.fsst_rejected++;
-                        result.fsst_rejected_id.push(id);
+                        result.fsst_rejected_data.push(entry);
                     }
                 }
             });
-
+    
             return result;
         };
-
+    
         // Process each week's data
         setWeek1(processWeekData(weeklyData[0]));
         setWeek2(processWeekData(weeklyData[1]));
         setWeek3(processWeekData(weeklyData[2]));
         setWeek4(processWeekData(weeklyData[3]));
-
+    
     }, [weeklyData]);
-
-    const handleBarClick = (week, site, status, value) => {
-        setSelectedData({ week, site, status, value });
-        console.log(`Clicked: Week ${week}, ${site} - ${status}: ${value}`);
-    };
+    
 
     // Create an array of labels for the Y-axis
     let weeks = [week4, week3, week2, week1];
@@ -147,7 +135,23 @@ const FirstSheet = () => {
     console.log(yAxisLabels)
     // Scale factor to normalize bar heights
     const scaleFactor = chartHeight / maxY;
+    // Function to handle bar clicks
+const handleBarClick = (weekData, site, category) => {
+    const dataField = `${site}_${category}_data`; // Use the new data field name
 
+    const filteredData = weekData[dataField]; // Get the full data array directly
+    console.log(filteredData);  // For debugging purposes, you can inspect the filtered data
+
+    setSelectedData({
+        category,
+        filteredData,
+        date: weekData.date,
+        site
+    });
+    setIsDialogOpen(true);
+};
+
+    
     return (
         <div className="p-4">
             <h1 className="text-xl font-bold mb-5 text-center">Change request summary from last 4 weeks</h1>
@@ -208,40 +212,53 @@ const FirstSheet = () => {
                                             <p style={{ transform: 'rotate(-90deg)', marginBottom: "10px", color: 'gray' }}>{site.toUpperCase()}</p>
 
                                             {/* Ongoing Bar with Number */}
-                                            <div className="relative w-4 bg-blue-500 flex justify-center items-center" style={{ height: `${ongoingHeight}px` }}>
-                                                {ongoing > 0 && (
-                                                    <span
-                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
-                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }}
-                                                    >
-                                                        {ongoing}
-                                                    </span>
-                                                )}
-                                            </div>
+<div 
+    className="relative w-4 bg-blue-500 flex justify-center items-center cursor-pointer" 
+    style={{ height: `${ongoingHeight}px` }} 
+    onClick={() => handleBarClick(weekData, site, "ongoing")}
+>
+    {ongoing > 0 && (
+        <span
+            className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
+            style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+        >
+            {ongoing}
+        </span>
+    )}
+</div>
 
-                                            {/* Completed Bar with Number */}
-                                            <div className="relative w-4 bg-green-500 flex justify-center items-center" style={{ height: `${completedHeight}px` }}>
-                                                {completed > 0 && (
-                                                    <span
-                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
-                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }}
-                                                    >
-                                                        {completed}
-                                                    </span>
-                                                )}
-                                            </div>
+{/* Completed Bar with Number */}
+<div 
+    className="relative w-4 bg-green-500 flex justify-center items-center cursor-pointer" 
+    style={{ height: `${completedHeight}px` }} 
+    onClick={() => handleBarClick(weekData, site, "completed")}
+>
+    {completed > 0 && (
+        <span
+            className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
+            style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+        >
+            {completed}
+        </span>
+    )}
+</div>
 
-                                            {/* Rejected Bar with Number */}
-                                            <div className="relative w-4 bg-red-500 flex justify-center items-center" style={{ height: `${rejectedHeight}px` }}>
-                                                {rejected > 0 && (
-                                                    <span
-                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-center"
-                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }} // Centering vertically and horizontally
-                                                    >
-                                                        {rejected}
-                                                    </span>
-                                                )}
-                                            </div>
+{/* Rejected Bar with Number */}
+<div 
+    className="relative w-4 bg-red-500 flex justify-center items-center cursor-pointer" 
+    style={{ height: `${rejectedHeight}px` }} 
+    onClick={() => handleBarClick(weekData, site, "rejected")}
+>
+    {rejected > 0 && (
+        <span
+            className="absolute left-3 transform -translate-x-1/2 text-xs text-center"
+            style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+        >
+            {rejected}
+        </span>
+    )}
+</div>
+
 
                                         </div>
                                     );
@@ -281,6 +298,22 @@ const FirstSheet = () => {
                         <span className="text-sm">Ongoing</span>
                     </div>
                 </div>
+                {/* Dialog Component */}
+            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                <h2 className="text-lg font-semibold mb-2">
+                    {selectedData?.category.toUpperCase()} Requests ({selectedData?.date})
+                </h2>
+                <p className="text-sm mb-4">
+                    Showing requests for <strong>{selectedData?.site.toUpperCase()}</strong>
+                </p>
+                <ul className="list-disc pl-5 space-y-2">
+                    {selectedData?.filteredData ? (
+                        <DataDetail requests={selectedData.filteredData} />
+                    ) : (
+                        <p className="text-gray-500">No data available.</p>
+                    )}
+                </ul>
+            </Dialog>
             </div>
         </div>
     );
