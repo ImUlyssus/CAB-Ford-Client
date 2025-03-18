@@ -153,44 +153,35 @@ const FirstSheet = () => {
             <h1 className="text-xl font-bold mb-5 text-center">Change request summary from last 4 weeks</h1>
 
             <div className="relative w-full h-64 border-l border-b border-gray-700 ml-3">
+                {/* Vertical Y-Axis Label */}
+    <div
+        className="absolute left-[-40px] bottom-4 transform -translate-y-1/2 -rotate-90 whitespace-nowrap"
+        style={{
+            transformOrigin: "left center", // Ensure the text rotates around the correct point
+        }}
+    >
+        <span className="text-sm">Change Request Amount</span>
+    </div>
                 {/* Y-Axis Labels */}
-                <div className={`absolute left-[-20px] top-3 h-[${chartHeight}px] flex flex-col justify-end`}>
-                    {/* Vertical Y-Axis Label */}
-                    <div
-                        className="absolute left-[-15px] bottom-4 transform -translate-y-1/2 -rotate-90 whitespace-nowrap"
-                        style={{
-                            transformOrigin: "left center", // Ensure the text rotates around the correct point
-                        }}
-                    >
-                        <span className="text-sm">Change Request Amount</span>
-                    </div>
-
-                    {/* Y-Axis Labels */}
+                <div className="absolute left-[-20px] top-0 h-full flex flex-col justify-between">
                     {yAxisLabels.map((num, index) => (
-                        <div
-                            key={index} // Use index as the key to avoid duplicate key issues
-                            className="flex items-end" // Align labels to the bottom of their container
-                            style={{
-                                marginTop: "auto", // Ensure the first label (0) is at the bottom
-                            }}
-                        >
+                        <div key={index} className="flex items-end">
                             <span className="text-sm">{num}</span>
                         </div>
                     ))}
                 </div>
-                {/* Horizontal Grid Lines */}
-                <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-between">
-                    {yAxisLabels.map((_, index) => (
-                        <div
-                            key={index}
-                            className="w-full border-t border-gray-700" // Add a horizontal grid line
-                            style={{
-                                height: `${100 / (yAxisLabels.length - 1)}%`, // Evenly space the grid lines
-                            }}
-                        />
-                    ))}
-                </div>
 
+                {/* Horizontal Grid Lines */}
+                {yAxisLabels.map((_, index) => (
+                    <div
+                        key={index}
+                        className="absolute w-full border-t border-gray-700"
+                        style={{
+                            top: `${(index / (yAxisLabels.length - 1)) * 100}%`,
+                            transform: "translateY(-50%)",
+                        }}
+                    />
+                ))}
                 {/* X-Axis Line */}
                 <div className="absolute bottom-0 left-0 w-full border-t border-gray-700"></div>
 
@@ -207,9 +198,9 @@ const FirstSheet = () => {
                                     const totalHeight = ongoing + completed + rejected;
 
                                     // Scale the bar heights to match the Y-axis
-                                    const ongoingHeight = ongoing * scaleFactor * 0.62;
-                                    const completedHeight = completed * scaleFactor * 0.62;
-                                    const rejectedHeight = rejected * scaleFactor * 0.62;
+                                    const ongoingHeight = ongoing * scaleFactor * 0.77;
+                                    const completedHeight = completed * scaleFactor * 0.77;
+                                    const rejectedHeight = rejected * scaleFactor * 0.77;
 
                                     return (
                                         <div key={siteIndex} className="flex flex-col items-center justify-end h-full">
@@ -266,9 +257,9 @@ const FirstSheet = () => {
                     ))}
                 </div>
                 {/* X-Axis Label - "Date" */}
-<div className="absolute bottom-[-60px] left-1/2 transform -translate-x-1/2 text-md">
-    Date
-</div>
+                <div className="absolute bottom-[-60px] left-1/2 transform -translate-x-1/2 text-md">
+                    Date
+                </div>
 
                 {/* Legend */}
                 <div className="flex justify-center mt-4 space-x-4">
