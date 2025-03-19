@@ -115,7 +115,7 @@ const SecondSheet = () => {
         <div className="grid grid-cols-5">
             {/* First column */}
             <div className="col-span-2 bg-transparent p-4">
-                <h2 className="text-xl font-semibold mb-6 text-center">All 3 sites</h2>
+                <h2 className="text-xl font-semibold mb-6 text-center text-[#beef70]">All 3 sites</h2>
 
                 <div className="space-y-6">
                     {/* Card 1 - Total */}
@@ -158,7 +158,7 @@ const SecondSheet = () => {
 
             {/* Fourth column (merged into one) */}
             <div className="col-span-3 p-4">
-                <h2 className="text-xl font-semibold mb-1 text-center">Change request distribution by site</ h2>
+                <h2 className="text-xl font-semibold mb-1 text-center text-[#beef70]">Change request distribution by site</ h2>
                 {/* <LayeredDonutChart aggregatedData={aggregatedData} /> */}
                 <TwoLayerDonutChart data={aggregatedData} />
             </div>

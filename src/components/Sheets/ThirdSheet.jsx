@@ -178,8 +178,8 @@ bars.append("rect")
     }, [aggregatedData]);
 
     return (
-        <div className="p-2">
-            <h1 className="text-xl font-bold mb-3 text-center">Plan and Unplanned change request summary</h1>
+        <div>
+            <h1 className="text-xl font-bold mb-3 text-center text-[#beef70]">Plan and Unplanned change request summary</h1>
 
             {/* Add legend here below the title */}
             <div className="flex justify-center mb-2">

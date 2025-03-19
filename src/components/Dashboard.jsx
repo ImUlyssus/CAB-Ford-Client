@@ -3,6 +3,7 @@ import FirstSheet from './Sheets/FirstSheet';
 import SecondSheet from './Sheets/SecondSheet';
 import { useTheme } from 'styled-components';
 import ThirdSheet from './Sheets/ThirdSheet';
+import FourthSheet from './Sheets/FourthSheet';
 const Dashboard = () => {
     const sheetStyle = "p-6 bg-gray-900 rounded-[15px]"
   return (
@@ -16,7 +17,9 @@ const Dashboard = () => {
       <div className={sheetStyle}>
         <ThirdSheet />
       </div>
-      <div className={sheetStyle}>Item 4</div>
+      <div className={sheetStyle}>
+        <FourthSheet />
+      </div>
     </div>
   );
 }

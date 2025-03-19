@@ -145,8 +145,8 @@ const handleBarClick = (weekData, site, category) => {
 
     
     return (
-        <div className="p-4">
-            <h1 className="text-xl font-bold mb-5 text-center">Change request summary from last 4 weeks</h1>
+        <div className='p-4'>
+            <h1 className="text-xl font-bold mb-5 text-center text-[#beef70]">Change request summary from last 4 weeks</h1>
 
             <div className="relative w-full h-64 border-l border-b border-gray-700 ml-3">
                 {/* Vertical Y-Axis Label */}
