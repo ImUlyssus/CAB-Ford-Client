@@ -74,7 +74,6 @@ const SecondSheet = () => {
 
         // Process the filteredData and store it in a single result
         const allData = processData(auth.filteredData);  // Assuming filteredData is your array of entries
-        console.log(allData.aat_total);
         setAggregatedData(allData);  // Store the result in your state (setAggregatedData should be defined)
     }, [auth.filteredData]);  // Run this effect whenever the filtered data changes
     // Determine the data to pass based on the selected category
@@ -236,12 +235,6 @@ const TwoLayerDonutChart = ({ data }) => {
             .on("click", function (event, d) {
                 const labels = ["aat", "ftm", "fsst"];
                 const category = labels[d.index]; // Use d.index instead of i
-
-                // Debugging: Log the category and constructed keys
-                console.log("Category:", category);
-                console.log("Ongoing Key:", `${category}_ongoing_data`);
-                console.log("Completed Key:", `${category}_completed_data`);
-                console.log("Rejected Key:", `${category}_rejected_data`);
 
                 // Combine ongoing, completed, and rejected data into filteredData
                 const ongoingData = data[`${category}_ongoing_data`] || [];

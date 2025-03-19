@@ -20,9 +20,7 @@ const FirstSheet = () => {
         const fetchWeeklyData = async () => {
             try {
                 const response = await axiosPrivate.get('/change-requests/get-four-week-data');
-                console.log('Weekly data from server:', response.data);
                 setWeeklyData(response.data);
-                console.log(response.data[3].week.start)
             } catch (err) {
                 console.error("Error fetching weekly data:", err.response ? err.response.data : err.message);
                 setError(err.response ? err.response.data.message : err.message);
@@ -116,7 +114,6 @@ const FirstSheet = () => {
     let weeks = [week4, week3, week2, week1];
     useEffect(() => {
         weeks = [week4, week3, week2, week1];
-        console.log(weeks);
     }, [week1, week2, week3, week4])
     const chartHeight = 247; // Adjust this value based on your chart's height
     const totals = weeks.flatMap(week =>
@@ -124,15 +121,11 @@ const FirstSheet = () => {
         (week.ftm_ongoing ?? 0) + (week.ftm_completed ?? 0) + (week.ftm_rejected ?? 0),
         (week.fsst_ongoing ?? 0) + (week.fsst_completed ?? 0) + (week.fsst_rejected ?? 0)]
     );
-    console.log("Totals:", totals);
 
     const maxY = Math.max(...totals);
     const interval = Math.ceil(maxY / 5); // Divide maxY into 5 intervals
-
-    console.log(maxY, interval)
-    console.log(weeks[1].ftm_ongoing + weeks[1].ftm_completed + weeks[1].ftm_rejected)
+    
     const yAxisLabels = Array.from({ length: 5 }, (_, index) => interval * index).reverse();
-    console.log(yAxisLabels)
     // Scale factor to normalize bar heights
     const scaleFactor = chartHeight / maxY;
     // Function to handle bar clicks
@@ -140,7 +133,6 @@ const handleBarClick = (weekData, site, category) => {
     const dataField = `${site}_${category}_data`; // Use the new data field name
 
     const filteredData = weekData[dataField]; // Get the full data array directly
-    console.log(filteredData);  // For debugging purposes, you can inspect the filtered data
 
     setSelectedData({
         category,
