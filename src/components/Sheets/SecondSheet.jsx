@@ -77,41 +77,41 @@ const SecondSheet = () => {
         console.log(allData.aat_total);
         setAggregatedData(allData);  // Store the result in your state (setAggregatedData should be defined)
     }, [auth.filteredData]);  // Run this effect whenever the filtered data changes
-// Determine the data to pass based on the selected category
-const getSelectedData = () => {
-    if (!selectedCategory) return null;
-    switch (selectedCategory) {
-        case "total":
-            return {
-                category: "Total",
-                filteredData: [...aggregatedData.aat_ongoing_data, ...aggregatedData.aat_completed_data, ...aggregatedData.aat_rejected_data, 
-                               ...aggregatedData.ftm_ongoing_data, ...aggregatedData.ftm_completed_data, ...aggregatedData.ftm_rejected_data,
-                               ...aggregatedData.fsst_ongoing_data, ...aggregatedData.fsst_completed_data, ...aggregatedData.fsst_rejected_data],
-            };
-        case "ongoing":
-            return {
-                category: "Ongoing",
-                filteredData: [...aggregatedData.aat_ongoing_data, ...aggregatedData.ftm_ongoing_data, ...aggregatedData.fsst_ongoing_data],
-            };
-        case "completed":
-            return {
-                category: "Completed",
-                filteredData: [...aggregatedData.aat_completed_data, ...aggregatedData.ftm_completed_data, ...aggregatedData.fsst_completed_data],
-            };
-        case "rejected":
-            return {
-                category: "Rejected",
-                filteredData: [...aggregatedData.aat_rejected_data, ...aggregatedData.ftm_rejected_data, ...aggregatedData.fsst_rejected_data],
-            };
-        default:
-            return null;
-    }
-};
-// Handle opening dialog with the selected category
-const openDialog = (category) => {
-    setSelectedCategory(category);
-    setIsDialogOpen(true);
-};
+    // Determine the data to pass based on the selected category
+    const getSelectedData = () => {
+        if (!selectedCategory) return null;
+        switch (selectedCategory) {
+            case "total":
+                return {
+                    category: "Total",
+                    filteredData: [...aggregatedData.aat_ongoing_data, ...aggregatedData.aat_completed_data, ...aggregatedData.aat_rejected_data,
+                    ...aggregatedData.ftm_ongoing_data, ...aggregatedData.ftm_completed_data, ...aggregatedData.ftm_rejected_data,
+                    ...aggregatedData.fsst_ongoing_data, ...aggregatedData.fsst_completed_data, ...aggregatedData.fsst_rejected_data],
+                };
+            case "ongoing":
+                return {
+                    category: "Ongoing",
+                    filteredData: [...aggregatedData.aat_ongoing_data, ...aggregatedData.ftm_ongoing_data, ...aggregatedData.fsst_ongoing_data],
+                };
+            case "completed":
+                return {
+                    category: "Completed",
+                    filteredData: [...aggregatedData.aat_completed_data, ...aggregatedData.ftm_completed_data, ...aggregatedData.fsst_completed_data],
+                };
+            case "rejected":
+                return {
+                    category: "Rejected",
+                    filteredData: [...aggregatedData.aat_rejected_data, ...aggregatedData.ftm_rejected_data, ...aggregatedData.fsst_rejected_data],
+                };
+            default:
+                return null;
+        }
+    };
+    // Handle opening dialog with the selected category
+    const openDialog = (category) => {
+        setSelectedCategory(category);
+        setIsDialogOpen(true);
+    };
     return (
         <div className="grid grid-cols-5">
             {/* First column */}
@@ -120,7 +120,7 @@ const openDialog = (category) => {
 
                 <div className="space-y-6">
                     {/* Card 1 - Total */}
-                    <div 
+                    <div
                         className="bg-transparent p-2 rounded-lg shadow-md text-center border-2 border-blue-500 text-blue-500 cursor-pointer"
                         onClick={() => openDialog("total")}
                     >
@@ -129,7 +129,7 @@ const openDialog = (category) => {
                     </div>
 
                     {/* Card 2 - Completed */}
-                    <div 
+                    <div
                         className="bg-transparent p-2 rounded-lg shadow-md text-center border-2 border-green-500 text-green-500 cursor-pointer"
                         onClick={() => openDialog("completed")}
                     >
@@ -138,7 +138,7 @@ const openDialog = (category) => {
                     </div>
 
                     {/* Card 3 - Ongoing */}
-                    <div 
+                    <div
                         className="bg-transparent p-2 rounded-lg shadow-md text-center border-2 border-yellow-500 text-yellow-500 cursor-pointer"
                         onClick={() => openDialog("ongoing")}
                     >
@@ -147,7 +147,7 @@ const openDialog = (category) => {
                     </div>
 
                     {/* Card 4 - Rejected */}
-                    <div 
+                    <div
                         className="bg-transparent p-2 rounded-lg shadow-md text-center border-2 border-red-500 text-red-500 cursor-pointer"
                         onClick={() => openDialog("rejected")}
                     >
@@ -159,7 +159,7 @@ const openDialog = (category) => {
 
             {/* Fourth column (merged into one) */}
             <div className="col-span-3 p-4">
-            <h2 className="text-xl font-semibold mb-4 text-center">Change request distribution by site</ h2>
+                <h2 className="text-xl font-semibold mb-1 text-center">Change request distribution by site</ h2>
                 {/* <LayeredDonutChart aggregatedData={aggregatedData} /> */}
                 <TwoLayerDonutChart data={aggregatedData} />
             </div>
@@ -182,7 +182,7 @@ const TwoLayerDonutChart = ({ data }) => {
     const outerCount = [
         data.aat_completed, data.aat_ongoing, data.aat_rejected,
         data.ftm_completed, data.ftm_ongoing, data.ftm_rejected,
-        data.fsst_completed, data.fsst_ongoing,  data.fsst_rejected
+        data.fsst_completed, data.fsst_ongoing, data.fsst_rejected
     ];
     const svgRef = useRef(null);
     const outerColors = ["#5B913B", "#FFEB00", "#D84040", "#5B913B", "#FFEB00", "#D84040", "#5B913B", "#FFEB00", "#D84040"];
@@ -224,84 +224,74 @@ const TwoLayerDonutChart = ({ data }) => {
 
         // Inner Sections
         svg
-        .selectAll(".innerSlice")
-        .data(innerPie(innerCount))
-        .enter()
-        .append("path")
-        .attr("d", innerArc)
-        .attr("fill", (d, i) => ["#22177A", "#FF2DF1", "#2196F3"][i]) // Different colors
-        .attr("stroke", "#111827")
-        .attr("stroke-width", 2)
-        .on("click", function(event, d) {
-            const labels = ["aat", "ftm", "fsst"];
-            const category = labels[d.index]; // Use d.index instead of i
-    
-            // Debugging: Log the category and constructed keys
-            console.log("Category:", category);
-            console.log("Ongoing Key:", `${category}_ongoing_data`);
-            console.log("Completed Key:", `${category}_completed_data`);
-            console.log("Rejected Key:", `${category}_rejected_data`);
-    
-            // Combine ongoing, completed, and rejected data into filteredData
-            const ongoingData = data[`${category}_ongoing_data`] || [];
-            const completedData = data[`${category}_completed_data`] || [];
-            const rejectedData = data[`${category}_rejected_data`] || [];
-    
-            const filteredData = ongoingData.concat(completedData, rejectedData); // Concatenate arrays
-    
-            setSelectedData({
-                category: category,
-                date: new Date().toLocaleDateString(), // Example date, use your data here
-                site: category.toUpperCase(), // Example site, use your data here
-                ongoingData: ongoingData, // Fallback to empty array if key doesn't exist
-                completedData: completedData, // Fallback to empty array if key doesn't exist
-                rejectedData: rejectedData, // Fallback to empty array if key doesn't exist
-                filteredData: filteredData // Combined data
+            .selectAll(".innerSlice")
+            .data(innerPie(innerCount))
+            .enter()
+            .append("path")
+            .attr("d", innerArc)
+            .attr("fill", (d, i) => ["#22177A", "#FF2DF1", "#2196F3"][i]) // Different colors
+            .attr("stroke", "#111827")
+            .attr("stroke-width", 2)
+            .style("cursor", "pointer")
+            .on("click", function (event, d) {
+                const labels = ["aat", "ftm", "fsst"];
+                const category = labels[d.index]; // Use d.index instead of i
+
+                // Debugging: Log the category and constructed keys
+                console.log("Category:", category);
+                console.log("Ongoing Key:", `${category}_ongoing_data`);
+                console.log("Completed Key:", `${category}_completed_data`);
+                console.log("Rejected Key:", `${category}_rejected_data`);
+
+                // Combine ongoing, completed, and rejected data into filteredData
+                const ongoingData = data[`${category}_ongoing_data`] || [];
+                const completedData = data[`${category}_completed_data`] || [];
+                const rejectedData = data[`${category}_rejected_data`] || [];
+
+                const filteredData = ongoingData.concat(completedData, rejectedData); // Concatenate arrays
+
+                setSelectedData({
+                    category: category,
+                    date: new Date().toLocaleDateString(), // Example date, use your data here
+                    site: category.toUpperCase(), // Example site, use your data here
+                    ongoingData: ongoingData, // Fallback to empty array if key doesn't exist
+                    completedData: completedData, // Fallback to empty array if key doesn't exist
+                    rejectedData: rejectedData, // Fallback to empty array if key doesn't exist
+                    filteredData: filteredData // Combined data
+                });
+                setIsDialogOpen(true);
             });
-            setIsDialogOpen(true);
-        });
         // Outer Sections
-svg
-.selectAll(".outerSlice")
-.data(outerPie(outerCount))
-.enter()
-.append("path")
-.attr("d", outerArc)
-.attr("fill", (d, i) => outerColors[i]) // Gradient color
-.attr("stroke", "#111827")
-.attr("stroke-width", 2)
-.on("click", function(event, d) {
-    // Get the index of the clicked slice
-    const index = d.index; // Use the index from the bound data
+        svg
+            .selectAll(".outerSlice")
+            .data(outerPie(outerCount))
+            .enter()
+            .append("path")
+            .attr("d", outerArc)
+            .attr("fill", (d, i) => outerColors[i]) // Gradient color
+            .attr("stroke", "#111827")
+            .attr("stroke-width", 2)
+            .style("cursor", "pointer")
+            .on("click", function (event, d) {
+                // Get the index of the clicked slice
+                const index = d.index; // Use the index from the bound data
 
-    const sectionNames = ["completed", "ongoing", "rejected"];
-    const sectionIndex = index % 3; // Index for section (0, 1, 2)
-    const categoryIndex = Math.floor(index / 3); // Index for category (0, 1, 2)
-    const labels = ["aat", "ftm", "fsst"];
+                const sectionNames = ["completed", "ongoing", "rejected"];
+                const sectionIndex = index % 3; // Index for section (0, 1, 2)
+                const categoryIndex = Math.floor(index / 3); // Index for category (0, 1, 2)
+                const labels = ["aat", "ftm", "fsst"];
+                // Get category and section
+                const category = labels[categoryIndex];
+                const section = sectionNames[sectionIndex];
 
-    // Debugging: Log intermediate values
-    console.log("Index (i):", index);
-    console.log("Section Index (i % 3):", sectionIndex);
-    console.log("Category Index (Math.floor(i / 3)):", categoryIndex);
-    console.log("Labels Array:", labels);
-    console.log("Section Names Array:", sectionNames);
-
-    // Get category and section
-    const category = labels[categoryIndex];
-    const section = sectionNames[sectionIndex];
-
-    // Debugging: Log category and section
-    console.log("Category:", category);
-    console.log("Section:", section);
-
-    setSelectedData({
-        category: `${category} - ${section}`,
-        date: new Date().toLocaleDateString(),
-        site: category,
-        filteredData: data[`${category}_${section}_data`] || [] // Fallback to empty array if key doesn't exist
-    });
-    setIsDialogOpen(true);
-});
+                setSelectedData({
+                    category: `${category} - ${section}`,
+                    date: new Date().toLocaleDateString(),
+                    site: category,
+                    filteredData: data[`${category}_${section}_data`] || [] // Fallback to empty array if key doesn't exist
+                });
+                setIsDialogOpen(true);
+            });
 
         // Inner Section Labels
         svg
@@ -338,25 +328,31 @@ svg
 
         // Outer Section Labels with Status and Percentage
         svg
-            .selectAll(".outerText")
-            .data(outerPie(outerCount))
-            .enter()
-            .append("text")
-            .attr("transform", (d) => `translate(${outerArc.centroid(d)})`)
-            .attr("text-anchor", "middle")
-            .attr("fill", "black")
-            .attr("font-size", "12px")
-            .text((d, i) => {
-                // Calculate the percentage for each outer section
-                const totalOuter = innerCount[Math.floor(i / 3)]; // Corresponding inner section total
-                const percentage = ((d.data / totalOuter) * 100).toFixed(1); // Calculate percentage for each slice
+    .selectAll(".outerText")
+    .data(outerPie(outerCount))
+    .enter()
+    .append("text")
+    .attr("transform", (d) => `translate(${outerArc.centroid(d)})`)
+    .attr("text-anchor", "middle")
+    .attr("fill", "black")
+    .attr("font-size", "12px")
+    .each(function (d, i) {
+        const totalOuter = innerCount[Math.floor(i / 3)];
+        const percentage = ((d.data / totalOuter) * 100).toFixed(1);
+        const status = ["C", "O", "R"][i % 3];
 
-                // Display the status (Completed, Rejected, Ongoing) based on index i
-                const status = ["C", "O", "R"][i % 3]; // Cycle through C, R, O
+        const textElement = d3.select(this);
+        textElement
+            .append("tspan")
+            .attr("font-weight", "bold") // Make status bold
+            .text(status);
 
-                // Return a combination of status and percentage (e.g., "C 25.0%")
-                return `${status} ${percentage}%`;
-            });
+        textElement
+            .append("tspan")
+            .attr("dx", "4px") // Add space between status and percentage
+            .text(` ${percentage}%`);
+    });
+
 
         // Add Chart Title
         svg
@@ -383,10 +379,10 @@ svg
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
                     {selectedData?.filteredData ? (
-                                            <DataDetail requests={selectedData.filteredData} />
-                                        ) : (
-                                            <p className="text-gray-500">No data available.</p>
-                                        )}
+                        <DataDetail requests={selectedData.filteredData} />
+                    ) : (
+                        <p className="text-gray-500">No data available.</p>
+                    )}
                 </ul>
             </Dialog>
         </div>
