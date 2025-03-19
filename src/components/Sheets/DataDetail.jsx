@@ -31,7 +31,7 @@ export default function DataDetail({requests}) {
                 <div className="flex-1 overflow-auto">
                     <div className="overflow-x-auto h-full">
                         <table className="w-full border border-gray-300 rounded-lg shadow-md text-sm" style={{ backgroundColor: theme.colors.primary400 }}>
-                            <thead className="sticky top-0 bg-gray-800">
+                            <thead className="sticky top-0 bg-gray-800 z-10">
                                 <tr>
                                     <th className={thStyle1}>Change Record</th>
                                     <th className={thStyle1}>Category</th>
@@ -95,7 +95,6 @@ export default function DataDetail({requests}) {
                                     return (
                                         <>
                                             <tr
-                                                onClick={() => { handleOpenDialog(request); setCurrentRow(index + 1) }}
                                                 key={request.id}
                                                 className="hover:bg-gray-100 hover:text-black">
                                                 <td className="py-2 px-4 border-b border-r text-center">{index + 1}</td>
