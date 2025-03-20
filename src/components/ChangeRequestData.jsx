@@ -7,6 +7,7 @@ import FilteredBar from "./FilteredBar";
 import AuthContext from '../context/AuthProvider';
 import VHDrawer from './VHDrawer';
 import { History } from "lucide-react";
+
 export default function ChangeRequestData() {
     const [changeRequests, setChangeRequests] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -20,19 +21,69 @@ export default function ChangeRequestData() {
     const [currentRow, setCurrentRow] = useState();
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
-
-
+    const email = localStorage.getItem("authEmail")?.split("@")[0];
+    const id = selectedRequest?.id;
     const handleOpenDialog = (request) => {
         setSelectedRequest(request); // Store the clicked row's request
         setDialogOpen(true); // Open the dialog
     };
+    const forceUpdateRequest = async (id, email) => {
+        try {
+            const response = await axiosPrivate.put(`/change-requests/force-update`, { id, email }, {
+                headers: { "Content-Type": "application/json" },
+            });
+    
+            if (response.data.canUpdate) {
+                alert("✅ Force update successful. You can now update the request.");
+                navigate("/change-request-update", { state: { request: selectedRequest } });
+            } else {
+                alert(`❌ Force update failed: ${response.data.message}`);
+            }
+        } catch (error) {
+            console.error("❌ Error forcing update:", error);
+            alert("❌ Error forcing update. Please try again later.");
+        }
+    };
 
-    const handleUpdate = () => {
-        if (selectedRequest) {
-            navigate("/change-request-update", { state: { request: selectedRequest } });
+    const handleUpdate = async () => {
+        const requestData = { email, id };
+    
+        try {
+            const response = await axiosPrivate.put(`/change-requests/check-to-update`, requestData, {
+                headers: { "Content-Type": "application/json" },
+            });
+    
+            if (response.data.canUpdate) {
+                // ✅ User can update the request
+                console.log("You can now update the request.");
+                navigate("/change-request-update", { state: { request: selectedRequest } });
+            } else if (response.data.canForceUpdate) {
+                // ❌ Someone else is updating, allow force update
+                const isForceUpdate = window.confirm(
+                    `❌ Someone is already updating this request (CDSID: ${response.data.isSomeoneUpdating}). 
+                    Would you like to force update?`
+                );
+    
+                if (isForceUpdate) {
+                    // 📝 Ask for email confirmation
+                    const confirmEmail = window.prompt("Enter your email to confirm force update:");
+    
+                    if (confirmEmail && confirmEmail.split("@")[0] === email) {
+                        // 🔥 Call API to force update
+                        await forceUpdateRequest(id, email);
+                    } else {
+                        alert("❌ Incorrect email. Force update canceled.");
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("❌ Error submitting Change Request", error.message);
+            alert("❌ An error occurred while checking update status.");
         }
         setDialogOpen(false);
     };
+    
+    
     const handleDelete = async () => {
         if (!selectedRequest) {
             alert("Please select a data row to delete.");
@@ -41,7 +92,7 @@ export default function ChangeRequestData() {
         const confirmDelete = window.confirm("Are you sure you want to delete this data row?");
         if (!confirmDelete) return;
         try {
-            const response = await axiosPrivate.delete(`/change-requests/${selectedRequest.id}`);
+            const response = await axiosPrivate.delete(`/change-requests/${selectedRequest.id}`,{data: { email }});
             alert("✅ Change Request deleted successfully")
             setChangeRequests(prev => prev.filter(request => request.id !== selectedRequest.id));
             setDialogOpen(false);

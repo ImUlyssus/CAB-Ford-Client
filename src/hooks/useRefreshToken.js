@@ -8,12 +8,36 @@ const useRefreshToken = () => {
         const response = await axios.get('/refresh', {
             withCredentials: true
         });
+        const newAccessToken = response.data.accessToken;
+        
+        // Ensure that we only update the access token, not the email
         setAuth(prev => {
-            return { ...prev, accessToken: response.data.accessToken }
+            const updatedAuth = { ...prev, accessToken: newAccessToken };
+            // Do not store the whole auth object in localStorage, just the email
+            if (prev?.email) {
+                localStorage.setItem('authEmail', prev.email);
+            }
+            return updatedAuth;
         });
-        return response.data.accessToken;
+        return newAccessToken;
     }
+    
     return refresh;
 };
 
 export default useRefreshToken;
+
+// const useRefreshToken = () => {
+//     const { setAuth } = useAuth();
+
+//     const refresh = async () => {
+//         const response = await axios.get('/refresh', {
+//             withCredentials: true
+//         });
+//         setAuth(prev => {
+//             return { ...prev, accessToken: response.data.accessToken }
+//         });
+//         return response.data.accessToken;
+//     }
+//     return refresh;
+// };

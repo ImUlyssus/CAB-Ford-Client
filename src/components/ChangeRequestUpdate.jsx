@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { useTheme } from "styled-components";
 import Dialog from "../components/Dialog";
 import Button from "../components/Button";
@@ -9,8 +9,10 @@ import BusinessTeamContact from "./BusinessTeamContact";
 import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
 import { useNavigate, useLocation } from "react-router-dom";
+import AuthContext from '../context/AuthProvider';
 function ChangeRequestUpdate() {
     const location = useLocation();
+    const {auth} = useContext(AuthContext);
     const request = location.state?.request;
     const [changeRequestData, setChangeRequestData] = useState({
         category: request.category,
@@ -44,6 +46,8 @@ function ChangeRequestUpdate() {
     const globalTeamContactRef = useRef(null);
     const navigate = useNavigate();
     console.log("From update", request);
+    console.log("From update", localStorage.getItem('authEmail'));
+
     // Function to handle change in select fields
     const handleChange = (event) => {
         const { name, value } = event.target; // Destructure name and value from the event
@@ -60,7 +64,7 @@ function ChangeRequestUpdate() {
             });
         }
     };
-
+    
     // the following useEffect is required when there is only one site in request.change_sites with no comma
     // or it will cause bug
     useEffect(() => {
@@ -68,7 +72,7 @@ function ChangeRequestUpdate() {
             setSelectedSites([request.change_sites])
         }
     })
-
+    
     const [crqs, setCrqs] = useState({
         aat: [],
         ftm: [],
@@ -139,7 +143,6 @@ function ChangeRequestUpdate() {
         }));
         updateDurations();
     }, [request])
-    console.log(request)
     const extractIntegers = (duration) => {
         if (!duration) return null; // Handle null or undefined cases
 
@@ -258,11 +261,14 @@ function ChangeRequestUpdate() {
 
         const hasEarlyEndDate = allEmpty || [...aatEndDates, ...ftmEndDates, ...fsstEndDates]
             .some(endDate => endDate < twoWeeksLater);
-
-
         const achieve_2_week_change_request = !hasEarlyEndDate;
-        console.log(achieve_2_week_change_request);
+        const is_someone_updating = localStorage.getItem('authEmail')?.split("@")[0];
+        if(!is_someone_updating){
+            alert("Cannot get email from local storage! Contact developer to solve this issue.")
+            return;
+        }
         const requestData = {
+            email: localStorage.getItem("authEmail").split("@")[0],
             id: request.id,
             category: changeRequestData.category,
             reason: changeRequestData.reason,
@@ -292,7 +298,8 @@ function ChangeRequestUpdate() {
             cancel_change_category: changeStatus == "Completed with no issue" || changeStatus == "" ?"":changeRequestData.cancel_change_category,
             cancel_change_reason: changeStatus == "Completed with no issue" || changeStatus == "" ?"":changeRequestData.cancel_change_reason,
             lesson_learnt: changeRequestData.lesson_learnt,
-            reschedule_reason: changeRequestData.reschedule_reason
+            reschedule_reason: changeRequestData.reschedule_reason,
+            is_someone_updating
         }
         try {
             const response = await axiosPrivate.put(`/change-requests`, requestData, {
@@ -331,10 +338,11 @@ function ChangeRequestUpdate() {
             }
         });
     };
+        // useReleaseLock({id:request.id, email:localStorage.getItem("authEmail").split("@")[0]});
     return (
         <div>
             <button
-                onClick={() => navigate(-1)} // Go back to the previous page
+                onClick={()=>navigate(-1)} // Go back to the previous page
                 className="px-4 py-2 bg-gray-500 text-white rounded-lg mb-4 hover:bg-gray-600"
             >
                 ← Back
