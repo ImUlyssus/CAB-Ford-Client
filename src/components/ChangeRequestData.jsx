@@ -48,8 +48,16 @@ export default function ChangeRequestData() {
     }
 
     useEffect(() => {
-        setChangeRequests(auth.filteredData)
+        const updateChangeRequests = async () => {
+            // Simulate async behavior (e.g., fetching, processing)
+            await new Promise(resolve => setTimeout(resolve, 0)); // Example delay
+    
+            setChangeRequests(auth.filteredData);
+        };
+    
+        updateChangeRequests();
     }, [auth]);
+    
 
     if (loading) {
         return <div className="text-center py-4">Loading...</div>;
@@ -84,7 +92,7 @@ export default function ChangeRequestData() {
                 </button>
             </div>
 
-            {changeRequests.length === 0 ? (
+            {changeRequests?.length === 0 ? (
                 <div className="flex-1 overflow-auto">
                     <div className="overflow-x-auto h-full">
                         <table className="w-full border border-gray-300 rounded-lg shadow-md text-sm" style={{ backgroundColor: theme.colors.primary400 }}>
@@ -137,7 +145,7 @@ export default function ChangeRequestData() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {changeRequests.map((request, index) => {
+                                {changeRequests?.map((request, index) => {
                                     const processSchedule = (scheduleString) => {
                                         if (!scheduleString) return { scheduleArray: [], totalDuration: 0 }; // Return empty array if no schedule
                                         const parts = scheduleString.split(" "); // Split by space

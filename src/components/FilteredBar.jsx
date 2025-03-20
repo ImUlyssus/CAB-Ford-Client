@@ -130,6 +130,11 @@ export default function FilteredBar() {
         try {
             const response = await axiosPrivate.get(`/change-requests/year/${selectedYear}`);
             setChangeRequests(response.data); // Initially, no filters applied
+            setAuth(prev => ({
+                ...prev, // Keep all existing values
+                filteredData: response.data // Remove selectedRequest.id
+              }));
+              
         } catch (err) {
             console.error("Error fetching change requests:", err.response ? err.response.data : err.message);
             setError(err.response ? err.response.data.message : err.message);
