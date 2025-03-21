@@ -32,7 +32,7 @@ export default function ChangeRequestData() {
             const response = await axiosPrivate.put(`/change-requests/force-update`, { id, email }, {
                 headers: { "Content-Type": "application/json" },
             });
-    
+
             if (response.data.canUpdate) {
                 alert("✅ Force update successful. You can now update the request.");
                 navigate("/change-request-update", { state: { request: selectedRequest } });
@@ -47,12 +47,12 @@ export default function ChangeRequestData() {
 
     const handleUpdate = async () => {
         const requestData = { email, id };
-    
+
         try {
             const response = await axiosPrivate.put(`/change-requests/check-to-update`, requestData, {
                 headers: { "Content-Type": "application/json" },
             });
-    
+
             if (response.data.canUpdate) {
                 // ✅ User can update the request
                 console.log("You can now update the request.");
@@ -63,11 +63,11 @@ export default function ChangeRequestData() {
                     `❌ Someone is already updating this request (CDSID: ${response.data.isSomeoneUpdating}). 
                     Would you like to force update?`
                 );
-    
+
                 if (isForceUpdate) {
                     // 📝 Ask for email confirmation
                     const confirmEmail = window.prompt("Enter your email to confirm force update:");
-    
+
                     if (confirmEmail && confirmEmail.split("@")[0] === email) {
                         // 🔥 Call API to force update
                         await forceUpdateRequest(id, email);
@@ -82,8 +82,8 @@ export default function ChangeRequestData() {
         }
         setDialogOpen(false);
     };
-    
-    
+
+
     const handleDelete = async () => {
         if (!selectedRequest) {
             alert("Please select a data row to delete.");
@@ -92,7 +92,7 @@ export default function ChangeRequestData() {
         const confirmDelete = window.confirm("Are you sure you want to delete this data row?");
         if (!confirmDelete) return;
         try {
-            const response = await axiosPrivate.delete(`/change-requests/${selectedRequest.id}`,{data: { email }});
+            const response = await axiosPrivate.delete(`/change-requests/${selectedRequest.id}`, { data: { email } });
             alert("✅ Change Request deleted successfully")
             setChangeRequests(prev => prev.filter(request => request.id !== selectedRequest.id));
             setDialogOpen(false);
@@ -145,13 +145,13 @@ export default function ChangeRequestData() {
                         Add Change Request
                     </button>
                     <button
-        onClick={() => setIsVersionHistoryOpen(true)}
-        className="hover:bg-blue-700 cursor-pointer font-bold py-2 px-4 rounded ml-auto flex items-center space-x-2"
-        style={{ background: 'gray', color: '#ffffff' }}
-      >
-        <History size={20} />  {/* Version history icon */}
-        <span>Version History</span>
-      </button>
+                        onClick={() => setIsVersionHistoryOpen(true)}
+                        className="hover:bg-blue-700 cursor-pointer font-bold py-2 px-4 rounded ml-auto flex items-center space-x-2"
+                        style={{ background: 'gray', color: '#ffffff' }}
+                    >
+                        <History size={20} />  {/* Version history icon */}
+                        <span>Version History</span>
+                    </button>
 
                 </div>
 
@@ -361,10 +361,10 @@ export default function ChangeRequestData() {
                 )}
             </div>
             {/* Version History Drawer */}
-      <VHDrawer 
-        isOpen={isVersionHistoryOpen} 
-        onClose={() => setIsVersionHistoryOpen(false)} 
-      />
+            <VHDrawer
+                isOpen={isVersionHistoryOpen}
+                onClose={() => setIsVersionHistoryOpen(false)}
+            />
         </>
     );
 }

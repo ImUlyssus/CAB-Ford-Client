@@ -1,14 +1,29 @@
-import React, { useState } from "react";
-import { useTheme } from "styled-components";
+import React, { useState, useEffect } from "react";
 
 function Dialog({ open, onClose, onSave }) {
     if (!open) return null;
-    const theme = useTheme();
-    
+
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
-    // Handle start date change
+    // Disable the "Today" button in the date picker
+    useEffect(() => {
+        const disableTodayButton = () => {
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach((input) => {
+                input.addEventListener("focus", () => {
+                    const picker = input._flatpickr; // Access the Flatpickr instance (if available)
+                    if (picker) {
+                        picker.set("disableMobile", true); // Disable mobile picker
+                        picker.set("allowInput", true); // Allow manual input
+                    }
+                });
+            });
+        };
+
+        disableTodayButton();
+    }, []);
+
     const handleStartDateChange = (e) => {
         setStartDate(e.target.value);
         if (endDate && e.target.value > endDate) {
@@ -16,7 +31,6 @@ function Dialog({ open, onClose, onSave }) {
         }
     };
 
-    // Handle end date change
     const handleEndDateChange = (e) => {
         setEndDate(e.target.value);
     };
@@ -24,9 +38,8 @@ function Dialog({ open, onClose, onSave }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-30">
             <div
-                className="p-6 rounded shadow-lg relative w-11/12 md:w-1/3 bg-white"
+                className="p-6 rounded shadow-lg relative w-11/12 md:w-1/3 bg-black"
                 style={{
-                    backgroundColor: theme.colors.primary400,
                     maxHeight: "60vh",
                     maxWidth: "50%",
                     overflowY: "auto",
