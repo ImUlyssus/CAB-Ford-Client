@@ -11,7 +11,7 @@ const SecondSheet = () => {
     console.log(auth.filteredData);
     useEffect(() => {
         if (!auth.filteredData) return;  // Assuming filteredData is the data source
-
+        console.log(auth.filteredData);
         const processData = (data) => {
             let result = {
                 aat_total: 0, aat_ongoing: 0, aat_rejected: 0, aat_completed: 0,
@@ -195,7 +195,7 @@ const TwoLayerDonutChart = ({ data }) => {
 
         // Calculate the total for innerCount
         const totalInner = d3.sum(innerCount);
-
+        d3.select(svgRef.current).selectAll("*").remove();
         const svg = d3
             .select(svgRef.current)
             .attr("width", width)
@@ -288,36 +288,36 @@ const TwoLayerDonutChart = ({ data }) => {
 
         // Inner Section Labels
         svg
-            .selectAll(".innerText")
-            .data(innerPie(innerCount))
-            .enter()
-            .append("text")
-            .attr("transform", (d) => `translate(${innerArc.centroid(d)})`)
-            .attr("text-anchor", "middle")
-            .attr("fill", "white")
-            .attr("font-size", "14px")
-            .each(function (d, i) {
-                // Calculate percentage for each section
-                const percentage = ((d.data / totalInner) * 100).toFixed(1);
+    .selectAll(".innerText")
+    .data(innerPie(innerCount))
+    .enter()
+    .append("text")
+    .attr("transform", (d) => `translate(${innerArc.centroid(d)})`)
+    .attr("text-anchor", "middle")
+    .attr("fill", "white")
+    .attr("font-size", "14px")
+    .each(function (d, i) {
+        if (d.data === 0) return;  // 🔥 Skip creating text for zero values
 
-                // Add corresponding text (AAT, FTM, FSST) based on index
-                const labels = ["AAT", "FTM", "FSST"];
+        // Calculate percentage
+        const percentage = ((d.data / totalInner) * 100).toFixed(1);
 
-                // Split the text into two lines
-                const label = labels[i];
-                const textElement = d3.select(this);
-                textElement
-                    .append("tspan")
-                    .attr("x", 0) // Center horizontally
-                    .attr("dy", "-0.6em") // Move up slightly
-                    .text(label);
+        // Labels
+        const labels = ["AAT", "FTM", "FSST"];
+        const textElement = d3.select(this);
 
-                textElement
-                    .append("tspan")
-                    .attr("x", 0) // Center horizontally
-                    .attr("dy", "1.2em") // Move down
-                    .text(`${percentage}%`);
-            });
+        textElement.append("tspan")
+            .attr("x", 0)
+            .attr("dy", "-0.6em")
+            .text(labels[i]);
+
+        textElement.append("tspan")
+            .attr("x", 0)
+            .attr("dy", "1.2em")
+            .text(`${percentage}%`);
+    });
+
+
 
         // Outer Section Labels with Status and Percentage
         svg

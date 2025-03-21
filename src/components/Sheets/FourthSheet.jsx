@@ -10,7 +10,7 @@ const FourthSheet = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     useEffect(() => {
         if (!auth.filteredData) return;
-
+        console.log(auth.filteredData)
         const processData = (data) => {
             let result = {
                 aat_cancel: 0, ftm_cancel: 0, fsst_cancel: 0,
@@ -21,20 +21,21 @@ const FourthSheet = () => {
 
             data.forEach((entry) => {
                 const { change_sites, approval, cancel_change_category } = entry;
-
-                if (change_sites.includes("aat")) {
-                    approval == "NO" && result.aat_cancel++;
-                    approval == "NO" && result.aat_cancel_data.push(entry);
+                const category_check = cancel_change_category !== null && cancel_change_category !== '';
+                if (change_sites.includes("aat") && category_check) {
+                    result.aat_cancel++;
+                    result.aat_cancel_data.push(entry);
+                    console.log(entry.cancel_change_category)
                 }
 
-                if (change_sites.includes("ftm")) {
-                    approval == "NO" && result.ftm_cancel++;
-                    approval == "NO" && result.ftm_cancel_data.push(entry);
+                if (change_sites.includes("ftm") && category_check) {
+                    result.ftm_cancel++;
+                    result.ftm_cancel_data.push(entry);
                 }
 
-                if (change_sites.includes("fsst")) {
-                    approval == "NO" && result.fsst_cancel++;
-                    approval == "NO" && result.fsst_cancel_data.push(entry);
+                if (change_sites.includes("fsst") && category_check) {
+                    result.fsst_cancel++;
+                    result.fsst_cancel_data.push(entry);
                 }
                 if (cancel_change_category == "Reason 1" ) {
                     result.reason_1++;
@@ -75,6 +76,7 @@ const DonutChart = ({ data }) => {
     const [selectedData, setSelectedData] = useState(null); // State to store the data for the dialog
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control dialog visibility
     const innerCount = [data.aat_cancel, data.ftm_cancel, data.fsst_cancel];
+    const totalInner = d3.sum(innerCount); // Calculate the total cancellations
 
     const svgRef = useRef(null);
 
@@ -83,8 +85,6 @@ const DonutChart = ({ data }) => {
         const height = 240;
         const innerRadius = 50;
         const center = width / 2;
-        // Calculate the total for innerCount
-        const totalInner = d3.sum(innerCount);
 
         const svg = d3
             .select(svgRef.current)
@@ -93,6 +93,21 @@ const DonutChart = ({ data }) => {
             .attr("viewBox", `0 0 ${width} ${height + 40}`)  // Added viewBox to scale the SVG properly
             .append("g")
             .attr("transform", `translate(${center}, ${center - 10})`);
+
+        // Clear existing content
+        svg.selectAll("*").remove();
+
+        // If there are no cancellations, display a message
+        // if (totalInner === 0) {
+        //     svg.append("text")
+        //         .attr("x", 0)
+        //         .attr("y", 0)
+        //         .attr("text-anchor", "middle")
+        //         .attr("fill", "white")
+        //         .attr("font-size", "16px")
+        //         .text("No cancellations to display");
+        //     return; // Exit the effect early
+        // }
 
         // Create pie generators
         const innerPie = d3.pie().sort(null);
@@ -173,32 +188,42 @@ const DonutChart = ({ data }) => {
             .attr("font-size", "18px")
             .text("Cancel change distribution by site");  // Replace with your dynamic title if needed
 
-    }, [data]);
+    }, [data, totalInner]);
+
     return (
-        <div className="flex justify-center items-center bg-gray-900">
-            <svg ref={svgRef}></svg>
-            {/* Dialog for displaying data */}
-            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                <h2 className="text-lg font-semibold mb-2">
-                    {selectedData?.category.toUpperCase()} Requests
-                </h2>
-                <p className="text-sm mb-4">
-                    Showing {selectedData?.filteredData.length} requests for <strong>{selectedData?.site.toUpperCase()}</strong>
-                </p>
-                <ul className="list-disc pl-5 space-y-2">
-                    {selectedData?.filteredData ? (
-                        <DataDetail requests={selectedData.filteredData} />
-                    ) : (
-                        <p className="text-gray-500">No data available.</p>
-                    )}
-                </ul>
-            </Dialog>
-        </div>
+        <>
+        { totalInner !==0 ?
+             <div className="flex justify-center items-center bg-gray-900">
+             <svg ref={svgRef}></svg>
+             {/* Dialog for displaying data */}
+             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                 <h2 className="text-lg font-semibold mb-2">
+                     {selectedData?.category.toUpperCase()} Requests
+                 </h2>
+                 <p className="text-sm mb-4">
+                     Showing {selectedData?.filteredData.length} requests for <strong>{selectedData?.site.toUpperCase()}</strong>
+                 </p>
+                 <ul className="list-disc pl-5 space-y-2">
+                     {selectedData?.filteredData ? (
+                         <DataDetail requests={selectedData.filteredData} />
+                     ) : (
+                         <p className="text-gray-500">No data available.</p>
+                     )}
+                 </ul>
+             </Dialog>
+         </div>
+             : <div className="flex justify-center items-center bg-gray-900 mt-[40%]">
+             <h1 className="text-white">No cancel change for this period.</h1>
+             </div>
+        }
+        </>
     );
 };
 const BarChart = ({ data }) => {
     const [selectedData, setSelectedData] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const cancelArr = [data.reason_1, data.reason_2, data.reason_3];
+    const totalCancel = d3.sum(cancelArr);
 
     const svgRef = useRef();
 
@@ -281,28 +306,35 @@ const BarChart = ({ data }) => {
     }, [data]);
 
     return (
+        <>
+        { totalCancel !==0 ?
         <div>
-            <h1 className="mb-3 text-center text-md">Change Request Summary</h1>
+        <h1 className="mb-3 text-center text-md">Change Request Summary</h1>
 
-            {/* Dialog */}
-            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                <h2 className="text-lg font-semibold mb-2">
-                    {selectedData?.category.toUpperCase()} Requests
-                </h2>
-                <p className="text-sm mb-4">
-                    Showing {selectedData?.filteredData?.length} requests
-                </p>
-                <ul className="list-disc pl-5 space-y-2">
-                    {selectedData?.filteredData?.length ? (
-                        <DataDetail requests={selectedData.filteredData} />
-                    ) : (
-                        <p className="text-gray-500">No data available.</p>
-                    )}
-                </ul>
-            </Dialog>
+        {/* Dialog */}
+        <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+            <h2 className="text-lg font-semibold mb-2">
+                {selectedData?.category.toUpperCase()} Requests
+            </h2>
+            <p className="text-sm mb-4">
+                Showing {selectedData?.filteredData?.length} requests
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+                {selectedData?.filteredData?.length ? (
+                    <DataDetail requests={selectedData.filteredData} />
+                ) : (
+                    <p className="text-gray-500">No data available.</p>
+                )}
+            </ul>
+        </Dialog>
 
-            <svg ref={svgRef}></svg>
-        </div>
+        <svg ref={svgRef}></svg>
+    </div>:
+    <div className="flex justify-center items-center bg-gray-900 mt-[40%]">
+        <h1 className="text-white">No cancel change for this period.</h1>
+    </div>
+        }
+        </>
     );
 };
 

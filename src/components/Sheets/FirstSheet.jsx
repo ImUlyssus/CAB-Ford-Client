@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import { useTheme } from 'styled-components';
-import Dialog from "../Dialog";
+import Dialog from "./Dialog";
 import DataDetail from './DataDetail';
 const FirstSheet = () => {
     const [weeklyData, setWeeklyData] = useState([]);

@@ -3,6 +3,7 @@ import { useTheme } from 'styled-components';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../context/AuthProvider';
+import CustomDateDialog from './CustomDateDialog';
 export default function FilteredBar() {
     const [year, setYear] = useState(new Date().getFullYear());
     const [month, setMonth] = useState(new Date().getMonth()); // Default to "All"
@@ -18,6 +19,47 @@ export default function FilteredBar() {
     const navigate = useNavigate();
     const location = useLocation();
     const axiosPrivate = useAxiosPrivate();
+    const [customDate, setCustomDate] = useState(false);
+    const [selectedDates, setSelectedDates] = useState({ start: "", end: "" });
+    const [isCustomDateOpen,setIsCustomDateOpen] = useState(false);
+    const [tempFilteredData,setTempFilteredData] = useState([]);
+    const [startDateFinal,setStartDateFinal] = useState("");
+    const [endDateFinal,setEndDateFinal] = useState("");
+    const handleSave = async (start, end) => {
+        setSelectedDates({ start, end });
+        setIsCustomDateOpen(false); // Close the dialog
+        setCustomDate(true);
+    
+        // Format start and end dates to include time
+        const formattedStartDate = `${start} 00:00:00`;
+        const formattedEndDate = `${end} 23:59:59`;
+    
+        console.log("Selected Dates:", formattedStartDate, formattedEndDate);
+        // setStartDateFinal(formattedStartDate);
+        // setEndDateFinal(formattedEndDate);
+        try {
+            const response = await axiosPrivate.get("/change-requests/custom-date", {
+                params: {
+                    start: formattedStartDate,
+                    end: formattedEndDate,
+                },
+            });
+    
+            console.log("📥 Custom Date Data:", response.data);
+            console.log("Filter Data: ", filteredChangeRequests);
+            setTempFilteredData(filteredChangeRequests); // Store the current filtered data
+            setAuth((prev) => ({
+                ...prev, // Keeps all existing values
+                filteredData: response.data,
+                startDateFinal:formattedStartDate,   // Add startDate
+                endDateFinal:formattedStartDate,
+              }));
+            // setChangeRequests(response.data); // Update state with filtered data
+        } catch (err) {
+            console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
+        }
+    };
+    
 
     const quarters = ["All", 1, 2, 3, 4];
 
@@ -142,10 +184,9 @@ export default function FilteredBar() {
         let sortedData = [...changeRequests];
         // ✅ Step 1: Sort the data in ascending order by request_change_date
         sortedData.sort((a, b) => new Date(a.request_change_date) - new Date(b.request_change_date));
-
         let filteredData = sortedData.filter((req) => {
             const requestDate = new Date(req.request_change_date); // Convert request_change_date to Date object
-
+              // Initialize endDate
             // ✅ 1. Filter by Year (Compare year and previous year)
             const previousYear = parseInt(year) - 1;
             if (requestDate.getFullYear() !== parseInt(year) && requestDate.getFullYear() !== previousYear) return false;
@@ -179,9 +220,11 @@ export default function FilteredBar() {
 
                 // Ensure endDate includes the full day
                 endDate.setHours(23, 59, 59, 999); // Set the end time to the last millisecond of the end date
-
+                setStartDateFinal(startDate);
+                setEndDateFinal(endDate);
                 // Compare requestDate with startDate and endDate
                 if (requestDate < startDate || requestDate > endDate) return false;
+                
             }
 
 
@@ -189,15 +232,16 @@ export default function FilteredBar() {
             if (week === "All" && !month.includes("-") && quarter !== "All") {
                 if (weeks.length) {
                     // Get the start date from the first week
-                    const startDate = new Date(weeks[0].startYear, months.indexOf(weeks[0].startMonth), weeks[0].start);
+                    let startDate = new Date(weeks[0].startYear, months.indexOf(weeks[0].startMonth), weeks[0].start);
 
                     // Get the end date from the fourth or fifth week (if it exists)
                     const endWeekIndex = weeks.length > 4 ? 4 : 3; // Use weeks[4] if it exists, otherwise use weeks[3]
-                    const endDate = new Date(weeks[endWeekIndex].endYear, months.indexOf(weeks[endWeekIndex].endMonth), weeks[endWeekIndex].end);
+                    let endDate = new Date(weeks[endWeekIndex].endYear, months.indexOf(weeks[endWeekIndex].endMonth), weeks[endWeekIndex].end);
 
                     // Ensure endDate includes the full day
                     endDate.setHours(23, 59, 59, 999);
-
+                    setStartDateFinal(startDate);
+                setEndDateFinal(endDate);
                     // Compare requestDate with startDate and endDate
                     if (requestDate < startDate || requestDate > endDate) return false;
                 }
@@ -249,7 +293,8 @@ export default function FilteredBar() {
                         endDate.setDate(endDate.getDate() - 1);
                     }
                 }
-
+                setStartDateFinal(startDate);
+                setEndDateFinal(endDate);
                 if (requestDate < startDate || requestDate >= new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1)) return false;
 
             }
@@ -283,20 +328,22 @@ export default function FilteredBar() {
 
                 // Ensure endDate includes the full day (up to the last millisecond)
                 endDate.setHours(23, 59, 59, 999);
-
+                setStartDateFinal(startDate);
+                setEndDateFinal(endDate);
                 // Compare requestDate with startDate and endDate
                 if (requestDate < startDate || requestDate > endDate) return false;
             }
             return true;
         });
 
-        console.log("Filtered Data Count:", filteredData.length);
+        console.log("Filtered Data Count:", filteredData.length, startDateFinal, endDateFinal);
         setFilteredChangeRequests(filteredData);
         setAuth((prev) => ({
             ...prev, // Keeps all existing values
-            filteredData, // Updates only filteredData
+            filteredData,
+            startDateFinal,   // Add startDate
+            endDateFinal,
           }));
-          
     }, [year, quarter, month, week, changeRequests]);
 
 
@@ -321,7 +368,8 @@ export default function FilteredBar() {
                         setWeek("All");
                         fetchChangeRequestsForYear(selectedYear); // Fetch data for selected year
                     }}
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${customDate ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}`}
+                    disabled={customDate}
                 >
                     {years.map((y) => (
                         <option key={y} value={y}>{y}</option>
@@ -344,7 +392,8 @@ export default function FilteredBar() {
                             }
                         }
                     }}
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${customDate ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}`}
+                    disabled={customDate}
                 >
                     {quarters.map((q) => (
                         <option key={q} value={q}>
@@ -360,8 +409,8 @@ export default function FilteredBar() {
                         setMonth(e.target.value);
                         setWeek("All");
                     }}
-                    className={`p-2 border rounded ${quarter === "All" ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}`}
-                    disabled={quarter === "All"}
+                    className={`p-2 border rounded ${quarter === "All" || customDate ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}`}
+                    disabled={quarter === "All" || customDate}
                 >
                     {availableMonths.map((m) => (
                         <option key={m} value={m}>{m}</option>
@@ -372,8 +421,8 @@ export default function FilteredBar() {
                 <select
                     value={week}
                     onChange={(e) => setWeek(e.target.value)}
-                    className={`p-2 border rounded ${isQuarterRangeSelected ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}`}
-                    disabled={isQuarterRangeSelected}
+                    className={`p-2 border rounded ${isQuarterRangeSelected || customDate ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}`}
+                    disabled={isQuarterRangeSelected || customDate}
                 >
                     <option value="All">All</option>
                     {weeks.map((w, index) => (
@@ -382,6 +431,44 @@ export default function FilteredBar() {
                         </option>
                     ))}
                 </select>
+                {/* Button to open dialog */}
+            {customDate ? 
+            <button
+                className="bg-gray-500 hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
+                onClick={() => {
+                    setCustomDate(false);
+                    setAuth((prev) => ({
+                        ...prev, // Keeps all existing values
+                        filteredData: tempFilteredData,
+                        startDateFinal,   // Add startDate
+                        endDateFinal,
+                      }));
+                }}
+            >
+                Clear Custom Date
+            </button>
+            : <button
+                className="bg-[#beef00] hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
+                onClick={() => {
+                    setIsCustomDateOpen(true);
+                    setCustomDate(true);
+                }
+                }
+            >
+                Custom Date
+            </button>}
+
+            {/* Dialog for selecting dates */}
+            <CustomDateDialog open={isCustomDateOpen} onClose={() => {
+                setIsCustomDateOpen(false);
+                setCustomDate(false);
+                setAuth((prev) => ({
+                    ...prev, // Keeps all existing values
+                    filteredData: tempFilteredData,
+                    startDateFinal,   // Add startDate
+                    endDateFinal,
+                  }));
+                }} onSave={handleSave} />
             </div>
         </div>
     );
