@@ -472,7 +472,7 @@ function ChangeRequest() {
                                     placeholder="Enter CDSID (50 char max)"
                                     className="p-2 border border-gray-300 rounded w-full"
                                     maxLength={50}
-                                    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
+                                    onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()} // Block comma input
                                 />
                             </div>
                         </div>

@@ -35,7 +35,7 @@ export default function FilteredBar() {
         // Format start and end dates to include time
         const formattedStartDate = `${start} 00:00:00`;
         const formattedEndDate = `${end} 23:59:59`;
-    
+        console.log(formattedStartDate, formattedEndDate);
         console.log("Selected Dates:", formattedStartDate, formattedEndDate);
         try {
             const response = await axiosPrivate.get("/change-requests/custom-date", {
@@ -48,8 +48,9 @@ export default function FilteredBar() {
             console.log("📥 Custom Date Data:", response.data);
             console.log("Filter Data: ", filteredChangeRequests);
             setTempFilteredData(filteredChangeRequests); // Store the current filtered data
-            setTempEndDateFinal(endDateFinal);
-            setTempStartDateFinal(startDateFinal);
+            // console.log(startDateFinal, endDateFinal);
+            // setTempEndDateFinal(endDateFinal);
+            // setTempStartDateFinal(startDateFinal);
             setStartDateFinal(formattedStartDate);
             setEndDateFinal(formattedEndDate);
             setAuth((prev) => ({
@@ -360,15 +361,15 @@ export default function FilteredBar() {
           }));
     }, [year, quarter, month, week, changeRequests]);
 
-    useEffect(() => {
-        setAuth((prev) => ({
-          ...prev,
-          startDateFinal,
-          endDateFinal,
-        }));
-        console.log("Updated Context:", startDateFinal, endDateFinal); // ✅ Debugging
-      }, [startDateFinal, endDateFinal, selectedDates]);  // ✅ Reacts to changes
-      
+    // useEffect(() => {
+    //     setAuth((prev) => ({
+    //       ...prev,
+    //       startDateFinal,
+    //       endDateFinal,
+    //     }));
+    //     console.log("Updated Context:", startDateFinal, endDateFinal); // ✅ Debugging
+    //   }, [startDateFinal, endDateFinal, selectedDates]);  // ✅ Reacts to changes
+
     // Weeks for the selected month and year
     // const weeks = getWeeksInMonth(year, month);
 
@@ -465,6 +466,7 @@ export default function FilteredBar() {
                         startDateFinal: tempStartDateFinal,   // Add startDate
                         endDateFinal: tempEndDateFinal,
                       }));
+                      console.log(tempStartDateFinal, tempEndDateFinal);
                 }}
             >
                 Clear Custom Date
@@ -486,8 +488,8 @@ export default function FilteredBar() {
                 setAuth((prev) => ({
                     ...prev, // Keeps all existing values
                     filteredData: tempFilteredData,
-                    startDateFinal: tempStartDateFinal,   // Add startDate
-                    endDateFinal: tempEndDateFinal,
+                    // startDateFinal: tempStartDateFinal,   // Add startDate
+                    // endDateFinal: tempEndDateFinal,
                   }));
                 setIsCustomDateOpen(false);
                 }} onSave={handleSave}

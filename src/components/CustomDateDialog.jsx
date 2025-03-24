@@ -36,9 +36,10 @@ function Dialog({ open, onClose, onSave }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-opacity-70">
             <div
-                className="p-6 rounded shadow-lg relative w-11/12 md:w-1/3 bg-black"
+                // className="p-6 rounded shadow-lg relative w-11/12 md:w-1/3 bg-gray-800"
+                className="sticky rounded-lg top-0 w-11/12 md:w-1/3 z-10 p-4 border-b bg-gray-800"
                 style={{
                     maxHeight: "60vh",
                     maxWidth: "50%",
