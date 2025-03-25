@@ -58,13 +58,6 @@ const Presentation = () => {
             </div>
             {/* <div className="w-full mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div> */}
             {/* Calender Section */}
-            <div className="flex justify-between items-center mt-10">
-                <h1 className="m-0 font-bold text-xl">Business Calender</h1>
-                <div className="flex space-x-3">
-                    <button className="px-4 py-2 rounded cursor-pointer" style={{backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500}}>Edit calender</button>
-                </div>
-            </div>
-            <div className="w-340 mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div>
             <BusinessCalendar calendar={calendar} />
         </div>
     );

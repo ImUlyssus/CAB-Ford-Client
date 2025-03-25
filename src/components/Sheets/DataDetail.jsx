@@ -45,7 +45,6 @@ export default function DataDetail({requests}) {
                                     <th className={thStyle1}>FTM Schedule Change</th>
                                     <th className={thStyle1}>AAT Schedule Change</th>
                                     <th className={thStyle1}>FSST Schedule Change</th>
-                                    <th className={thStyle1}>Time of Change (Hours)</th>
                                     <th className={thStyle1}>Achieve 2 Weeks Request Change</th>
                                     <th className={thStyle3}>Description</th>
                                     <th className={thStyle3}>Test Plan</th>
@@ -70,23 +69,20 @@ export default function DataDetail({requests}) {
                             <tbody>
                                 {requests.map((request, index) => {
                                     const processSchedule = (scheduleString) => {
-                                        if (!scheduleString) return { scheduleArray: [], totalDuration: 0 }; // Return empty array if no schedule
+                                        if (!scheduleString) return { scheduleArray: [] }; // Return empty array if no schedule
                                         const parts = scheduleString.split(" "); // Split by space
                                         const scheduleArray = [];
-                                        let duration = 0;
                                     
-                                        for (let i = 0; i < parts.length; i += 3) {
-                                            if (i + 2 < parts.length) { // Ensure there's a valid start, end, and duration
+                                        for (let i = 0; i < parts.length; i += 2) {
+                                            if (i + 1 < parts.length) { // Ensure there's a valid start, end, and duration
                                                 let start = parts[i].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
-                                                let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
-                                                let currentDuration = parseInt(parts[i + 2], 10) || 0; // Convert to integer safely
+                                                let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, "");
                                     
                                                 scheduleArray.push(`${start} TO ${end}`);
-                                                duration += currentDuration; // Accumulate total duration
                                             }
                                         }
                                     
-                                        return { scheduleArray, totalDuration: duration }; // Always return an object
+                                        return { scheduleArray }; // Always return an object
                                     };
                                     const ftmSchedule = processSchedule(request.ftm_schedule_change);
                                     const aatSchedule = processSchedule(request.aat_schedule_change);
@@ -133,7 +129,6 @@ export default function DataDetail({requests}) {
                                                         </div>
                                                     ))}
                                                 </td>
-                                                <td className="py-2 px-4 border-b border-r text-center">{aatSchedule.totalDuration + ftmSchedule.totalDuration + fsstSchedule.totalDuration}</td>
                                                 <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.description}</td>
                                                 <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>

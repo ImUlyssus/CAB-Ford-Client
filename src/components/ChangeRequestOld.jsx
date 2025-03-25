@@ -9,7 +9,7 @@ import BusinessTeamContact from "./BusinessTeamContact";
 import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
 import { useNavigate } from "react-router-dom";
-function ChangeRequest() {
+function ChangeRequestOld() {
     const theme = useTheme();
     const [selectedSites, setSelectedSites] = useState([]);
     const [openDialog, setOpenDialog] = useState(null);
@@ -31,9 +31,9 @@ function ChangeRequest() {
         fsst: [],
     });
     const [scheduleChanges, setScheduleChanges] = useState({
-        aat: { addedDates: [], startDateForRange: null, endDateForRange: null },
-        ftm: { addedDates: [], startDateForRange: null, endDateForRange: null },
-        fsst: { addedDates: [], startDateForRange: null, endDateForRange: null },
+        aat: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
+        ftm: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
+        fsst: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
     });
     const handleCRQChange = (type, updatedCRQs) => {
         setCrqs((prev) => ({
@@ -99,15 +99,15 @@ function ChangeRequest() {
         }
         // Transform scheduleChanges into space-separated strings for each site
         const aat_schedule_change = scheduleChanges.aat?.addedDates
-            ?.map(date => `${date.start} ${date.end}`)
+            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
             .join(' ') || '';
 
         const ftm_schedule_change = scheduleChanges.ftm?.addedDates
-            ?.map(date => `${date.start} ${date.end}`)
+            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
             .join(' ') || '';
 
         const fsst_schedule_change = scheduleChanges.fsst?.addedDates
-            ?.map(date => `${date.start} ${date.end}`)
+            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
             .join(' ') || '';
         // Convert request_change_date to a Date object
         const requestChangeDate = new Date();
@@ -124,7 +124,7 @@ function ChangeRequest() {
 
             return scheduleStr
                 .split(' ') // Split by space
-                .filter((_, index) => index % 2 === 1) // Extract every second value (end date)
+                .filter((_, index) => index % 3 === 1) // Extract every second value (end date)
                 .map(dateStr => new Date(dateStr)) // Convert to Date objects
                 .filter(date => !isNaN(date)); // Remove invalid dates
         };
@@ -333,6 +333,7 @@ function ChangeRequest() {
                             type={site}
                             startDateForRange={scheduleChanges[site].startDateForRange}
                             endDateForRange={scheduleChanges[site].endDateForRange}
+                            duration={scheduleChanges[site].duration}
                             addedDates={scheduleChanges[site].addedDates}
                             onScheduleChange={(field, value) => setScheduleChanges((prev) => ({
                                 ...prev,
@@ -509,6 +510,7 @@ function ScheduleChangeSection({
     type,
     startDateForRange,
     endDateForRange,
+    duration,
     addedDates,
     onScheduleChange,
     onAddDate,
@@ -524,8 +526,8 @@ function ScheduleChangeSection({
 
     // Handle adding a date
     const handleAddDate = () => {
-        if (startDateForRange && endDateForRange) {
-            const newDate = { start: startDateForRange, end: endDateForRange };
+        if (startDateForRange && endDateForRange && duration) {
+            const newDate = { start: startDateForRange, end: endDateForRange, duration };
             if (addedDates.length < 5) {
                 onAddDate(newDate);  // Pass the added date to the parent
             } else {
@@ -547,7 +549,7 @@ function ScheduleChangeSection({
 
                 <div className="grid grid-cols-1 relative">
                     <Button type="button" onClick={() => setOpenDialog("range")}>
-                        Choose date and time
+                        Choose date and duration
                     </Button>
                 </div>
             </div>
@@ -587,7 +589,7 @@ function ScheduleChangeSection({
                     </div>
                 </div>
 
-                {/* <div className="mb-4">
+                <div className="mb-4">
                     <input
                         type="number"
                         value={duration || ""}
@@ -595,7 +597,7 @@ function ScheduleChangeSection({
                         placeholder="Choose duration in hour"
                         className="p-2 border border-gray-300 rounded w-full"
                     />
-                </div> */}
+                </div>
                 <div className="flex">
                     <Button type="button" onClick={handleAddDate} className="ml-auto">
                         Add
@@ -607,4 +609,4 @@ function ScheduleChangeSection({
 }
 
 
-export default ChangeRequest;
+export default ChangeRequestOld;

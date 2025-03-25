@@ -79,9 +79,9 @@ function ChangeRequestUpdate() {
         fsst: [],
     });
     const [scheduleChanges, setScheduleChanges] = useState({
-        aat: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
-        ftm: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
-        fsst: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
+        aat: { addedDates: [], startDateForRange: null, endDateForRange: null },
+        ftm: { addedDates: [], startDateForRange: null, endDateForRange: null },
+        fsst: { addedDates: [], startDateForRange: null, endDateForRange: null },
     });
     const handleApprovalChange = (status) => {
         setApproval(status)
@@ -101,16 +101,14 @@ function ChangeRequestUpdate() {
         const parts = scheduleString.split(" "); // Split by space
         const scheduleArray = [];
 
-        for (let i = 0; i < parts.length; i += 3) {
+        for (let i = 0; i < parts.length; i += 2) {
             if (i + 1 < parts.length) { // Ensure there's a valid start and end time
                 let start = parts[i].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
-                let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
-                let duration = parts[i + 2]; // Duration
+                let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, "");
 
                 scheduleArray.push({
                     start: start,
-                    end: end,
-                    duration: duration,
+                    end: end
                 });
             }
         }
@@ -124,32 +122,22 @@ function ChangeRequestUpdate() {
                 addedDates: parseSchedule(request.aat_schedule_change),
                 startDateForRange: prevState.aat.startDateForRange ?? null,
                 endDateForRange: prevState.aat.endDateForRange ?? null,
-                duration: prevState.aat.duration ?? null,
             },
             ftm: {
                 ...prevState.ftm,
                 addedDates: parseSchedule(request.ftm_schedule_change),
                 startDateForRange: prevState.ftm.startDateForRange ?? null,
                 endDateForRange: prevState.ftm.endDateForRange ?? null,
-                duration: prevState.ftm.duration ?? null,
             },
             fsst: {
                 ...prevState.fsst,
                 addedDates: parseSchedule(request.fsst_schedule_change),
                 startDateForRange: prevState.fsst.startDateForRange ?? null,
                 endDateForRange: prevState.fsst.endDateForRange ?? null,
-                duration: prevState.fsst.duration ?? null,
             },
         }));
         updateDurations();
     }, [request])
-    const extractIntegers = (duration) => {
-        if (!duration) return null; // Handle null or undefined cases
-
-        return duration
-            .match(/\d+/g) // Extract all numbers using regex
-            ?.map(Number) || []; // Convert to numbers and return an array
-    };
     // Function to update the duration and date format
     const updateDurations = () => {
         const sites = ["aat", "ftm", "fsst"]; // Define site keys
@@ -164,14 +152,11 @@ function ChangeRequestUpdate() {
                         ...entry,
                         // Update start and end date formats
                         start: entry.start?.replace(/\//g, "-") ?? getRandomDate(),
-                        end: entry.end?.replace(/\//g, "-") ?? getRandomDate(),
-                        // Extract and reformat duration
-                        duration: extractIntegers(entry.duration).join(" ") || getRandomDuration(),
+                        end: entry.end?.replace(/\//g, "-") ?? getRandomDate()
                     })),
-                    // Ensure site-level start, end, and duration are assigned if null
+                    // Ensure site-level start, end are assigned if null
                     startDateForRange: prevState[site].startDateForRange ?? null,
-                    endDateForRange: prevState[site].endDateForRange ?? null,
-                    duration: prevState[site].duration ?? null,
+                    endDateForRange: prevState[site].endDateForRange ?? null
                 };
             });
 
@@ -222,15 +207,15 @@ function ChangeRequestUpdate() {
         }
         // Transform scheduleChanges into space-separated strings for each site
         const aat_schedule_change = scheduleChanges.aat?.addedDates
-            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            ?.map(date => `${date.start} ${date.end}`)
             .join(' ') || '';
 
         const ftm_schedule_change = scheduleChanges.ftm?.addedDates
-            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            ?.map(date => `${date.start} ${date.end}`)
             .join(' ') || '';
 
         const fsst_schedule_change = scheduleChanges.fsst?.addedDates
-            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            ?.map(date => `${date.start} ${date.end}`)
             .join(' ') || '';
         // Convert request_change_date to a Date object
         const requestChangeDate = new Date();
@@ -338,11 +323,24 @@ function ChangeRequestUpdate() {
             }
         });
     };
+    const handleBack = async () => {
+        try {
+            const response = await axiosPrivate.put(`/change-requests/go-back-update`, { id: request.id, email:"" }, {
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (response.data.canUpdate) {
+                navigate(-1);
+            }
+        } catch (error) {
+            console.error("❌ Error: ", error);
+        }
+    };
         // useReleaseLock({id:request.id, email:localStorage.getItem("authEmail").split("@")[0]});
     return (
         <div>
             <button
-                onClick={()=>navigate(-1)} // Go back to the previous page
+                onClick={handleBack} // Go back to the previous page
                 className="px-4 py-2 bg-gray-500 text-white rounded-lg mb-4 hover:bg-gray-600"
             >
                 ← Back
@@ -488,7 +486,6 @@ function ChangeRequestUpdate() {
                             type={site}
                             startDateForRange={scheduleChanges[site].startDateForRange}
                             endDateForRange={scheduleChanges[site].endDateForRange}
-                            duration={scheduleChanges[site].duration}
                             addedDates={scheduleChanges[site].addedDates}
                             onScheduleChange={(field, value) => setScheduleChanges((prev) => ({
                                 ...prev,
@@ -848,7 +845,6 @@ function ScheduleChangeSection({
     type,
     startDateForRange,
     endDateForRange,
-    duration,
     addedDates,
     onScheduleChange,
     onAddDate,
@@ -864,8 +860,8 @@ function ScheduleChangeSection({
 
     // Handle adding a date
     const handleAddDate = () => {
-        if (startDateForRange && endDateForRange && duration) {
-            const newDate = { start: startDateForRange, end: endDateForRange, duration };
+        if (startDateForRange && endDateForRange) {
+            const newDate = { start: startDateForRange, end: endDateForRange };
             if (addedDates.length < 5) {
                 onAddDate(newDate);  // Pass the added date to the parent
             } else {
@@ -887,7 +883,7 @@ function ScheduleChangeSection({
 
                 <div className="grid grid-cols-1 relative">
                     <Button type="button" onClick={() => setOpenDialog("range")}>
-                        Choose date and duration
+                        Choose date and time
                     </Button>
                 </div>
             </div>
@@ -927,7 +923,7 @@ function ScheduleChangeSection({
                     </div>
                 </div>
 
-                <div className="mb-4">
+                {/* <div className="mb-4">
                     <input
                         type="number"
                         value={duration || ""}
@@ -935,7 +931,7 @@ function ScheduleChangeSection({
                         placeholder="Choose duration in hour"
                         className="p-2 border border-gray-300 rounded w-full"
                     />
-                </div>
+                </div> */}
                 <div className="flex">
                     <Button type="button" onClick={handleAddDate} className="ml-auto">
                         Add

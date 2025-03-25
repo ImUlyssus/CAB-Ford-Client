@@ -12,22 +12,20 @@ export default function DataComparison({ requests }) {
     const matchColStyle = "py-2 px-30 border-b border-r whitespace-nowrap bg-[#beef30] text-black";
 
     const processSchedule = (scheduleString) => {
-        if (!scheduleString) return { scheduleArray: [], totalDuration: 0 }; // Return empty array if no schedule
+        if (!scheduleString) return { scheduleArray: [] }; // Return empty array if no schedule
         const parts = scheduleString.split(" "); // Split by space
         const scheduleArray = [];
         let duration = 0;
-        for (let i = 0; i < parts.length; i += 3) {
-            if (i + 2 < parts.length) { // Ensure there's a valid start, end, and duration
+        for (let i = 0; i < parts.length; i += 2) {
+            if (i + 1 < parts.length) { // Ensure there's a valid start, end, and duration
                 let start = parts[i].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
-                let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
-                let currentDuration = parseInt(parts[i + 2], 10) || 0; // Convert to integer safely
+                let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, "");
 
                 scheduleArray.push(`${start} TO ${end}`);
-                duration += currentDuration; // Accumulate total duration
             }
         }
 
-        return { scheduleArray, totalDuration: duration }; // Always return an object
+        return { scheduleArray }; // Always return an object
     };
     const ftmScheduleThead1 = processSchedule(requests[0].ftm_schedule_change);
     const aatScheduleThead1 = processSchedule(requests[0].aat_schedule_change);
@@ -86,7 +84,6 @@ export default function DataComparison({ requests }) {
                                         <th className={requests[0].ftm_schedule_change !== requests[1].ftm_schedule_change ? matchColStyle : thStyle1}>FTM Schedule Change</th>
                                         <th className={requests[0].aat_schedule_change !== requests[1].aat_schedule_change ? matchColStyle : thStyle1}>AAT Schedule Change</th>
                                         <th className={requests[0].fsst_schedule_change !== requests[1].fsst_schedule_change ? matchColStyle : thStyle1}>FSST Schedule Change</th>
-                                        <th className={durationDifference ? matchColStyle : thStyle1}>Time of Change (Hours)</th>
                                         <th className={plannedUnplanned ? matchColStyle : thStyle1}>Achieve 2 Weeks Request Change</th>
                                         <th className={requests[0].description !== requests[1].description ? matchColStyle : thStyle3}>Description</th>
                                         <th className={requests[0].test_plan !== requests[1].test_plan ? matchColStyle : thStyle3}>Test Plan</th>
@@ -154,7 +151,6 @@ export default function DataComparison({ requests }) {
                                                             </div>
                                                         ))}
                                                     </td>
-                                                    <td className="py-2 px-4 border-b border-r text-center">{aatSchedule.totalDuration + ftmSchedule.totalDuration + fsstSchedule.totalDuration}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.description}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>

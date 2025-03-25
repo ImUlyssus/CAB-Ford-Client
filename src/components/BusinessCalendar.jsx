@@ -1,11 +1,15 @@
 import React, {use, useState} from "react";
 import { useTheme } from "styled-components";
 import Calendar from "./Calendar";
+import { useNavigate } from 'react-router-dom';
+import DaysOfWeek from "./DaysOfWeek";
+import GridComponent from "./GridComponent";
 export default function BusinessCalendar({calendar}) {
     const currentYear = new Date().getFullYear();
     const [activeYear, setActiveYear] = React.useState(new Date().getFullYear());
     const theme = useTheme();
     const daysStyle = "py-3 px-1 font-sm";
+    const navigate = useNavigate();
     // Function to handle year click
     const handleYearChange = (year) => {
         setActiveYear(year);
@@ -14,14 +18,27 @@ export default function BusinessCalendar({calendar}) {
     const filteredCalendarData = Object.values(calendar).filter(
         (monthData) => parseInt(monthData.year) === activeYear
     );
+    const handleEditCalendar = () => {
+        // Navigate to the new page and pass the calendar data in the state
+        navigate('/edit-calendar', {
+            state: { calendar: filteredCalendarData, activeYear }  // Passing the calendar data
+        });
+    };
     // console.log("From business Calendar page:", filteredCalendarData)
     return (
         <div>
+            <div className="flex justify-between items-center mt-10">
+                <h1 className="m-0 font-bold text-xl">Business Calender</h1>
+                <div className="flex space-x-3">
+                    <button onClick={handleEditCalendar} className="px-4 py-2 rounded cursor-pointer" style={{backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500}}>Edit calender</button>
+                </div>
+            </div>
+            <div className="w-340 mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div>
             <div className="flex justify-between">
             <div className="flex justify-start mt-4" style={{ color: theme.colors.primary500 }}>
-                <h5 onClick={()=>handleYearChange(currentYear-1)} className='py-2 px-5 font-bold cursor-pointer rounded-xl' style={{ background: activeYear == currentYear - 1 ? theme.colors.secondary500 : theme.colors.primary500, color: activeYear == currentYear - 1 ? theme.colors.primary500 : theme.colors.secondary500 }}>2024</h5>
-                <h5 onClick={()=>handleYearChange(currentYear)} className='py-2 px-5 font-bold cursor-pointer rounded-xl' style={{ background: activeYear == currentYear ? theme.colors.secondary500 : theme.colors.primary500, color: activeYear == currentYear ? theme.colors.primary500 : theme.colors.secondary500 }}>2025</h5>
-                <h5 onClick={()=>handleYearChange(currentYear+1)} className='py-2 px-5 font-bold cursor-pointer rounded-xl' style={{ background: activeYear == currentYear + 1 ? theme.colors.secondary500 : theme.colors.primary500, color: activeYear == currentYear + 1 ? theme.colors.primary500 : theme.colors.secondary500 }}>2026</h5>
+                <h5 onClick={()=>handleYearChange(currentYear-1)} className='py-2 px-5 font-bold cursor-pointer rounded-xl' style={{ background: activeYear == currentYear - 1 ? theme.colors.secondary500 : theme.colors.primary500, color: activeYear == currentYear - 1 ? theme.colors.primary500 : theme.colors.secondary500 }}>{currentYear-1}</h5>
+                <h5 onClick={()=>handleYearChange(currentYear)} className='py-2 px-5 font-bold cursor-pointer rounded-xl' style={{ background: activeYear == currentYear ? theme.colors.secondary500 : theme.colors.primary500, color: activeYear == currentYear ? theme.colors.primary500 : theme.colors.secondary500 }}>{currentYear}</h5>
+                <h5 onClick={()=>handleYearChange(currentYear+1)} className='py-2 px-5 font-bold cursor-pointer rounded-xl' style={{ background: activeYear == currentYear + 1 ? theme.colors.secondary500 : theme.colors.primary500, color: activeYear == currentYear + 1 ? theme.colors.primary500 : theme.colors.secondary500 }}>{currentYear+1}</h5>
             </div>
             <div className="flex justify-end mt-4" style={{ color: theme.colors.primary500 }}>
                 <h5 className='py-2 px-5 font-bold mx-1 rounded-xl' style={{ border: "1px solid #f005bd", color: "#f005bd" }}>Holiday</h5>
@@ -48,168 +65,3 @@ export default function BusinessCalendar({calendar}) {
         </div>
     );
 }
-
-function DaysOfWeek() {
-    const theme = useTheme();
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const repetitions = 5; // 5 repetitions of the week
-
-    return (
-        <div 
-            className="grid" 
-            style={{ gridTemplateColumns: "50px 100px repeat(37, 1fr)" }}
-        >
-            {/* Empty cells for alignment with GridComponent */}
-            <div className="bg-transparent"></div>
-            <div className="bg-transparent"></div>
-
-            {/* Days of the week repeated 5 times */}
-            {Array.from({ length: repetitions }, () =>
-                days.map((day, idx) => (
-                    <div
-                        key={`${day}-${idx}`}
-                        className="flex items-center justify-center border text-xs"
-                        style={{
-                            paddingTop: "6px", paddingBottom: "6px",
-                            background: idx === 0 || idx === 6 ? theme.colors.secondary500 : "#003478",
-                            color: idx === 0 || idx === 6 ? "black" : theme.colors.secondary500,
-                            textAlign: "center",
-                        }}
-                    >
-                        {day}
-                    </div>
-                ))
-            )}
-
-            {/* Add Sunday and Monday after the 5 repetitions */}
-            {days.slice(0, 2).map((day, idx) => (
-                <div
-                    key={`extra-${day}-${idx}`}
-                    className="flex items-center justify-center border text-xs"
-                    style={{
-                        paddingTop: "6px", paddingBottom: "6px",
-                        background: idx === 0 ? theme.colors.secondary500 : "#003478", // Sunday is idx 0
-                        color: idx === 0 ? "black" : theme.colors.secondary500,
-                        textAlign: "center",
-                    }}
-                >
-                    {day}
-                </div>
-            ))}
-        </div>
-    );
-}
-function GridComponent({ data, activeYear }) {
-    const monthName = data["month"];
-    const year = activeYear;
-    const theme = useTheme();
-
-    // Map month names to zero-indexed numerical values
-    const monthMap = {
-        January: 0,
-        February: 1,
-        March: 2,
-        April: 3,
-        May: 4,
-        June: 5,
-        July: 6,
-        August: 7,
-        September: 8,
-        October: 9,
-        November: 10,
-        December: 11,
-    };
-
-    const month = monthMap[monthName];
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
-
-    const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-    const emptyCells = Array.from({ length: firstDayOfMonth }, () => null);
-
-    // Extract weekend data from the provided strings
-    const weekendInfo = data.aat.slice(0, daysInMonth); // Replace `aat` if another field holds the correct data
-
-    // Function to determine if a day is a weekend based on the `1`s in the string
-    const isWeekend = (index) => weekendInfo[index] === "1";
-
-    return (
-        <div
-            className="grid grid-rows-4 border"
-            style={{ gridTemplateColumns: "90px 60px repeat(37, 1fr)" }}
-        >
-            <div className="row-span-4 flex items-center text-center justify-center border p-2 text-xs bg-transparent font-bold">
-                {activeYear || "Loading..."} <br />
-                {monthName || "Loading..."}
-            </div>
-
-            <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
-                Site
-            </div>
-
-            {emptyCells.map((_, index) => (
-                <div
-                    key={`empty-${index}`}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                ></div>
-            ))}
-
-            {daysArray.map((day, index) => (
-                <div
-                    key={day}
-                    className="flex items-center justify-center border py-2 text-xs"
-                    style={{
-                        backgroundColor: isWeekend(index)
-                            ? theme.colors.secondary500 // Weekend color
-                            : "#003478", // Weekday color
-                        color: isWeekend(index) ? "black" : theme.colors.secondary500,
-                        borderColor: theme.colors.secondary500,
-                    }}
-                >
-                    {day}
-                </div>
-            ))}
-
-            {Array.from({ length: 37 - (emptyCells.length + daysArray.length) }, (_, index) => (
-                <div
-                    key={`remaining-${index}`}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                ></div>
-            ))}
-
-            <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
-                AAT
-            </div>
-
-            {Array.from({ length: 1 * 37 }, (_, index) => (
-                <div
-                    key={index}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                ></div>
-            ))}
-
-            <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
-                FTM
-            </div>
-
-            {Array.from({ length: 1 * 37 }, (_, index) => (
-                <div
-                    key={index}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                ></div>
-            ))}
-
-            <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
-                FSST
-            </div>
-
-            {Array.from({ length: 1 * 37 }, (_, index) => (
-                <div
-                    key={index}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                ></div>
-            ))}
-        </div>
-    );
-}
-
