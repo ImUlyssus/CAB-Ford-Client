@@ -125,7 +125,7 @@ const FirstSheet = () => {
     const maxY = Math.max(...totals);
     const interval = Math.ceil(maxY / 5); // Divide maxY into 5 intervals
     
-    const yAxisLabels = Array.from({ length: 5 }, (_, index) => interval * index).reverse();
+    const yAxisLabels = Array.from({ length: 7 }, (_, index) => interval * index).reverse();
     // Scale factor to normalize bar heights
     const scaleFactor = chartHeight / maxY;
     // Function to handle bar clicks
@@ -194,9 +194,9 @@ const handleBarClick = (weekData, site, category) => {
                                     const totalHeight = ongoing + completed + rejected;
 
                                     // Scale the bar heights to match the Y-axis
-                                    const ongoingHeight = ongoing * scaleFactor * 0.77;
-                                    const completedHeight = completed * scaleFactor * 0.77;
-                                    const rejectedHeight = rejected * scaleFactor * 0.77;
+                                    const ongoingHeight = ongoing * scaleFactor * 0.69;
+                                    const completedHeight = completed * scaleFactor * 0.69;
+                                    const rejectedHeight = rejected * scaleFactor * 0.69;
 
                                     return (
                                         <div key={siteIndex} className="flex flex-col items-center justify-end h-full">

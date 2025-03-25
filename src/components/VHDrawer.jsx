@@ -71,7 +71,7 @@ const VHDrawer = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleGoToVersion = () => {
+  const handleSeeThisVersion = () => {
     console.log("See details clicked");
   }
   return (
@@ -128,7 +128,7 @@ const VHDrawer = ({ isOpen, onClose }) => {
                     {/* Buttons Row - Pushed to Right */}
                     <div className="flex justify-end gap-2">
                       <button className="btn-primary text-sm px-3 py-1 border-1 border-gray-500 rounded-sm" onClick={() => handleSeeDetails(request.original_id, request.updated_date, request, request.is_deleted)}>See details</button>
-                      <button className="btn-secondary text-sm text-blue-500 px-3 py-1 border-1 border-blue-500 rounded-sm" onClick={handleGoToVersion}>Go to this version</button>
+                      <button className="btn-secondary text-sm text-blue-500 px-3 py-1 border-1 border-blue-500 rounded-sm" onClick={handleSeeThisVersion}>See this version</button>
                     </div>
                   </div>
                 ))}

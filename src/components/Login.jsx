@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../api/axios';
 import API_BASE_URL from '../config/apiConfig';
 import AuthContext from '../context/AuthProvider';
 
@@ -12,6 +12,8 @@ export default function Login() {
     const [apiError, setApiError] = useState("");  // State to handle API errors
     const navigate = useNavigate();
     const location = useLocation();
+    const [attempts, setAttempts] = useState(0);
+    const [isLocked, setIsLocked] = useState(false);
     const from = location.state?.from?.pathname || "/";
 
     const labelStyle = "text-right pr-20";
@@ -34,7 +36,12 @@ export default function Login() {
     // Form Submission
     const handleSubmit = async (e) => {
         e.preventDefault();  // Prevents page reload
-        setApiError("");      // Clear previous API error
+        setApiError("");
+        if (isLocked) {
+            alert("Too many failed attempts. Please try again after 5 minutes.");
+            return;
+        }
+         // Clear previous API error
         if (validateForm()) {
             try {
                 const response = await axios.post(
@@ -58,7 +65,17 @@ export default function Login() {
                     setApiError("Login failed. Please check your email and password.");
                 }
             } catch (err) {
-                console.error("API Error:", err); // Log the complete error
+                setAttempts((prev) => prev + 1);
+                if (attempts + 1 >= 5) {
+                    setIsLocked(true); // ⏳ Lock login
+                    alert("Too many failed attempts. Please try again after 5 minutes.");
+    
+                    // Unlock after 5 minutes
+                    setTimeout(() => {
+                        setAttempts(0);
+                        setIsLocked(false);
+                    }, 5 * 60 * 1000);
+                }
                 setApiError("Login failed. Please check your email and password.");
             }
         }

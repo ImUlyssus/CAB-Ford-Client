@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios from "../api/axios";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API_BASE_URL from "../config/apiConfig";
 
 export default function Register() {
@@ -10,6 +10,8 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [site, setSite] = useState("");
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     let newErrors = {};
@@ -28,51 +30,64 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      try {
-        const response = await axios.post(`${API_BASE_URL}/users`, {
-          username,
-          email,
-          password,
-          site,
-        });
-  
-        // Assuming successful registration
-        const { user } = response.data;
-        alert("Registration successful!");
-  
-        // Optionally, you can redirect the user to the login page or dashboard
-        // For example:
-        // history.push("/login"); // or navigate to dashboard
-      } catch (error) {
-        // Handle different types of errors
-        let errorMessage = "An unexpected error occurred. Please try again later.";
-  
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          errorMessage = error.response.data.message || error.response.statusText;
-        } else if (error.request) {
-          // The request was made but no response was received
-          errorMessage = "No response from the server. Please check your network connection.";
-        } else {
-          // Something happened in setting up the request
-          errorMessage = error.message;
-        }
-  
-        // Display the error message to the user
-        alert(errorMessage);
-  
-        // Log the full error for debugging
-        // console.error("Registration error:", error);
+      setIsLoading(true);
+        try {
+          const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const response = await axios.post(`/users`, {
+                username,
+                email,
+                password,
+                site,
+                verificationCode
+            });
+
+            // Assuming successful registration
+            const { user } = response.data;
+            alert("Registration successful! Please check your email for the verification code.");
+
+            // Navigate to verification page and pass email as state
+            navigate("/verification-page", {
+              state: {
+                  username,
+                  email, // Ensure the correct email is passed
+                  password,
+                  site,
+                  verificationCode,
+              },
+          });
+        } catch (error) {
+            let errorMessage = "An unexpected error occurred. Please try again later.";
+
+            if (error.response) {
+                errorMessage = error.response.data.message || error.response.statusText;
+            } else if (error.request) {
+                errorMessage = "No response from the server. Please check your network connection.";
+            } else {
+                errorMessage = error.message;
+            }
+
+            alert(errorMessage);
+        }finally {
+          setIsLoading(false); // 🔴 Hide loading
       }
     }
-  };
+};
   
 
   const labelStyle = "text-right pr-20";
   const inputStyle = "w-80 p-2 border rounded bg-gray-800 text-white";
   
   return (
-    <div className="flex items-center justify-center h-screen bg-black text-white">
+    <>
+    {isLoading && (
+    <div className="fixed inset-0 flex items-center justify-center bg-opacity-30">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+            <p className="text-lg font-semibold">Processing...</p>
+            <p>Please wait while we register your account.</p>
+        </div>
+    </div>
+)}
+  <div className="flex items-center justify-center h-screen bg-black text-white">
       <div className="w-full">
         <h2 className="font-bold text-center mb-4" style={{color: "#003478", fontSize:"36px"}}>Welcome to FORD CAB</h2>
         <p className="text-xl font-bold text-center mb-2">Register your account</p>
@@ -82,7 +97,7 @@ export default function Register() {
           <div className="grid grid-cols-2 gap-4 items-center mb-3">
             <label className={labelStyle}>Username:</label>
             <div>
-              <input type="text" placeholder="Enter username" className={inputStyle} value={username} onChange={(e) => setUsername(e.target.value)} />
+              <input type="text" placeholder="Enter username" className={inputStyle} value={username} maxLength={60} onChange={(e) => setUsername(e.target.value)} />
               {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
             </div>
           </div>
@@ -136,5 +151,7 @@ export default function Register() {
         </p>
       </div>
     </div>
+</>
+    
   );
 }
