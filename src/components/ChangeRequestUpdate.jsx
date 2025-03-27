@@ -252,6 +252,31 @@ function ChangeRequestUpdate() {
             alert("Cannot get email from local storage! Contact developer to solve this issue.")
             return;
         }
+        const getEverySecondDate = (scheduleString) => {
+            if (!scheduleString) return []; // Handle empty or undefined case
+
+            // Convert string schedule to an array and parse as Date objects
+            const scheduleArray = scheduleString.split(" ").map(dateStr => new Date(dateStr));
+
+            // Extract every second date (index 1, 3, 5, ...)
+            return scheduleArray.filter((_, index) => index % 2 === 1);
+        };
+
+        // Extract second dates from each site's schedule
+        const aatDates = getEverySecondDate(aat_schedule_change);
+        const ftmDates = getEverySecondDate(ftm_schedule_change);
+        const fsstDates = getEverySecondDate(fsst_schedule_change);
+
+        // Combine all second dates
+        const allSecondDates = [...aatDates, ...ftmDates, ...fsstDates];
+
+        // Find the latest date
+        const latestDate = allSecondDates.length > 0
+            ? new Date(Math.max(...allSecondDates.map(date => date.getTime())))
+            : null;
+
+        // Format latest date as 'YYYY-MM-DD' if it exists
+        const latest_schedule_date = latestDate ? latestDate.toISOString().split("T")[0] : null;
         const requestData = {
             email: localStorage.getItem("authEmail").split("@")[0],
             id: request.id,
@@ -266,6 +291,7 @@ function ChangeRequestUpdate() {
             aat_schedule_change: selectedSitesString.includes('aat') ? aat_schedule_change : "",
             ftm_schedule_change: selectedSitesString.includes('ftm') ? ftm_schedule_change : "",
             fsst_schedule_change: selectedSitesString.includes('fsst') ? fsst_schedule_change : "",
+            latest_schedule_date,
             description: changeRequestData.description,
             test_plan: changeRequestData.test_plan,
             rollback_plan: changeRequestData.rollback_plan,
@@ -432,9 +458,9 @@ function ChangeRequestUpdate() {
                                 name="change_name"
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value (1500 characters max)"
+                                placeholder="Enter value (300 characters max)"
                                 rows={4}
-                                maxLength={1500}
+                                maxLength={300}
                                 value={changeRequestData.change_name} // Bind the value to state
                                 onChange={handleChange} // Add the onChange handler
                             />

@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Ford_Logo from '../../assets/ford_logo.png';
 const ForApprovalCommon = () => {
     return (
         <div className="w-full h-full bg-white p-8">
@@ -7,7 +7,9 @@ const ForApprovalCommon = () => {
             <h1 className="text-2xl font-bold mb-6 text-[#003478] border-b-2 border-gray-300 pb-2">
                 <span className='text-red-500'>Common</span> - Change Requests for Approval
             </h1>
-
+            <div className='flex absolute top-2 right-2'>
+                <img src={Ford_Logo} className='h-5 w-15' />
+            </div>
             {/* Table */}
             <div className="w-full max-h-[80%] overflow-y-auto border border-gray-300">
                 <table className="min-w-full border border-gray-300">
@@ -39,13 +41,6 @@ const ForApprovalCommon = () => {
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-            {/* Legend */}
-            <div className="flex justify-center text-black gap-4 absolute bottom-2 justify-center w-full">
-                <p className="font-semibold mb-2"><span className='px-2 py-1 bg-blue-700 text-white mr-2'>C</span>Completed</p>
-                <p className="font-semibold mb-2"><span className='px-2 py-1 bg-blue-300 text-white mr-2'>O</span>Approved & ongoing implementation</p>
-                <p className="font-semibold mb-2"><span className='px-2 py-1 bg-red-700 text-white mr-2'>R</span>Postponed / Cancelled</p>
             </div>
         </div>
     );

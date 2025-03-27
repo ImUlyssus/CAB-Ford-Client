@@ -141,7 +141,33 @@ function ChangeRequest() {
 
 
         const achieve_2_week_change_request = !hasEarlyEndDate;
-        console.log(achieve_2_week_change_request);
+        // Helper function to extract every second date from a list
+        const getEverySecondDate = (scheduleString) => {
+            if (!scheduleString) return []; // Handle empty or undefined case
+
+            // Convert string schedule to an array and parse as Date objects
+            const scheduleArray = scheduleString.split(" ").map(dateStr => new Date(dateStr));
+
+            // Extract every second date (index 1, 3, 5, ...)
+            return scheduleArray.filter((_, index) => index % 2 === 1);
+        };
+
+        // Extract second dates from each site's schedule
+        const aatDates = getEverySecondDate(aat_schedule_change);
+        const ftmDates = getEverySecondDate(ftm_schedule_change);
+        const fsstDates = getEverySecondDate(fsst_schedule_change);
+
+        // Combine all second dates
+        const allSecondDates = [...aatDates, ...ftmDates, ...fsstDates];
+
+        // Find the latest date
+        const latestDate = allSecondDates.length > 0
+            ? new Date(Math.max(...allSecondDates.map(date => date.getTime())))
+            : null;
+
+        // Format latest date as 'YYYY-MM-DD' if it exists
+        const latest_schedule_date = latestDate ? latestDate.toISOString().split("T")[0] : null;
+
         // Create the request payload
         const requestData = {
             category,
@@ -159,6 +185,7 @@ function ChangeRequest() {
             aat_schedule_change: selectedSitesString.includes('aat') ? aat_schedule_change : "",
             ftm_schedule_change: selectedSitesString.includes('ftm') ? ftm_schedule_change : "",
             fsst_schedule_change: selectedSitesString.includes('fsst') ? fsst_schedule_change : "",
+            latest_schedule_date,
             aat_it_contact: selectedSitesString.includes('aat') ? aat_it_contact : "",
             ftm_it_contact: selectedSitesString.includes('ftm') ? ftm_it_contact : "",
             fsst_it_contact: selectedSitesString.includes('fsst') ? fsst_it_contact : "",
@@ -176,7 +203,7 @@ function ChangeRequest() {
 
             alert("✅ Change Request submitted successfully");
             // there will be an error in the console every time you make a change request bc of this refresh, related to access and refresh token. Don't worry about it.
-            navigate(0);
+            navigate(-1);
         } catch (error) {
             if (error.response) {
                 alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
@@ -281,9 +308,9 @@ function ChangeRequest() {
                                 id="changeName"
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value (1500 characters max)"
+                                placeholder="Enter value (300 characters max)"
                                 rows={4}
-                                maxLength={1500}
+                                maxLength={300}
                             />
 
                             {/* Style your text dialog button */}

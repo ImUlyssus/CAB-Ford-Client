@@ -6,20 +6,33 @@ import ApprovedCRC from "./Presentation/ApprovedCRC";
 import ApprovedCRO from "./Presentation/ApprovedCRO";
 import ApprovedCRR from "./Presentation/ApprovedCRR";
 import ForApprovalCommon from "./Presentation/ForApprovalCommon";
+import ForApprovalAAT from "./Presentation/ForApprovalAAT";
+import ForApprovalFTM from "./Presentation/ForApprovalFTM";
+import ForApprovalFSST from "./Presentation/ForApprovalFSST";
+import Summary from "./Presentation/Summary";
+import CustomDateDialog from './CustomDateDialog';
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 const slides = [
   CoverPage,
   BusinessCalendarSlide,
   ApprovedCRC,
   ApprovedCRO,
   ApprovedCRR,
-  ForApprovalCommon
+  ForApprovalCommon,
+  ForApprovalAAT,
+  ForApprovalFTM,
+  ForApprovalFSST,
+  Summary
 ];
 
 export default function Carousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const theme = useTheme();
-
+  const [isCustomDateOpen, setIsCustomDateOpen] = useState(false);
+  const [customDate, setCustomDate] = useState(false);
+  const [changeRequests, setChangeRequests] = useState([]);
+  const axiosPrivate = useAxiosPrivate();
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? slides.length - 1 : prevIndex - 1));
   };
@@ -80,7 +93,6 @@ if (isFullscreen) {
         >
           ❯
         </button>
-        
       </div>
       <button
           onClick={toggleFullscreen}
@@ -91,16 +103,60 @@ if (isFullscreen) {
     </div>
   );
 }
+const handleSave = async (start, end) => {
+  setIsCustomDateOpen(false); // Close the dialog
+  setCustomDate(true);
 
+  // Format start and end dates to include time
+  const formattedStartDate = `${start} 00:00:00`;
+  const formattedEndDate = `${end} 23:59:59`;
+  console.log("Selected Dates:", formattedStartDate, formattedEndDate);
+  try {
+      const response = await axiosPrivate.get("/change-requests/custom-date", {
+          params: {
+              start: formattedStartDate,
+              end: formattedEndDate,
+          },
+      });
+
+      console.log("📥 Custom Date Data:", response.data);
+      setChangeRequests(response.data); // Update state with filtered data
+  } catch (err) {
+      console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
+  }
+};
   // Normal view
   return (
     <>
       <div className="flex justify-between items-center mt-2">
         <h1 className="m-0 font-bold text-xl">This week presentation</h1>
         <div className="flex space-x-3">
-          <button className="px-4 py-2 rounded cursor-pointer" style={{backgroundColor: theme.colors.secondary500, color: theme.colors.primary500}}>
-            Edit
-          </button>
+        {customDate ? 
+            <button
+                className="bg-gray-500 hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
+                onClick={() => {
+                    setCustomDate(false);
+                }}
+            >
+                Clear Custom Date
+            </button>
+            : <button
+                className="bg-[#beef00] hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
+                onClick={() => {
+                    setIsCustomDateOpen(true);
+                    setCustomDate(true);
+                }
+                }
+            >
+                Custom Date
+            </button>}
+
+            {/* Dialog for selecting dates */}
+            <CustomDateDialog open={isCustomDateOpen} onClose={() => {
+                setCustomDate(false);
+                setIsCustomDateOpen(false);
+                }} onSave={handleSave}
+                 />
           <button 
             onClick={toggleFullscreen}
             className="px-4 py-2 rounded cursor-pointer" 
