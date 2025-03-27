@@ -179,17 +179,17 @@ bars.append("rect")
 
     return (
         <div>
-            <h1 className="text-xl font-bold mb-3 text-center text-[#beef70]">Plan and Unplanned change request summary</h1>
+            <h1 className="text-xl font-bold mb-3 text-center text-[#beef70]">Achieved two-week change request or not</h1>
 
             {/* Add legend here below the title */}
             <div className="flex justify-center mb-2">
                 <div className="flex items-center mr-4">
                     <div className="w-4 h-4 bg-[#3498db] mr-2 rounded-[50%]"></div>
-                    <span className="text-sm">Unplanned</span>
+                    <span className="text-sm">Not-achieved</span>
                 </div>
                 <div className="flex items-center">
                     <div className="w-4 h-4 bg-[#76e2ff] mr-2 rounded-[50%]"></div>
-                    <span className="text-sm">Planned</span>
+                    <span className="text-sm">Achieved</span>
                 </div>
             </div>
             {/* Dialog */}
@@ -200,7 +200,7 @@ bars.append("rect")
                 <p className="text-sm mb-4">
                 {selectedData?.category.includes("TOTAL") &&
                 <p className="text-yellow-700">
-                    Note: For common change, 1 change request may contain more than one planned/unplanned change request since there are more than one site.
+                    Note: For common change, 1 change request may contain more than one achieved/not-achieved change request since there are more than one site.
                 </p>
                 }
                     Showing {selectedData?.filteredData?.length} requests

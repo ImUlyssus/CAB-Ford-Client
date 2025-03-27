@@ -1,22 +1,58 @@
 import { Outlet, useLocation } from "react-router-dom";
-// import NavBar from "./NavBar";
 import NavBar from "./Navbar";
 import Footer from "./Footer";
 import { useTheme } from "styled-components";
+import { useState, useEffect } from "react";
 
 const Layout = () => {
     const theme = useTheme();
-    const location = useLocation(); // Get current route
+    const location = useLocation();
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
-    // Hide Navbar and Footer for '/change-request-update' route
-    const hideNavbarAndFooter = location.pathname === "/change-request-update";
+    // Listen for fullscreen changes
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement || 
+                          !!document.webkitFullscreenElement || 
+                          !!document.msFullscreenElement);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('msfullscreenchange', handleFullscreenChange);
+
+        return () => {
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+            document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.removeEventListener('msfullscreenchange', handleFullscreenChange);
+        };
+    }, []);
+
+    // Hide Navbar and Footer for '/change-request-update' route or when in fullscreen
+    const hideNavbarAndFooter = location.pathname === "/change-request-update" || isFullscreen;
 
     return (
-        <div style={{ color: theme.colors.secondary500 }}>
+        <div style={{ 
+            color: theme.colors.secondary500,
+            // Add this to ensure full height in fullscreen mode
+            height: isFullscreen ? '100vh' : 'auto',
+            overflow: isFullscreen ? 'hidden' : 'visible'
+        }}>
             {/* Conditionally render Navbar */}
             {!hideNavbarAndFooter && <NavBar />}
 
-            <main style={{ minHeight: "80vh", padding: "40px", backgroundColor: theme.colors.primary500, marginTop: !hideNavbarAndFooter && "60px" }}>
+            <main style={{ 
+                minHeight: "80vh", 
+                padding: isFullscreen ? "0" : "40px",
+                backgroundColor: isFullscreen ? theme.colors.secondary500 : theme.colors.primary500, 
+                marginTop: !hideNavbarAndFooter ? "60px" : "0",
+                // Add these to ensure full coverage in fullscreen
+                height: isFullscreen ? '100vh' : 'auto',
+                width: isFullscreen ? '100vw' : 'auto',
+                position: isFullscreen ? 'fixed' : 'relative',
+                top: isFullscreen ? 0 : 'auto',
+                left: isFullscreen ? 0 : 'auto'
+            }}>
                 <Outlet /> {/* This renders the child components */}
             </main>
 

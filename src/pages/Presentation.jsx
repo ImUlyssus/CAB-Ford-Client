@@ -1,30 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useTheme } from 'styled-components';
+
 import PresentationSlides from '../components/PresentationSlides';
 import API_BASE_URL from '../config/apiConfig';
 import BusinessCalendar from '../components/BusinessCalendar';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { useLocation, useNavigate } from 'react-router-dom';
-const slides = [
-    {
-      title: "Slide 1",
-      content: "This is the first slide with a custom UI.",
-      buttonText: "Learn More",
-    },
-    {
-      title: "Slide 2",
-      content: "Here’s another slide with different content.",
-      buttonText: "Explore",
-    },
-    {
-      title: "Slide 3",
-      content: "You can customize each slide as needed!",
-      buttonText: "Get Started",
-    },
-  ];
 
 const Presentation = () => {
-    const theme = useTheme();
+    
     const [calendar, setCalendar] = useState([]);
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
@@ -45,16 +28,8 @@ const Presentation = () => {
     return (
         <div>
             {/* Presentation Section */}
-            <div className="flex justify-between items-center mt-2">
-                <h1 className="m-0 font-bold text-xl">This week presentation</h1>
-                <div className="flex space-x-3">
-                    <button className="px-4 py-2 rounded cursor-pointer" style={{backgroundColor: theme.colors.secondary500, color: theme.colors.primary500}}>Edit</button>
-                    <button className="px-4 py-2 rounded cursor-pointer" style={{backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500}}>Present now</button>
-                </div>
-            </div>
-            <div className="w-340 mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div>
             <div className="mt-4">
-                <PresentationSlides slides={slides} />
+                <PresentationSlides />
             </div>
             {/* <div className="w-full mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div> */}
             {/* Calender Section */}

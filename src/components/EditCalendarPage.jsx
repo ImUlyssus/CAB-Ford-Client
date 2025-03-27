@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import DaysOfWeek from './DaysOfWeek';
-import GridComponent from './GridComponent';
+import EditGridComponent from './EditGridComponent';
 import { useTheme } from "styled-components";
 export default function EditCalendarPage() {
     const location = useLocation();
@@ -27,13 +27,14 @@ export default function EditCalendarPage() {
             </div>
             <div className="mt-3">
             {/* <Calendar data={filteredCalendarData} /> */}
-            <div style={{ height: "450px", overflowY: "auto", paddingBottom: "10px" }}>
-                {calendar.map((monthData, index) => (
-                    <div key={index} style={{ paddingTop: "10px" }}>
-                        <GridComponent data={monthData} activeYear={activeYear} />
-                    </div>
-                ))}
-            </div>
+            <EditGridComponent calendar={calendar} activeYear={activeYear} />
+            {/* <div style={{ height: "450px", overflowY: "auto", paddingBottom: "10px" }}> */}
+                {/* {calendar.map((monthData, index) => ( */}
+                    {/* <div key={index} style={{ paddingTop: "10px" }}> */}
+                    {/* <EditGridComponent activeYear={activeYear} allSitesMonths={calendar} /> */}
+                {/* </div> */}
+                {/* ))} */}
+            {/* </div> */}
             </div>
         </div>
     );
