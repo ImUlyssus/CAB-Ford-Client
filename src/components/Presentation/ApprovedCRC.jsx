@@ -1,6 +1,9 @@
 import React from 'react';
 import Ford_Logo from '../../assets/ford_logo.png';
-const ApprovedCRC = () => {
+const ApprovedCRC = ({ changeRequests }) => {
+    if (!changeRequests || !changeRequests.approved) {
+        return <div className="w-full h-full bg-white p-8">No approved change requests available.</div>;
+    }
     return (
         <div className="w-full h-full bg-white p-8">
             {/* Title */}
@@ -25,142 +28,33 @@ const ApprovedCRC = () => {
                     </thead>
                     <tbody className="text-black text-xs">
                         {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">FTM</td>
-                            <td className="border border-gray-300 px-4 text-center">Sat, 17 Aug 24 13:00 – 19:00</td>
-                            <td className="border border-gray-300 text-center">Suiya (SKAMMEEJ)</td>
-                            <td className="border border-gray-300 text-center">Complete with no issue</td>
-                        </tr>
+                        {changeRequests?.approved
+  ?.filter(request => request.change_status === "Completed with no issue") // Filtering step
+  .map((request, index) => {
+    return (
+      <tr key={index}>
+        <td className="border border-gray-300 bg-blue-700 text-center text-white">C</td>
+        <td className="border border-gray-300 px-4 py-2">{request.change_name}</td>
+        <td className="border border-gray-300 text-center">
+          {request.change_sites.split(',').join(", ").toUpperCase()}
+        </td>
+        <td className="border border-gray-300 px-4 text-center">
+          {request.aat_schedule_change && <div>{request.aat_schedule_change}</div>}
+          {request.ftm_schedule_change && <div>{request.ftm_schedule_change}</div>}
+          {request.fsst_schedule_change && <div>{request.fsst_schedule_change}</div>}
+        </td>
+        <td className="border border-gray-300 text-center">
+          {request.aat_it_contact && <div>{request.aat_it_contact}</div>}
+          {request.ftm_it_contact && <div>{request.ftm_it_contact}</div>}
+          {request.fsst_it_contact && <div>{request.fsst_it_contact}</div>}
+        </td>
+        <td className="border border-gray-300 text-center">
+          {request.change_status && <div>{request.change_status}</div>}
+        </td>
+      </tr>
+    );
+  })}
+
                     </tbody>
                 </table>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from 'styled-components';
+import { useNavigate } from "react-router-dom";
 import CoverPage from "./Presentation/CoverPage";
 import BusinessCalendarSlide from "./Presentation/BusinessCalendarSlide";
 import ApprovedCRC from "./Presentation/ApprovedCRC";
@@ -33,6 +34,7 @@ export default function Carousel() {
   const [customDate, setCustomDate] = useState(false);
   const [changeRequests, setChangeRequests] = useState([]);
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? slides.length - 1 : prevIndex - 1));
   };
@@ -62,6 +64,21 @@ export default function Carousel() {
     };
   }, []);
 
+  useEffect(()=>{
+      const getThisWeekData = async () => {
+        try {
+            const response = await axiosPrivate.get('/change-requests/get-this-week-data');
+            console.log(response.data)
+            setChangeRequests(response.data);
+        } catch (err) {
+            console.error("Error fetching this week data:", err.response ? err.response.data : err.message); // Debugging
+            // setError(err.response ? err.response.data.message : err.message);
+            navigate('/login', { state: { from: location }, replace: true });
+        }
+    };
+    getThisWeekData();
+    },[])
+
   // Fullscreen presentation view
   // In your fullscreen presentation view (replace the existing code)
 if (isFullscreen) {
@@ -75,7 +92,7 @@ if (isFullscreen) {
       index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
     }`}
   >
-    {React.createElement(SlideComponent, { theme })}
+    {React.createElement(SlideComponent, { theme, changeRequests })}
   </div>
 ))}
 
@@ -141,7 +158,7 @@ const handleSave = async (start, end) => {
                 Clear Custom Date
             </button>
             : <button
-                className="bg-[#beef00] hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
+                className="border-1 border-[#beef00] hover:bg-[#beef70] hover:text-black text-[#beef70] font-bold py-2 px-4 rounded"
                 onClick={() => {
                     setIsCustomDateOpen(true);
                     setCustomDate(true);
@@ -159,7 +176,7 @@ const handleSave = async (start, end) => {
                  />
           <button 
             onClick={toggleFullscreen}
-            className="px-4 py-2 rounded cursor-pointer" 
+            className="px-4 py-2 rounded cursor-pointer font-bold" 
             style={{backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500}}
           >
             Present now
