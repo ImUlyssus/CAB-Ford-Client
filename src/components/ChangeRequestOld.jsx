@@ -9,7 +9,7 @@ import BusinessTeamContact from "./BusinessTeamContact";
 import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
 import { useNavigate } from "react-router-dom";
-function ChangeRequestOld() {
+function ChangeRequest() {
     const theme = useTheme();
     const [selectedSites, setSelectedSites] = useState([]);
     const [openDialog, setOpenDialog] = useState(null);
@@ -31,9 +31,9 @@ function ChangeRequestOld() {
         fsst: [],
     });
     const [scheduleChanges, setScheduleChanges] = useState({
-        aat: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
-        ftm: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
-        fsst: { addedDates: [], startDateForRange: null, endDateForRange: null, duration: null },
+        aat: { addedDates: [], startDateForRange: null, endDateForRange: null },
+        ftm: { addedDates: [], startDateForRange: null, endDateForRange: null },
+        fsst: { addedDates: [], startDateForRange: null, endDateForRange: null },
     });
     const handleCRQChange = (type, updatedCRQs) => {
         setCrqs((prev) => ({
@@ -99,15 +99,15 @@ function ChangeRequestOld() {
         }
         // Transform scheduleChanges into space-separated strings for each site
         const aat_schedule_change = scheduleChanges.aat?.addedDates
-            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            ?.map(date => `${date.start} ${date.end}`)
             .join(' ') || '';
 
         const ftm_schedule_change = scheduleChanges.ftm?.addedDates
-            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            ?.map(date => `${date.start} ${date.end}`)
             .join(' ') || '';
 
         const fsst_schedule_change = scheduleChanges.fsst?.addedDates
-            ?.map(date => `${date.start} ${date.end} ${date.duration}`)
+            ?.map(date => `${date.start} ${date.end}`)
             .join(' ') || '';
         // Convert request_change_date to a Date object
         const requestChangeDate = new Date();
@@ -124,7 +124,7 @@ function ChangeRequestOld() {
 
             return scheduleStr
                 .split(' ') // Split by space
-                .filter((_, index) => index % 3 === 1) // Extract every second value (end date)
+                .filter((_, index) => index % 2 === 1) // Extract every second value (end date)
                 .map(dateStr => new Date(dateStr)) // Convert to Date objects
                 .filter(date => !isNaN(date)); // Remove invalid dates
         };
@@ -141,7 +141,33 @@ function ChangeRequestOld() {
 
 
         const achieve_2_week_change_request = !hasEarlyEndDate;
-        console.log(achieve_2_week_change_request);
+        // Helper function to extract every second date from a list
+        const getEverySecondDate = (scheduleString) => {
+            if (!scheduleString) return []; // Handle empty or undefined case
+
+            // Convert string schedule to an array and parse as Date objects
+            const scheduleArray = scheduleString.split(" ").map(dateStr => new Date(dateStr));
+
+            // Extract every second date (index 1, 3, 5, ...)
+            return scheduleArray.filter((_, index) => index % 2 === 1);
+        };
+
+        // Extract second dates from each site's schedule
+        const aatDates = getEverySecondDate(aat_schedule_change);
+        const ftmDates = getEverySecondDate(ftm_schedule_change);
+        const fsstDates = getEverySecondDate(fsst_schedule_change);
+
+        // Combine all second dates
+        const allSecondDates = [...aatDates, ...ftmDates, ...fsstDates];
+
+        // Find the latest date
+        const latestDate = allSecondDates.length > 0
+            ? new Date(Math.max(...allSecondDates.map(date => date.getTime())))
+            : null;
+
+        // Format latest date as 'YYYY-MM-DD' if it exists
+        const latest_schedule_date = latestDate ? latestDate.toISOString().split("T")[0] : null;
+
         // Create the request payload
         const requestData = {
             category,
@@ -159,6 +185,7 @@ function ChangeRequestOld() {
             aat_schedule_change: selectedSitesString.includes('aat') ? aat_schedule_change : "",
             ftm_schedule_change: selectedSitesString.includes('ftm') ? ftm_schedule_change : "",
             fsst_schedule_change: selectedSitesString.includes('fsst') ? fsst_schedule_change : "",
+            latest_schedule_date,
             aat_it_contact: selectedSitesString.includes('aat') ? aat_it_contact : "",
             ftm_it_contact: selectedSitesString.includes('ftm') ? ftm_it_contact : "",
             fsst_it_contact: selectedSitesString.includes('fsst') ? fsst_it_contact : "",
@@ -176,7 +203,7 @@ function ChangeRequestOld() {
 
             alert("✅ Change Request submitted successfully");
             // there will be an error in the console every time you make a change request bc of this refresh, related to access and refresh token. Don't worry about it.
-            navigate(0);
+            navigate(-1);
         } catch (error) {
             if (error.response) {
                 alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
@@ -281,9 +308,9 @@ function ChangeRequestOld() {
                                 id="changeName"
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value (1500 characters max)"
+                                placeholder="Enter value (300 characters max)"
                                 rows={4}
-                                maxLength={1500}
+                                maxLength={300}
                             />
 
                             {/* Style your text dialog button */}
@@ -333,7 +360,6 @@ function ChangeRequestOld() {
                             type={site}
                             startDateForRange={scheduleChanges[site].startDateForRange}
                             endDateForRange={scheduleChanges[site].endDateForRange}
-                            duration={scheduleChanges[site].duration}
                             addedDates={scheduleChanges[site].addedDates}
                             onScheduleChange={(field, value) => setScheduleChanges((prev) => ({
                                 ...prev,
@@ -510,7 +536,6 @@ function ScheduleChangeSection({
     type,
     startDateForRange,
     endDateForRange,
-    duration,
     addedDates,
     onScheduleChange,
     onAddDate,
@@ -526,8 +551,8 @@ function ScheduleChangeSection({
 
     // Handle adding a date
     const handleAddDate = () => {
-        if (startDateForRange && endDateForRange && duration) {
-            const newDate = { start: startDateForRange, end: endDateForRange, duration };
+        if (startDateForRange && endDateForRange) {
+            const newDate = { start: startDateForRange, end: endDateForRange };
             if (addedDates.length < 5) {
                 onAddDate(newDate);  // Pass the added date to the parent
             } else {
@@ -549,7 +574,7 @@ function ScheduleChangeSection({
 
                 <div className="grid grid-cols-1 relative">
                     <Button type="button" onClick={() => setOpenDialog("range")}>
-                        Choose date and duration
+                        Choose date and time
                     </Button>
                 </div>
             </div>
@@ -589,7 +614,7 @@ function ScheduleChangeSection({
                     </div>
                 </div>
 
-                <div className="mb-4">
+                {/* <div className="mb-4">
                     <input
                         type="number"
                         value={duration || ""}
@@ -597,7 +622,7 @@ function ScheduleChangeSection({
                         placeholder="Choose duration in hour"
                         className="p-2 border border-gray-300 rounded w-full"
                     />
-                </div>
+                </div> */}
                 <div className="flex">
                     <Button type="button" onClick={handleAddDate} className="ml-auto">
                         Add
@@ -609,4 +634,4 @@ function ScheduleChangeSection({
 }
 
 
-export default ChangeRequestOld;
+export default ChangeRequest;

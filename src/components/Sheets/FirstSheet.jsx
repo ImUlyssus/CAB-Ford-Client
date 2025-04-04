@@ -33,7 +33,7 @@ const FirstSheet = () => {
     }, []);
     useEffect(() => {
         if (weeklyData.length === 0) return;
-    
+
         const processWeekData = (weekData) => {
             let result = {
                 aat_total: 0, aat_ongoing: 0, aat_rejected: 0, aat_completed: 0,
@@ -44,17 +44,17 @@ const FirstSheet = () => {
                 fsst_ongoing_data: [], fsst_completed_data: [], fsst_rejected_data: [],
                 date: "", // Formatted date range
             };
-    
+
             // Process the start and end dates
             const startDate = new Date(weekData.week.start);
             const endDate = new Date(weekData.week.end);
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             result.date = `${monthNames[startDate.getMonth()]} ${startDate.getDate()} - ${monthNames[endDate.getMonth()]} ${endDate.getDate()}`;
-    
+
             // Process data entries and store the full objects
             weekData.data.forEach((entry) => {
                 const { change_sites, change_status } = entry;
-    
+
                 if (change_sites.includes("aat")) {
                     result.aat_total++;
                     if (change_status === "") {
@@ -68,7 +68,7 @@ const FirstSheet = () => {
                         result.aat_rejected_data.push(entry);
                     }
                 }
-    
+
                 if (change_sites.includes("ftm")) {
                     result.ftm_total++;
                     if (change_status === "") {
@@ -82,7 +82,7 @@ const FirstSheet = () => {
                         result.ftm_rejected_data.push(entry);
                     }
                 }
-    
+
                 if (change_sites.includes("fsst")) {
                     result.fsst_total++;
                     if (change_status === "") {
@@ -97,18 +97,18 @@ const FirstSheet = () => {
                     }
                 }
             });
-    
+
             return result;
         };
-    
+
         // Process each week's data
         setWeek1(processWeekData(weeklyData[0]));
         setWeek2(processWeekData(weeklyData[1]));
         setWeek3(processWeekData(weeklyData[2]));
         setWeek4(processWeekData(weeklyData[3]));
-    
+
     }, [weeklyData]);
-    
+
 
     // Create an array of labels for the Y-axis
     let weeks = [week4, week3, week2, week1];
@@ -124,40 +124,40 @@ const FirstSheet = () => {
 
     const maxY = Math.max(...totals);
     const interval = Math.ceil(maxY / 5); // Divide maxY into 5 intervals
-    
+
     const yAxisLabels = Array.from({ length: 7 }, (_, index) => interval * index).reverse();
     // Scale factor to normalize bar heights
     const scaleFactor = chartHeight / maxY;
     // Function to handle bar clicks
-const handleBarClick = (weekData, site, category) => {
-    const dataField = `${site}_${category}_data`; // Use the new data field name
+    const handleBarClick = (weekData, site, category) => {
+        const dataField = `${site}_${category}_data`; // Use the new data field name
 
-    const filteredData = weekData[dataField]; // Get the full data array directly
+        const filteredData = weekData[dataField]; // Get the full data array directly
 
-    setSelectedData({
-        category,
-        filteredData,
-        date: weekData.date,
-        site
-    });
-    setIsDialogOpen(true);
-};
+        setSelectedData({
+            category,
+            filteredData,
+            date: weekData.date,
+            site
+        });
+        setIsDialogOpen(true);
+    };
 
-    
+
     return (
         <div className='p-4'>
             <h1 className="text-xl font-bold mb-5 text-center text-[#beef70]">Change request summary from last 4 weeks</h1>
 
             <div className="relative w-full h-64 border-l border-b border-gray-700 ml-3">
                 {/* Vertical Y-Axis Label */}
-    <div
-        className="absolute left-[-40px] bottom-4 transform -translate-y-1/2 -rotate-90 whitespace-nowrap"
-        style={{
-            transformOrigin: "left center", // Ensure the text rotates around the correct point
-        }}
-    >
-        <span className="text-sm">Change Request Amount</span>
-    </div>
+                <div
+                    className="absolute left-[-40px] bottom-4 transform -translate-y-1/2 -rotate-90 whitespace-nowrap"
+                    style={{
+                        transformOrigin: "left center", // Ensure the text rotates around the correct point
+                    }}
+                >
+                    <span className="text-sm">Change Request Amount</span>
+                </div>
                 {/* Y-Axis Labels */}
                 <div className="absolute left-[-20px] top-0 h-full flex flex-col justify-between">
                     {yAxisLabels.map((num, index) => (
@@ -194,9 +194,9 @@ const handleBarClick = (weekData, site, category) => {
                                     const totalHeight = ongoing + completed + rejected;
 
                                     // Scale the bar heights to match the Y-axis
-                                    const ongoingHeight = ongoing * scaleFactor * 0.69;
-                                    const completedHeight = completed * scaleFactor * 0.69;
-                                    const rejectedHeight = rejected * scaleFactor * 0.69;
+                                    const ongoingHeight = ongoing * scaleFactor * 0.77;
+                                    const completedHeight = completed * scaleFactor * 0.77;
+                                    const rejectedHeight = rejected * scaleFactor * 0.77;
 
                                     return (
                                         <div key={siteIndex} className="flex flex-col items-center justify-end h-full">
@@ -204,52 +204,52 @@ const handleBarClick = (weekData, site, category) => {
                                             <p style={{ transform: 'rotate(-90deg)', marginBottom: "10px", color: 'gray' }}>{site.toUpperCase()}</p>
 
                                             {/* Ongoing Bar with Number */}
-<div 
-    className="relative w-4 bg-blue-500 flex justify-center items-center cursor-pointer" 
-    style={{ height: `${ongoingHeight}px` }} 
-    onClick={() => handleBarClick(weekData, site, "ongoing")}
->
-    {ongoing > 0 && (
-        <span
-            className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
-            style={{ top: "50%", transform: "translate(-50%, -50%)" }}
-        >
-            {ongoing}
-        </span>
-    )}
-</div>
+                                            <div
+                                                className="relative w-4 bg-blue-500 flex justify-center items-center cursor-pointer"
+                                                style={{ height: `${ongoingHeight}px` }}
+                                                onClick={() => handleBarClick(weekData, site, "ongoing")}
+                                            >
+                                                {ongoing > 0 && (
+                                                    <span
+                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
+                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+                                                    >
+                                                        {ongoing}
+                                                    </span>
+                                                )}
+                                            </div>
 
-{/* Completed Bar with Number */}
-<div 
-    className="relative w-4 bg-green-500 flex justify-center items-center cursor-pointer" 
-    style={{ height: `${completedHeight}px` }} 
-    onClick={() => handleBarClick(weekData, site, "completed")}
->
-    {completed > 0 && (
-        <span
-            className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
-            style={{ top: "50%", transform: "translate(-50%, -50%)" }}
-        >
-            {completed}
-        </span>
-    )}
-</div>
+                                            {/* Completed Bar with Number */}
+                                            <div
+                                                className="relative w-4 bg-green-500 flex justify-center items-center cursor-pointer"
+                                                style={{ height: `${completedHeight}px` }}
+                                                onClick={() => handleBarClick(weekData, site, "completed")}
+                                            >
+                                                {completed > 0 && (
+                                                    <span
+                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
+                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+                                                    >
+                                                        {completed}
+                                                    </span>
+                                                )}
+                                            </div>
 
-{/* Rejected Bar with Number */}
-<div 
-    className="relative w-4 bg-red-500 flex justify-center items-center cursor-pointer" 
-    style={{ height: `${rejectedHeight}px` }} 
-    onClick={() => handleBarClick(weekData, site, "rejected")}
->
-    {rejected > 0 && (
-        <span
-            className="absolute left-3 transform -translate-x-1/2 text-xs text-center"
-            style={{ top: "50%", transform: "translate(-50%, -50%)" }}
-        >
-            {rejected}
-        </span>
-    )}
-</div>
+                                            {/* Rejected Bar with Number */}
+                                            <div
+                                                className="relative w-4 bg-red-500 flex justify-center items-center cursor-pointer"
+                                                style={{ height: `${rejectedHeight}px` }}
+                                                onClick={() => handleBarClick(weekData, site, "rejected")}
+                                            >
+                                                {rejected > 0 && (
+                                                    <span
+                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-center"
+                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+                                                    >
+                                                        {rejected}
+                                                    </span>
+                                                )}
+                                            </div>
 
 
                                         </div>
@@ -291,21 +291,21 @@ const handleBarClick = (weekData, site, category) => {
                     </div>
                 </div>
                 {/* Dialog Component */}
-            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                <h2 className="text-lg font-semibold mb-2">
-                    {selectedData?.category.toUpperCase()} Requests ({selectedData?.date})
-                </h2>
-                <p className="text-sm mb-4">
-                    Showing requests for <strong>{selectedData?.site.toUpperCase()}</strong>
-                </p>
-                <ul className="list-disc pl-5 space-y-2">
-                    {selectedData?.filteredData ? (
-                        <DataDetail requests={selectedData.filteredData} />
-                    ) : (
-                        <p className="text-gray-500">No data available.</p>
-                    )}
-                </ul>
-            </Dialog>
+                <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                    <h2 className="text-lg font-semibold mb-2">
+                        {selectedData?.category.toUpperCase()} Requests ({selectedData?.date})
+                    </h2>
+                    <p className="text-sm mb-4">
+                        Showing requests for <strong>{selectedData?.site.toUpperCase()}</strong>
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2">
+                        {selectedData?.filteredData ? (
+                            <DataDetail requests={selectedData.filteredData} />
+                        ) : (
+                            <p className="text-gray-500">No data available.</p>
+                        )}
+                    </ul>
+                </Dialog>
             </div>
         </div>
     );
