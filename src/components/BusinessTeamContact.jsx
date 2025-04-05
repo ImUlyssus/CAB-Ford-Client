@@ -106,7 +106,7 @@ const BusinessTeamContact = ({onContactChange, businessContact, isUpdate}) => {
                             onChange={(e) => setPosition(e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full mb-2"
                             maxLength={50}
-                            onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()}
+                            onKeyDown={(e) => e.key === ',' && e.preventDefault()}
                         />
                         <input
                             type="text"
@@ -115,7 +115,7 @@ const BusinessTeamContact = ({onContactChange, businessContact, isUpdate}) => {
                             onChange={(e) => setPersonName(e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full mb-2"
                             maxLength={50}
-                            onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()}
+                            onKeyDown={(e) => e.key === ',' && e.preventDefault()}
                         />
                         <input
                             type="text"
@@ -124,7 +124,7 @@ const BusinessTeamContact = ({onContactChange, businessContact, isUpdate}) => {
                             onChange={(e) => setPersonCdsid(e.target.value)}
                             className="p-2 border border-gray-300 rounded w-full mb-2"
                             maxLength={50}
-                            onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()}
+                            onKeyDown={(e) => e.key === ',' && e.preventDefault()}
                         />
                         <div className="flex justify-end gap-2">
                             <button

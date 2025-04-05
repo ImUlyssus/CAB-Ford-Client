@@ -97,6 +97,15 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
             <Dialog open={isEditDialogOpen} onClose={handleCancelClick}>
                 <h4 className="text-md font-semibold mb-2">Edit Schedule Change</h4>
                 <div className="mb-1">
+                    <label className="block text-sm font-bold mb-1">Title:</label>
+                    <input
+                        type="text"
+                        value={editedDate.title || ""}
+                        onChange={(e) => handleInputChange(e, "title")}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                </div>
+                <div className="mb-1">
                     <label className="block text-sm font-bold mb-1">Start:</label>
                     <input
                         type="datetime-local"
@@ -111,15 +120,6 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
                         type="datetime-local"
                         value={editedDate.end || ""}
                         onChange={(e) => handleInputChange(e, "end")}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                </div>
-                <div className="mb-1">
-                    <label className="block text-sm font-bold mb-1">Title:</label>
-                    <input
-                        type="text"
-                        value={editedDate.title || ""}
-                        onChange={(e) => handleInputChange(e, "title")}
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                     />
                 </div>

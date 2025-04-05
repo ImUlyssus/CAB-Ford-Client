@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useTheme } from "styled-components";
 import Dialog from "../components/Dialog";
 import Button from "../components/Button";
@@ -10,6 +10,7 @@ import BusinessTeamContact from "./BusinessTeamContact";
 import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
 import { useNavigate } from "react-router-dom";
+import AISuggestionDialog from "./AISuggestionDialog";
 function ChangeRequest() {
     const theme = useTheme();
     const [selectedSites, setSelectedSites] = useState([]);
@@ -17,8 +18,23 @@ function ChangeRequest() {
     const axiosPrivate = useAxiosPrivate();
     const [businessContact, setBusinessContact] = useState({});
     const [globalContact, setGlobalContact] = useState({});
+    const [changeDescription, setChangeDescription] = useState("");
+    const [users, setUsers] = useState([]);
+    const [isAISuggestionDialogOpen, setIsAISuggestionDialogOpen] = useState(false);
     const globalTeamContactRef = useRef(null);
     const navigate = useNavigate();
+    const [requestors, setRequestors] = useState({
+        AAT: "",
+        FTM: "",
+        FSST: "",
+    });
+    
+    const handleRequestorChange = (site, value) => {
+        setRequestors((prev) => ({
+            ...prev,
+            [site]: value,
+        }));
+    };
 
     const handleRemoveContact = () => {
         if (globalTeamContactRef.current) {
@@ -67,6 +83,32 @@ function ChangeRequest() {
             </div>
         )
     );
+    useEffect(() => {
+        let isMounted = true; // Prevent memory leaks on unmount
+        const controller = new AbortController(); // To cancel the request
+
+        const getAllUsers = async () => {
+            try {
+                const response = await axiosPrivate.get("/users", {
+                    signal: controller.signal, // Link request to controller
+                });
+                setUsers(response.data);
+            } catch (error) {
+                if (error.name === "CanceledError") {
+                    console.log("Request canceled:", error.message);
+                } else {
+                    console.error("❌ Error fetching users:", error.response?.data || error.message);
+                }
+            }
+        };
+
+        getAllUsers();
+
+        return () => {
+            isMounted = false;
+            controller.abort(); // Cleanup request on unmount
+        };
+    }, []);
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -77,8 +119,11 @@ function ChangeRequest() {
         const change_name = document.getElementById("changeName").value;
         const selectedSitesString = selectedSites.join(',');
         const isCommonChange = selectedSites.length > 1;
-        const change_description = document.getElementById("changeDescription").value || "";
-        const test_plan = document.getElementById("testPlan").value || "";
+        // const change_description = document.getElementById("changeDescription").value || "";
+        const change_description = changeDescription || "";
+        const aat_test_plan = document.getElementById("aatTestPlan").value || "";
+        const ftm_test_plan = document.getElementById("ftmTestPlan")?.value || "";
+        const fsst_test_plan = document.getElementById("fsstTestPlan")?.value || "";
         const rollback_plan = document.getElementById("rollbackPlan")?.value || "";
         const aat_contact_name = document.getElementById("aatContactName")?.value || "";
         const aat_contact_cdsid = document.getElementById("aatContactCdsid")?.value || "";
@@ -98,35 +143,35 @@ function ChangeRequest() {
             alert("❌ A change request must include those fields: category, reason, impact, priority, change name and change site to submit.");
             return;
         }
-         // Transform scheduleChanges into space-separated strings for each site
-         const aat_schedule_change = scheduleChanges.aat?.addedDates
-         ?.map(date => {
-             const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
-             const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+        // Transform scheduleChanges into space-separated strings for each site
+        const aat_schedule_change = scheduleChanges.aat?.addedDates
+            ?.map(date => {
+                const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+                const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
 
-             const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
-             return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
-         })
-         .join(' ') || '';
+                const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+            })
+            .join(' ') || '';
 
-     const ftm_schedule_change = scheduleChanges.ftm?.addedDates
-         ?.map(date => {
-             const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
-             const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
-             const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
-             return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
-         })
-         .join(' ') || '';
+        const ftm_schedule_change = scheduleChanges.ftm?.addedDates
+            ?.map(date => {
+                const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+                const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+                const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+            })
+            .join(' ') || '';
 
-     const fsst_schedule_change = scheduleChanges.fsst?.addedDates
-         ?.map(date => {
-             const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
-             const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+        const fsst_schedule_change = scheduleChanges.fsst?.addedDates
+            ?.map(date => {
+                const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+                const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
 
-             const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
-             return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
-         })
-         .join(' ') || '';
+                const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+            })
+            .join(' ') || '';
 
         // Convert request_change_date to a Date object
         const requestChangeDate = new Date();
@@ -197,7 +242,9 @@ function ChangeRequest() {
             common_change: isCommonChange,
             description: change_description,
             request_change_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-            test_plan,
+            aat_test_plan,
+            ftm_test_plan,
+            fsst_test_plan,
             rollback_plan,
             achieve_2_week_change_request,
             aat_schedule_change: selectedSitesString.includes('aat') ? aat_schedule_change : "",
@@ -234,24 +281,33 @@ function ChangeRequest() {
         }
     };
 
+    const handleOpenAISuggestionDialog = () => {
+        setIsAISuggestionDialogOpen(true);
+    };
 
+    const handleCloseAISuggestionDialog = () => {
+        setIsAISuggestionDialogOpen(false);
+    };
     const labelStyle = {
         marginLeft: "auto", marginRight: "10rem"
     }
+    const handleDescriptionChange = (newDescription) => {
+        setChangeDescription(newDescription);
+    };
     const handleScheduleChangeEdit = (type, index, updatedDate) => {
         setScheduleChanges((prev) => {
-          const updatedAddedDates = [...prev[type].addedDates]; // Create a copy
-          updatedAddedDates[index] = updatedDate; // Update the date at the index
-    
-          return {
-            ...prev,
-            [type]: {
-              ...prev[type],
-              addedDates: updatedAddedDates, // Update addedDates
-            },
-          };
+            const updatedAddedDates = [...prev[type].addedDates]; // Create a copy
+            updatedAddedDates[index] = updatedDate; // Update the date at the index
+
+            return {
+                ...prev,
+                [type]: {
+                    ...prev[type],
+                    addedDates: updatedAddedDates, // Update addedDates
+                },
+            };
         });
-      };
+    };
     const handleSiteSelection = (e) => {
         const { value, checked } = e.target;
 
@@ -384,106 +440,117 @@ function ChangeRequest() {
                             ))}
                         </div>
                     </div>
+                    {/* Change requestor */}
+                    {selectedSites.map((site) => (
+    <div key={site} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
+        <label htmlFor={`${site}Requestor`} style={labelStyle}>
+            {site.toUpperCase()} change requestor:
+        </label>
+        <select
+            id={`${site}Requestor`}
+            style={{ backgroundColor: theme.colors.primary400 }}
+            className="p-2 border border-gray-300 rounded text-white"
+            value={requestors[site] || ""}
+            onChange={(e) => handleRequestorChange(site, e.target.value)}
+        >
+            <option key="_" value="">
+                _
+            </option>
+            {users
+                .filter((user) => user.site === site.toUpperCase()) // 🔥 Filter users by site
+                .map((filteredUser) => (
+                    <option key={filteredUser.email} value={filteredUser.name}>
+                        {filteredUser.name}
+                    </option>
+                ))}
+        </select>
+    </div>
+))}
                     {/* schedule change section */}
                     {selectedSites.map((site) => (
                         <>
-                        <ScheduleChangeSection
-                            key={site}
-                            type={site}
-                            startDateForRange={scheduleChanges[site].startDateForRange}
-                            endDateForRange={scheduleChanges[site].endDateForRange}
-                            addedDates={scheduleChanges[site].addedDates}
-                            onScheduleChange={(field, value) => setScheduleChanges((prev) => ({
-                                ...prev,
-                                [site]: { ...prev[site], [field]: value },
-                            }))}
-                            onAddDate={(newDate) => setScheduleChanges((prev) => ({
-                                ...prev,
-                                [site]: {
-                                    ...prev[site],
-                                    addedDates: [...prev[site].addedDates, newDate],
-                                },
-                            }))}
-                            onRemoveDate={(index) => setScheduleChanges((prev) => ({
-                                ...prev,
-                                [site]: {
-                                    ...prev[site],
-                                    addedDates: prev[site].addedDates.filter((_, i) => i !== index),
-                                },
-                            }))}  // Handle removing dates dynamically
-                        />
-                        <AddedDatesList
-            addedDates={scheduleChanges[site].addedDates}
-            label={site.toUpperCase()}
-            onRemove={(index) => handleRemoveDate(site, index)}
-            onEdit={(index, updatedDate) => handleScheduleChangeEdit(site, index, updatedDate)} // Pass the onEdit function
-        />
-        </>
+                            <ScheduleChangeSection
+                                key={site}
+                                type={site}
+                                startDateForRange={scheduleChanges[site].startDateForRange}
+                                endDateForRange={scheduleChanges[site].endDateForRange}
+                                addedDates={scheduleChanges[site].addedDates}
+                                onScheduleChange={(field, value) => setScheduleChanges((prev) => ({
+                                    ...prev,
+                                    [site]: { ...prev[site], [field]: value },
+                                }))}
+                                onAddDate={(newDate) => setScheduleChanges((prev) => ({
+                                    ...prev,
+                                    [site]: {
+                                        ...prev[site],
+                                        addedDates: [...prev[site].addedDates, newDate],
+                                    },
+                                }))}
+                                onRemoveDate={(index) => setScheduleChanges((prev) => ({
+                                    ...prev,
+                                    [site]: {
+                                        ...prev[site],
+                                        addedDates: prev[site].addedDates.filter((_, i) => i !== index),
+                                    },
+                                }))}  // Handle removing dates dynamically
+                            />
+                            <AddedDatesList
+                                addedDates={scheduleChanges[site].addedDates}
+                                label={site.toUpperCase()}
+                                onRemove={(index) => handleRemoveDate(site, index)}
+                                onEdit={(index, updatedDate) => handleScheduleChangeEdit(site, index, updatedDate)} // Pass the onEdit function
+                            />
+                        </>
                     ))}
 
 
                     {/* Change Description Field */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
                         <label htmlFor="changeDescription" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Change description:</label>
                         <div className="relative w-full">
-                            <textarea
-                                id="changeDescription"
-                                style={{ backgroundColor: theme.colors.primary400 }}
-                                className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value (1500 characters max)"
-                                rows={4}
-                                maxLength={1500}
-                            />
-
-                            {/* Style your text dialog button */}
-                            <button
-                                type='button'
-                                onClick={() => toggleSyntaxInfo("changeDescription")}
-                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
-                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
-                            >
-                                Style your text
-                                <HelpCircle className="w-4 h-4 ml-1" />
-                            </button>
-
-                            {/* Syntax Info Box */}
-                            <SyntaxInfoBox
-                                isVisible={openDialog === "changeDescription"}
-                                onClose={() => setOpenDialog(null)}
-                            />
+                            <Button className='w-full' type="button" onClick={handleOpenAISuggestionDialog}>
+                                Add description
+                            </Button>
                         </div>
                     </div>
+                    <AISuggestionDialog
+                        isOpen={isAISuggestionDialogOpen}
+                        onClose={handleCloseAISuggestionDialog}
+                        onDescriptionChange={handleDescriptionChange}
+                    />
                     {/* Test Plan Field */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
-                        <label htmlFor="testPlan" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Test plan:</label>
-                        <div className="relative w-full">
-                            <textarea
-                                id="testPlan"
-                                style={{ backgroundColor: theme.colors.primary400 }}
-                                className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value (500 characters max)"
-                                rows={4}
-                                maxLength={500}
-                            />
+                    {selectedSites.map((site) => (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                            <label htmlFor={`${site}TestPlan`} style={{ marginLeft: 'auto', marginRight: '10rem' }}>{site.toUpperCase()} Test plan:</label>
+                            <div className="relative w-full">
+                                <textarea
+                                    id={`${site}TestPlan`}
+                                    style={{ backgroundColor: theme.colors.primary400 }}
+                                    className="p-2 border border-gray-300 rounded text-white w-full"
+                                    placeholder="Enter value (500 characters max)"
+                                    rows={4}
+                                    maxLength={500}
+                                />
 
-                            {/* Style your text dialog button */}
-                            <button
-                                type='button'
-                                onClick={() => toggleSyntaxInfo("testPlan")}
-                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
-                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
-                            >
-                                Style your text
-                                <HelpCircle className="w-4 h-4 ml-1" />
-                            </button>
+                                {/* Style your text dialog button */}
+                                <button
+                                    type='button'
+                                    onClick={() => toggleSyntaxInfo(`${site}testPlan`)}
+                                    className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                                    style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                                >
+                                    Style your text
+                                    <HelpCircle className="w-4 h-4 ml-1" />
+                                </button>
 
-                            {/* Syntax Info Box */}
-                            <SyntaxInfoBox
-                                isVisible={openDialog === "testPlan"}
-                                onClose={() => setOpenDialog(null)}
-                            />
+                                {/* Syntax Info Box */}
+                                <SyntaxInfoBox
+                                    isVisible={openDialog === `${site}testPlan`}
+                                    onClose={() => setOpenDialog(null)}
+                                />
+                            </div>
                         </div>
-                    </div>
+                    ))}
                     {/* Rollback Plan Field */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
                         <label htmlFor="rollbackPlan" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Rollback plan:</label>
@@ -515,6 +582,7 @@ function ChangeRequest() {
                             />
                         </div>
                     </div>
+                    {/* Site IT Contact */}
                     {selectedSites.map((site) => (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
                             <label htmlFor="aatSiteItContact" style={{ marginLeft: "auto", marginRight: "10rem" }}>
@@ -528,7 +596,7 @@ function ChangeRequest() {
                                     placeholder="Enter name (50 char max)"
                                     className="p-2 border border-gray-300 rounded w-full"
                                     maxLength={50}
-                                    onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()} // Block comma input
+                                    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
                                 />
 
                                 <input
@@ -538,7 +606,7 @@ function ChangeRequest() {
                                     placeholder="Enter CDSID (50 char max)"
                                     className="p-2 border border-gray-300 rounded w-full"
                                     maxLength={50}
-                                    onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()} // Block comma input
+                                    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
                                 />
                             </div>
                         </div>
@@ -552,7 +620,37 @@ function ChangeRequest() {
                     {selectedSites.map((site) => (
                         <CRQSection type={site} onCRQChange={(updatedCRQs) => handleCRQChange(site, updatedCRQs)} crqs={crqs[site]} />
                     ))}
+                    {/* Remark Plan Field */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
+                        <label htmlFor="remarks" style={{ marginLeft: 'auto', marginRight: '10rem' }}>Remarks:</label>
+                        <div className="relative w-full">
+                            <textarea
+                                id="remarks"
+                                style={{ backgroundColor: theme.colors.primary400 }}
+                                className="p-2 border border-gray-300 rounded text-white w-full"
+                                placeholder="Enter value (500 characters max)"
+                                rows={4}
+                                maxLength={500}
+                            />
 
+                            {/* Style your text dialog button */}
+                            <button
+                                type='button'
+                                onClick={() => toggleSyntaxInfo("remarks")}
+                                className="flex items-center absolute top-0 right-0 mt-2 mr-2 text-sm rounded-full px-2 py-1 hover:bg-gray-600"
+                                style={{ backgroundColor: "#fff18d", color: theme.colors.primary500 }}
+                            >
+                                Style your text
+                                <HelpCircle className="w-4 h-4 ml-1" />
+                            </button>
+
+                            {/* Syntax Info Box */}
+                            <SyntaxInfoBox
+                                isVisible={openDialog === "remarks"}
+                                onClose={() => setOpenDialog(null)}
+                            />
+                        </div>
+                    </div>
                     {/* Submit Button */}
                     <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
                         <button

@@ -128,7 +128,7 @@ const FirstSheet = () => {
 
     const yAxisLabels = Array.from({ length: 7 }, (_, index) => interval * index).reverse();
     // Scale factor to normalize bar heights
-    const scaleFactor = chartHeight / (maxY+(maxY * 0.6)); // Adding 10% to maxY for better scaling
+    const scaleFactor = chartHeight / maxY;
     // Function to handle bar clicks
     const handleBarClick = (weekData, site, category) => {
         const dataField = `${site}_${category}_data`; // Use the new data field name
@@ -195,9 +195,9 @@ const FirstSheet = () => {
                                     const totalHeight = ongoing + completed + rejected;
 
                                     // Scale the bar heights to match the Y-axis
-                                    const ongoingHeight = ongoing * scaleFactor ;
-                                    const completedHeight = completed * scaleFactor;
-                                    const rejectedHeight = rejected * scaleFactor;
+                                    const ongoingHeight = ongoing * scaleFactor * 0.77;
+                                    const completedHeight = completed * scaleFactor * 0.77;
+                                    const rejectedHeight = rejected * scaleFactor * 0.77;
 
                                     return (
                                         <div key={siteIndex} className="flex flex-col items-center justify-end h-full">
@@ -206,13 +206,13 @@ const FirstSheet = () => {
 
                                             {/* Ongoing Bar with Number */}
                                             <div
-                                                className="relative w-4 bg-[#FFEB00] flex justify-center items-center cursor-pointer"
+                                                className="relative w-4 bg-blue-500 flex justify-center items-center cursor-pointer"
                                                 style={{ height: `${ongoingHeight}px` }}
                                                 onClick={() => handleBarClick(weekData, site, "ongoing")}
                                             >
                                                 {ongoing > 0 && (
                                                     <span
-                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-black"
+                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
                                                         style={{ top: "50%", transform: "translate(-50%, -50%)" }}
                                                     >
                                                         {ongoing}
@@ -287,7 +287,7 @@ const FirstSheet = () => {
 
                     {/* Ongoing */}
                     <div className="flex items-center">
-                        <div className="w-4 h-4 bg-[#FFEB00] mr-2 rounded-[50%]"></div>
+                        <div className="w-4 h-4 bg-blue-500 mr-2 rounded-[50%]"></div>
                         <span className="text-sm">Ongoing</span>
                     </div>
                 </div>

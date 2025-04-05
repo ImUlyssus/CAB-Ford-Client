@@ -12,8 +12,8 @@ function Dialog({ open, onClose, children }) {
                 className="sticky top-0 bg-opacity-90 z-10 p-4 border-b"
                 style={{
                     backgroundColor: theme.colors.primary400,
-                    maxHeight: '60vh', // Restrict max height
-                    width: '80%',
+                    height: '90%', // Restrict max height
+                    width: '90%',
                     overflow: 'hidden', // Prevent entire div from scrolling
                 }}
             >
@@ -28,7 +28,7 @@ function Dialog({ open, onClose, children }) {
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="p-6 overflow-y-auto" style={{ maxHeight: '55vh' }}>
+                <div className="p-3 overflow-y-auto" style={{ maxHeight: '80vh' }}>
                     {children}
                 </div>
             </div>

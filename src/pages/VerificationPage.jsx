@@ -17,7 +17,6 @@ export default function VerificationPage() {
     const username = location.state?.username || "";
     const [systemCode, setSystemCode] = useState(verificationCode);
     const [isLoading, setIsLoading] = useState(false);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -26,7 +25,7 @@ export default function VerificationPage() {
             setSystemCode("");
             return;
         }
-
+        
         if (code === systemCode) {
             try {
                 // Send a POST request to backend to insert user

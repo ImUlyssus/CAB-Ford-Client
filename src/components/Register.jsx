@@ -102,17 +102,28 @@ export default function Register() {
             </div>
           </div>
           {/* Site Selection */}
-          <div className="grid grid-cols-2 gap-4 items-center mb-3">
-            <label className={labelStyle}>Your Site:</label>
-            <div className="flex gap-4">
-              {["AAT", "FSST", "FTM"].map((s) => (
-                <label key={s}>
-                  <input type="radio" name="site" value={s} className="mr-1" onChange={(e) => setSite(e.target.value)} /> {s}
-                </label>
-              ))}
-            </div>
-            {errors.site && <p className="text-red-500 text-sm">{errors.site}</p>}
-          </div>
+<div className="grid grid-cols-2 gap-4 items-center mb-3">
+  <label className={labelStyle}>Your Site:</label>
+  <div>
+    <div className="flex gap-4">
+      {["AAT", "FSST", "FTM"].map((s) => (
+        <label key={s}>
+          <input
+            type="radio"
+            name="site"
+            value={s}
+            className="mr-1"
+            onChange={(e) => setSite(e.target.value)}
+          /> 
+          {s}
+        </label>
+      ))}
+    </div>
+    {/* Error message is now on a separate line */}
+    {errors.site && <p className="text-red-500 text-sm mt-1">{errors.site}</p>}
+  </div>
+</div>
+
           {/* Email */}
           <div className="grid grid-cols-2 gap-4 items-center mb-3">
             <label className={labelStyle}>Email:</label>

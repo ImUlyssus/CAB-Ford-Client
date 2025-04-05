@@ -11,7 +11,7 @@ function Dialog({ open, onClose, children }) {
     className={`p-6 rounded shadow-lg relative w-11/12 md:w-1/2`}
     style={{
         backgroundColor: theme.colors.primary400,
-        maxHeight: '60vh', // Set max height to 80% of the viewport height
+        maxHeight: '70vh', // Set max height to 80% of the viewport height
         maxWidth: '70%',
         overflowY: 'auto', // Allow scrolling if content exceeds max height
     }}
