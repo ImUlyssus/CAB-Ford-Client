@@ -45,136 +45,204 @@ const ThirdSheet = () => {
     }, [auth.filteredData]);
 
     useEffect(() => {
-        if (!aggregatedData || Object.keys(aggregatedData).length === 0) return;
-
-        const data = [
-            { name: "TOTAL", planned: aggregatedData.aat_planned + aggregatedData.ftm_planned + aggregatedData.fsst_planned, unplanned: aggregatedData.aat_unplanned + aggregatedData.ftm_unplanned + aggregatedData.fsst_unplanned },
-            { name: "AAT", planned: aggregatedData.aat_planned, unplanned: aggregatedData.aat_unplanned },
-            { name: "FTM", planned: aggregatedData.ftm_planned, unplanned: aggregatedData.ftm_unplanned },
-            { name: "FSST", planned: aggregatedData.fsst_planned, unplanned: aggregatedData.fsst_unplanned }
-        ];
-
-        const svg = d3.select(svgRef.current);
-        svg.selectAll("*").remove();
-
-        const width = 600, height = 220;
-        const barHeight = 20, spacing = 5;
-
-        svg.attr("width", width).attr("height", height);
-
-        const maxVal = d3.max(data, (d) => d.planned + d.unplanned);
-        const xScale = d3.scaleLinear().domain([0, maxVal]).range([0, width - 150]);
-
-        const yScale = d3.scaleBand().domain(data.map(d => d.name)).range([0, height]).padding(0.2);
-
-        const bars = svg.selectAll(".bar-group").data(data).enter().append("g").attr("transform", (d) => `translate(100, ${yScale(d.name)})`);
-
-        const offset = 5; // Offset for unplanned bars
-
-        bars.append("rect")
-  .attr("height", barHeight)
-  .attr("width", d => xScale(d.planned) + 20)
-  .attr("x", d => xScale(d.unplanned))
-  .attr("fill", "#76e2ff")
-  .attr("rx", 10)
-  .style("cursor", "pointer")
-  .on("click", function (event, d) {
-    let siteData;
-
-    if (d.name === "TOTAL") {
-      // Combine data from all sites (AAT, FTM, FSST) for planned requests
-      siteData = auth.filteredData.filter(item => {
-        return item.achieve_2_week_change_request;
-      });
-    } else {
-      switch (d.name) {
-        case "AAT":
-          siteData = auth.filteredData.filter(item => item.change_sites.includes("aat") && item.achieve_2_week_change_request);
-          break;
-        case "FTM":
-          siteData = auth.filteredData.filter(item => item.change_sites.includes("ftm") && item.achieve_2_week_change_request);
-          break;
-        case "FSST":
-          siteData = auth.filteredData.filter(item => item.change_sites.includes("fsst") && item.achieve_2_week_change_request);
-          break;
-        default:
-          siteData = [];
-      }
-    }
-
-    setSelectedData({
-      category: `${d.name} - Planned`,
-      filteredData: siteData // Filtered planned data
-    });
-    setIsDialogOpen(true);
-  });
-
-bars.append("rect")
-  .attr("height", barHeight)
-  .attr("width", d => xScale(d.unplanned))
-  .attr("x", -(offset - 20))
-  .attr("fill", "#3498db")
-  .attr("rx", 10)
-  .style("cursor", "pointer")
-  .on("click", function (event, d) {
-    let siteData;
-
-    if (d.name === "TOTAL") {
-      // Combine data from all sites (AAT, FTM, FSST) for unplanned requests
-      siteData = auth.filteredData.filter(item => {
-        return !item.achieve_2_week_change_request;
-      });
-    } else {
-      switch (d.name) {
-        case "AAT":
-          siteData = auth.filteredData.filter(item => item.change_sites.includes("aat") && !item.achieve_2_week_change_request);
-          break;
-        case "FTM":
-          siteData = auth.filteredData.filter(item => item.change_sites.includes("ftm") && !item.achieve_2_week_change_request);
-          break;
-        case "FSST":
-          siteData = auth.filteredData.filter(item => item.change_sites.includes("fsst") && !item.achieve_2_week_change_request);
-          break;
-        default:
-          siteData = [];
-      }
-    }
-
-    setSelectedData({
-      category: `${d.name} - Unplanned`,
-      filteredData: siteData // Filtered unplanned data
-    });
-    setIsDialogOpen(true);
-  });
-
-
-        bars.append("text")
-            .attr("x", d => (xScale(d.unplanned) - offset) / 2 + 17)
-            .attr("y", barHeight / 2)
-            .attr("dy", "0.35em")
-            .attr("fill", "white")
-            .attr("font-size", "14px")
-            .attr("text-anchor", "middle")
-            .text(d => d.unplanned);
-
-        bars.append("text")
-            .attr("x", d => xScale(d.unplanned) - offset + xScale(d.planned) / 2 + 20)
-            .attr("y", barHeight / 2)
-            .attr("dy", "0.35em")
-            .attr("fill", "white")
-            .attr("font-size", "14px")
-            .attr("text-anchor", "middle")
-            .text(d => d.planned);
-
-        svg.selectAll(".label").data(data).enter()
-            .append("text")
-            .attr("x", 80)
-            .attr("y", d => yScale(d.name) + barHeight / 2)
-            .attr("dy", "0.35em")
-            .attr("text-anchor", "end")
-            .attr("fill", "#3498db")
-            .attr("font-weight", "bold")
-            .text(d => d.name);
+      if (!aggregatedData || Object.keys(aggregatedData).length === 0) return;
+    
+      const data = [
+        {
+          name: "TOTAL",
+          planned:
+            aggregatedData.aat_planned +
+            aggregatedData.ftm_planned +
+            aggregatedData.fsst_planned,
+          unplanned:
+            aggregatedData.aat_unplanned +
+            aggregatedData.ftm_unplanned +
+            aggregatedData.fsst_unplanned,
+        },
+        {
+          name: "AAT",
+          planned: aggregatedData.aat_planned,
+          unplanned: aggregatedData.aat_unplanned,
+        },
+        {
+          name: "FTM",
+          planned: aggregatedData.ftm_planned,
+          unplanned: aggregatedData.ftm_unplanned,
+        },
+        {
+          name: "FSST",
+          planned: aggregatedData.fsst_planned,
+          unplanned: aggregatedData.fsst_unplanned,
+        },
+      ];
+    
+      const svg = d3.select(svgRef.current);
+      svg.selectAll("*").remove();
+    
+      const width = 600,
+        height = 220;
+      const barHeight = 20,
+        spacing = 5;
+    
+      svg.attr("width", width).attr("height", height);
+    
+      const maxVal = d3.max(data, (d) => d.planned + d.unplanned);
+      const xScale = d3
+        .scaleLinear()
+        .domain([0, maxVal])
+        .range([0, width - 150]);
+    
+      const yScale = d3
+        .scaleBand()
+        .domain(data.map((d) => d.name))
+        .range([0, height])
+        .padding(0.2);
+    
+      const offset = 5;
+    
+      // Filter out rows where both planned and unplanned are zero
+      const barData = data.filter((d) => d.planned > 0 || d.unplanned > 0);
+    
+      const bars = svg
+        .selectAll(".bar-group")
+        .data(barData)
+        .enter()
+        .append("g")
+        .attr("transform", (d) => `translate(100, ${yScale(d.name)})`);
+    
+      // Planned bar
+      bars
+        .append("rect")
+        .attr("height", barHeight)
+        .attr("width", (d) => xScale(d.planned) + 20)
+        .attr("x", (d) => xScale(d.unplanned))
+        .attr("fill", "#76e2ff")
+        .attr("rx", 10)
+        .style("cursor", "pointer")
+        .on("click", function (event, d) {
+          let siteData;
+          if (d.name === "TOTAL") {
+            siteData = auth.filteredData.filter(
+              (item) => item.achieve_2_week_change_request
+            );
+          } else {
+            switch (d.name) {
+              case "AAT":
+                siteData = auth.filteredData.filter(
+                  (item) =>
+                    item.change_sites.includes("aat") &&
+                    item.achieve_2_week_change_request
+                );
+                break;
+              case "FTM":
+                siteData = auth.filteredData.filter(
+                  (item) =>
+                    item.change_sites.includes("ftm") &&
+                    item.achieve_2_week_change_request
+                );
+                break;
+              case "FSST":
+                siteData = auth.filteredData.filter(
+                  (item) =>
+                    item.change_sites.includes("fsst") &&
+                    item.achieve_2_week_change_request
+                );
+                break;
+              default:
+                siteData = [];
+            }
+          }
+          setSelectedData({
+            category: `${d.name} - Planned`,
+            filteredData: siteData,
+          });
+          setIsDialogOpen(true);
+        });
+    
+      // Unplanned bar
+      bars
+        .append("rect")
+        .attr("height", barHeight)
+        .attr("width", (d) => xScale(d.unplanned))
+        .attr("x", -(offset - 20))
+        .attr("fill", "#3498db")
+        .attr("rx", 10)
+        .style("cursor", "pointer")
+        .on("click", function (event, d) {
+          let siteData;
+          if (d.name === "TOTAL") {
+            siteData = auth.filteredData.filter(
+              (item) => !item.achieve_2_week_change_request
+            );
+          } else {
+            switch (d.name) {
+              case "AAT":
+                siteData = auth.filteredData.filter(
+                  (item) =>
+                    item.change_sites.includes("aat") &&
+                    !item.achieve_2_week_change_request
+                );
+                break;
+              case "FTM":
+                siteData = auth.filteredData.filter(
+                  (item) =>
+                    item.change_sites.includes("ftm") &&
+                    !item.achieve_2_week_change_request
+                );
+                break;
+              case "FSST":
+                siteData = auth.filteredData.filter(
+                  (item) =>
+                    item.change_sites.includes("fsst") &&
+                    !item.achieve_2_week_change_request
+                );
+                break;
+              default:
+                siteData = [];
+            }
+          }
+          setSelectedData({
+            category: `${d.name} - Unplanned`,
+            filteredData: siteData,
+          });
+          setIsDialogOpen(true);
+        });
+    
+      // Unplanned text inside bar
+      bars
+        .append("text")
+        .attr("x", (d) => (xScale(d.unplanned) - offset) / 2 + 17)
+        .attr("y", barHeight / 2)
+        .attr("dy", "0.35em")
+        .attr("fill", "white")
+        .attr("font-size", "14px")
+        .attr("text-anchor", "middle")
+        .text((d) => d.unplanned);
+    
+      // Planned text inside bar
+      bars
+        .append("text")
+        .attr("x", (d) => xScale(d.unplanned) - offset + xScale(d.planned) / 2 + 20)
+        .attr("y", barHeight / 2)
+        .attr("dy", "0.35em")
+        .attr("fill", "white")
+        .attr("font-size", "14px")
+        .attr("text-anchor", "middle")
+        .text((d) => d.planned);
+    
+      // Always draw all labels regardless of value
+      svg
+        .selectAll(".label")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("x", 80)
+        .attr("y", (d) => yScale(d.name) + barHeight / 2)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "end")
+        .attr("fill", "#3498db")
+        .attr("font-weight", "bold")
+        .text((d) => d.name);
     }, [aggregatedData]);
 
     return (

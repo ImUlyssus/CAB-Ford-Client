@@ -28,7 +28,7 @@ const SecondSheet = () => {
 
                 if (change_sites.includes("aat")) {
                     result.aat_total++;
-                    if (change_status === "") {
+                    if (change_status === "_") {
                         result.aat_ongoing++;
                         result.aat_ongoing_data.push(entry);
                     } else if (change_status === "Completed with no issue") {
@@ -42,7 +42,7 @@ const SecondSheet = () => {
 
                 if (change_sites.includes("ftm")) {
                     result.ftm_total++;
-                    if (change_status === "") {
+                    if (change_status === "_") {
                         result.ftm_ongoing++;
                         result.ftm_ongoing_data.push(entry);
                     } else if (change_status === "Completed with no issue") {
@@ -56,7 +56,7 @@ const SecondSheet = () => {
 
                 if (change_sites.includes("fsst")) {
                     result.fsst_total++;
-                    if (change_status === "") {
+                    if (change_status === "_") {
                         result.fsst_ongoing++;
                         result.fsst_ongoing_data.push(entry);
                     } else if (change_status === "Completed with no issue") {
@@ -79,33 +79,65 @@ const SecondSheet = () => {
     // Determine the data to pass based on the selected category
     const getSelectedData = () => {
         if (!selectedCategory) return null;
+
+        const mergeAndDeduplicate = (...arrays) => {
+            const seen = new Map();
+            arrays.flat().forEach(item => {
+                if (!seen.has(item.id)) {
+                    seen.set(item.id, item);
+                }
+            });
+            return Array.from(seen.values());
+        };
+
         switch (selectedCategory) {
             case "total":
                 return {
                     category: "Total",
-                    filteredData: [...aggregatedData.aat_ongoing_data, ...aggregatedData.aat_completed_data, ...aggregatedData.aat_rejected_data,
-                    ...aggregatedData.ftm_ongoing_data, ...aggregatedData.ftm_completed_data, ...aggregatedData.ftm_rejected_data,
-                    ...aggregatedData.fsst_ongoing_data, ...aggregatedData.fsst_completed_data, ...aggregatedData.fsst_rejected_data],
+                    filteredData: mergeAndDeduplicate(
+                        aggregatedData.aat_ongoing_data,
+                        aggregatedData.aat_completed_data,
+                        aggregatedData.aat_rejected_data,
+                        aggregatedData.ftm_ongoing_data,
+                        aggregatedData.ftm_completed_data,
+                        aggregatedData.ftm_rejected_data,
+                        aggregatedData.fsst_ongoing_data,
+                        aggregatedData.fsst_completed_data,
+                        aggregatedData.fsst_rejected_data
+                    ),
                 };
             case "ongoing":
                 return {
                     category: "Ongoing",
-                    filteredData: [...aggregatedData.aat_ongoing_data, ...aggregatedData.ftm_ongoing_data, ...aggregatedData.fsst_ongoing_data],
+                    filteredData: mergeAndDeduplicate(
+                        aggregatedData.aat_ongoing_data,
+                        aggregatedData.ftm_ongoing_data,
+                        aggregatedData.fsst_ongoing_data
+                    ),
                 };
             case "completed":
                 return {
                     category: "Completed",
-                    filteredData: [...aggregatedData.aat_completed_data, ...aggregatedData.ftm_completed_data, ...aggregatedData.fsst_completed_data],
+                    filteredData: mergeAndDeduplicate(
+                        aggregatedData.aat_completed_data,
+                        aggregatedData.ftm_completed_data,
+                        aggregatedData.fsst_completed_data
+                    ),
                 };
             case "rejected":
                 return {
                     category: "Rejected",
-                    filteredData: [...aggregatedData.aat_rejected_data, ...aggregatedData.ftm_rejected_data, ...aggregatedData.fsst_rejected_data],
+                    filteredData: mergeAndDeduplicate(
+                        aggregatedData.aat_rejected_data,
+                        aggregatedData.ftm_rejected_data,
+                        aggregatedData.fsst_rejected_data
+                    ),
                 };
             default:
                 return null;
         }
     };
+
     // Handle opening dialog with the selected category
     const openDialog = (category) => {
         setSelectedCategory(category);
@@ -288,63 +320,63 @@ const TwoLayerDonutChart = ({ data }) => {
 
         // Inner Section Labels
         svg
-    .selectAll(".innerText")
-    .data(innerPie(innerCount))
-    .enter()
-    .append("text")
-    .attr("transform", (d) => `translate(${innerArc.centroid(d)})`)
-    .attr("text-anchor", "middle")
-    .attr("fill", "white")
-    .attr("font-size", "14px")
-    .each(function (d, i) {
-        if (d.data === 0) return;  // 🔥 Skip creating text for zero values
+            .selectAll(".innerText")
+            .data(innerPie(innerCount))
+            .enter()
+            .append("text")
+            .attr("transform", (d) => `translate(${innerArc.centroid(d)})`)
+            .attr("text-anchor", "middle")
+            .attr("fill", "white")
+            .attr("font-size", "14px")
+            .each(function (d, i) {
+                if (d.data === 0) return;  // 🔥 Skip creating text for zero values
 
-        // Calculate percentage
-        const percentage = ((d.data / totalInner) * 100).toFixed(1);
+                // Calculate percentage
+                const percentage = ((d.data / totalInner) * 100).toFixed(1);
 
-        // Labels
-        const labels = ["AAT", "FTM", "FSST"];
-        const textElement = d3.select(this);
+                // Labels
+                const labels = ["AAT", "FTM", "FSST"];
+                const textElement = d3.select(this);
 
-        textElement.append("tspan")
-            .attr("x", 0)
-            .attr("dy", "-0.6em")
-            .text(labels[i]);
+                textElement.append("tspan")
+                    .attr("x", 0)
+                    .attr("dy", "-0.6em")
+                    .text(labels[i]);
 
-        textElement.append("tspan")
-            .attr("x", 0)
-            .attr("dy", "1.2em")
-            .text(`${percentage}%`);
-    });
+                textElement.append("tspan")
+                    .attr("x", 0)
+                    .attr("dy", "1.2em")
+                    .text(`${percentage}%`);
+            });
 
 
 
         // Outer Section Labels with Status and Percentage
         svg
-    .selectAll(".outerText")
-    .data(outerPie(outerCount))
-    .enter()
-    .append("text")
-    .attr("transform", (d) => `translate(${outerArc.centroid(d)})`)
-    .attr("text-anchor", "middle")
-    .attr("fill", "black")
-    .attr("font-size", "12px")
-    .each(function (d, i) {
-        const totalOuter = innerCount[Math.floor(i / 3)];
-        const percentage = ((d.data / totalOuter) * 100).toFixed(1);
-        const status = ["C", "O", "R"][i % 3];
-
-        const textElement = d3.select(this);
-        textElement
-            .append("tspan")
-            .attr("font-weight", "bold") // Make status bold
-            .text(status);
-
-        textElement
-            .append("tspan")
-            .attr("dx", "4px") // Add space between status and percentage
-            .text(` ${percentage}%`);
-    });
+            .selectAll(".outerText")
+            .data(outerPie(outerCount))
+            .enter()
+            .append("text")
+            .attr("transform", (d) => `translate(${outerArc.centroid(d)})`)
+            .attr("text-anchor", "middle")
+            .attr("fill", "black")
+            .attr("font-size", "12px")
+            .each(function (d, i) {
+                const totalOuter = innerCount[Math.floor(i / 3)];
+                const percentage = ((d.data / totalOuter) * 100).toFixed(1);
+                // Skip if percentage is zero (or falsy)
+                if (percentage <= 0 || isNaN(percentage)) return;
+                const status = ["C", "O", "R"][i % 3];
+                const textElement = d3.select(this);
+                textElement
+                    .append("tspan")
+                    .attr("font-weight", "bold")
+                    .text(status);
+                textElement
+                    .append("tspan")
+                    .attr("dx", "4px")
+                    .text(` ${percentage}%`);
+            });
 
 
         // Add Chart Title
