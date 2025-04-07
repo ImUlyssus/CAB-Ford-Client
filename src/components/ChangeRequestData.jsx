@@ -231,82 +231,109 @@ export default function ChangeRequestData() {
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.common_change ? "YES" : "NO"}</td>
                                                     <td className="py-2 px-4 border-b border-r">{new Date(request.request_change_date).toLocaleDateString()}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">
-                                                    {aatSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">AAT</p>}
-                                                    {aatSchedule.scheduleArray.map((item, i) => (
-                                                        <div key={i} className="mb-1">
-                                                            <p className="p-1 border border-white rounded-md text-xs">{item}</p>
-                                                        </div>
-                                                    ))}
-                                                    {ftmSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">FTM</p>}
-                                                    {ftmSchedule.scheduleArray.map((item, i) => (
-                                                        <div key={i} className="mb-1">
-                                                            <p className="p-1 border border-white rounded-md text-xs">{item}</p>
-                                                        </div>
-                                                    ))}
-                                                    {fsstSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">FSST</p>}
-                                                    {fsstSchedule.scheduleArray.map((item, i) => (
-                                                        <div key={i} className="mb-1">
-                                                            <p className="p-1 border border-white rounded-md text-xs">{item}</p>
-                                                        </div>
-                                                    ))}
+                                                        {aatSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">AAT</p>}
+                                                        {aatSchedule.scheduleArray.map((item, i) => (
+                                                            <div key={i} className="mb-1">
+                                                                <p className="p-1 border border-white rounded-md text-xs">{item}</p>
+                                                            </div>
+                                                        ))}
+                                                        {ftmSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">FTM</p>}
+                                                        {ftmSchedule.scheduleArray.map((item, i) => (
+                                                            <div key={i} className="mb-1">
+                                                                <p className="p-1 border border-white rounded-md text-xs">{item}</p>
+                                                            </div>
+                                                        ))}
+                                                        {fsstSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">FSST</p>}
+                                                        {fsstSchedule.scheduleArray.map((item, i) => (
+                                                            <div key={i} className="mb-1">
+                                                                <p className="p-1 border border-white rounded-md text-xs">{item}</p>
+                                                            </div>
+                                                        ))}
 
-                                                </td>
+                                                    </td>
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.description}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.test_plan}</td>
+                                                    <td className="px-2 py-2 border-b border-r text-center">
+                                                        <div className="max-h-70 overflow-y-auto border-2 border-gray-300 rounded-lg p-2">
+                                                            {request.aat_test_plan !== null && request.aat_test_plan !== '' && <p className="text-xs font-semibold text-center">AAT Test Plan</p>}
+                                                            {request.aat_test_plan == null ? "" :
+                                                                <div className="mb-1">{request.aat_test_plan}</div>
+                                                            }
+                                                            {request.ftm_test_plan !== null && request.ftm_test_plan !== '' && <p className="text-xs font-semibold text-center">FTM Test Plan</p>}
+                                                            {request.ftm_test_plan == null ? "" :
+                                                                <div className="mb-1">{request.ftm_test_plan}</div>
+                                                            }
+                                                            {request.fsst_test_plan !== null && request.fsst_test_plan !== '' && <p className="text-xs font-semibold text-center">FSST Test Plan</p>}
+                                                            {request.fsst_test_plan == null ? "" :
+                                                                <div className="mb-1">{request.fsst_test_plan}</div>
+                                                            }
+                                                        </div>
+                                                    </td>
                                                     <td className="py-2 px-4 border-b border-r">{request.rollback_plan}</td>
                                                     <td className="py-2 px-4 border-b border-r">
                                                         <div className='mb-2'><span className='font-bold text-[#beef70]'>Category: </span><div>{request.category}</div></div>
                                                         <div className='mb-2'><span className='font-bold text-[#beef70]'>Reason: </span><div>{request.reason}</div></div>
                                                         <div className='mb-2'><span className='font-bold text-[#beef70]'>Impact & Priority: </span><div>{request.impact} & {request.priority}</div></div>
                                                     </td>
-                                                    {/* <td className="py-2 px-4 border-b border-r">{request.reason}</td>
-                                                    <td className="py-2 px-4 border-b border-r text-center">{request.impact}</td>
-                                                    <td className="py-2 px-4 border-b border-r text-center">{request.priority}</td> */}
                                                     <td className="px-2 py-2 border-b border-r text-center">
-                                                    <div className="max-h-70 overflow-y-auto border-2 border-gray-300 rounded-lg p-2">
-                                                    {request.aat_it_contact !== null && request.aat_it_contact !== ',' && <p className="text-xs font-semibold text-center">AAT Contact</p>}
-                                                    {request.aat_it_contact == null ? "" :
-                                                        request.aat_it_contact.split(',').map((item, i) => (
-                                                            <div key={i} className="mb-1">{item.trim()}</div>
-                                                        ))}
-                                                    {request.ftm_it_contact !== null && request.ftm_it_contact !== ',' && <p className="text-xs font-semibold text-center">FTM Contact</p>}
-                                                    {request.ftm_it_contact == null ? "" :
-                                                        request.ftm_it_contact.split(',').map((item, i) => (
-                                                            <div key={i} className="mb-1">{item.trim()}</div>
-                                                        ))}
-                                                    {request.fsst_it_contact !== null  && request.fsst_it_contact !== ',' && <p className="text-xs font-semibold text-center">FSST Contact</p>}
-                                                    {request.fsst_it_contact == null ? "" :
-                                                        request.fsst_it_contact.split(',').map((item, i) => (
-                                                            <div key={i} className="mb-1">{item.trim()}</div>
-                                                        ))}
-                                                    {request.global_team_contact !== null && request.global_team_contact !== ',' && <p className="text-xs font-semibold text-center">Global Contact</p>}
-                                                    {request.global_team_contact == null ? "" :
-                                                        request.global_team_contact.split(',').map((item, i) => (
-                                                            <div key={i} className="mb-1">{item.trim()}</div>
-                                                        ))}
-                                                    {request.business_team_contact !== null && request.business_team_contact !== ',' && <p className="text-xs font-semibold text-center">Business Contact</p>}
-                                                    {request.business_team_contact == null ? "" :
-                                                        request.business_team_contact.split(',').map((item, i) => (
-                                                            <div key={i} className="mb-1">{item.trim()}</div>
-                                                        ))}
+                                                        <div className="max-h-70 overflow-y-auto border-2 border-gray-300 rounded-lg p-2">
+                                                            {request.aat_it_contact !== null && request.aat_it_contact !== ',' && <p className="text-xs font-semibold text-center text-[#beef70]">AAT Contact</p>}
+                                                            {request.aat_it_contact == null ? "" :
+                                                                request.aat_it_contact.split(',').map((item, i) => (
+                                                                    <div key={i} className="mb-1">
+                                                                    {item.trim().split('_').join(" ")}
+                                                                </div>
+                                                                ))}
+                                                            {request.ftm_it_contact !== null && request.ftm_it_contact !== ',' && <p className="text-xs font-semibold text-center text-[#beef70]">FTM Contact</p>}
+                                                            {request.ftm_it_contact == null ? "" :
+                                                                request.ftm_it_contact.split(',').map((item, i) => (
+                                                                    <div key={i} className="mb-1">
+                                                                    {item.trim().split('_').join(" ")}
+                                                                </div>
+                                                                ))}
+                                                            {request.fsst_it_contact !== null && request.fsst_it_contact !== ',' && <p className="text-xs font-semibold text-center text-[#beef70]">FSST Contact</p>}
+                                                            {request.fsst_it_contact == null ? "" :
+                                                                request.fsst_it_contact.split(',').map((item, i) => (
+                                                                    <div key={i} className="mb-1">
+                                                                    {item.trim().split('_').join(" ")}
+                                                                </div>
+                                                                ))}
+                                                            {request.global_team_contact !== null && request.global_team_contact !== ',' && <p className="text-xs font-semibold text-center text-[#beef70]">Global Contact</p>}
+                                                            {request.global_team_contact == null ? "" :
+                                                                request.global_team_contact.split(',').map((item, i) => (
+                                                                    <div key={i} className="mb-1">{item.trim()}</div>
+                                                                ))}
+                                                            {request.business_team_contact !== null && request.business_team_contact !== ',' && <p className="text-xs font-semibold text-center text-[#beef70]">Business Contact</p>}
+                                                            {request.business_team_contact == null ? "" :
+                                                                request.business_team_contact.split(',').map((item, i) => (
+                                                                    <div key={i} className="mb-1">{item.trim()}</div>
+                                                                ))}
                                                         </div>
-                                                </td>
+                                                    </td>
                                                     <td className="py-2 px-4 border-b border-r text-center">
-                                                        {request.aat_crq !== null && request.aat_crq !== ',' && <p className="text-xs font-semibold text-center">AAT CRQ</p>}
+                                                        {request.aat_crq !== null && request.aat_crq !== ',' && <p className="text-xs font-semibold text-center text-[#beef70]">AAT CRQ</p>}
                                                         {request.aat_crq &&
                                                             request.aat_crq.split(",").map((item, i) => (
-                                                                <div key={i} className="mb-1">{item.trim()}</div>
+                                                                <div key={i} className="mb-1">
+                                                                    {item.trim().split('!')[0]}
+                                                                    <div>{item.trim().split('!')[1]}</div>
+                                                                </div>
                                                             ))}
-                                                        {request.ftm_crq !== null && request.ftm_crq !== ',' && <p className="text-xs font-semibold text-center">FTM CRQ</p>}
+                                                        {request.ftm_crq !== null && request.ftm_crq !== ',' && <p className="text-xs font-semibold text-center text-[#beef70]">FTM CRQ</p>}
                                                         {request.ftm_crq &&
                                                             request.ftm_crq.split(",").map((item, i) => (
-                                                                <div key={i} className="mb-1">{item.trim()}</div>
+                                                                <div key={i} className="mb-1">
+                                                                    {item.trim().split('!')[0]}
+                                                                    <div>{item.trim().split('!')[1]}</div>
+                                                                </div>
                                                             ))}
-                                                            {request.fsst_crq !== null && request.fsst_crq !== ',' && <p className="text-xs font-semibold text-center">FSST CRQ</p>}
+                                                        {request.fsst_crq !== null && request.fsst_crq !== ',' && <p className="text-xs font-semibold text-center text-[#beef70]">FSST CRQ</p>}
                                                         {request.fsst_crq &&
                                                             request.fsst_crq.split(",").map((item, i) => (
-                                                                <div key={i} className="mb-1">{item.trim()}</div>
+                                                                <div key={i} className="mb-1">
+                                                                    {item.trim().split('!')[0]}
+                                                                    <div>{item.trim().split('!')[1]}</div>
+                                                                </div>
                                                             ))}
                                                     </td>
                                                     {/* <td className="py-2 px-4 border-b border-r">{request.common_crq}</td> */}

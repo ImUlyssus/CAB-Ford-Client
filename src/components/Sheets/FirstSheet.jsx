@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import { useTheme } from 'styled-components';
 import Dialog from "./Dialog";
@@ -126,9 +126,9 @@ const FirstSheet = () => {
     const maxY = Math.max(...totals);
     const interval = Math.ceil(maxY / 5); // Divide maxY into 5 intervals
 
-    const yAxisLabels = Array.from({ length: 7 }, (_, index) => interval * index).reverse();
+    const yAxisLabels = Array.from({ length: 6 }, (_, index) => interval * index).reverse(); // Reduce the number of labels
     // Scale factor to normalize bar heights
-    const scaleFactor = chartHeight / (maxY+(maxY * 0.6)); // Adding 10% to maxY for better scaling
+    const scaleFactor = chartHeight / (maxY+(maxY * 0.1)); // Adding 10% to maxY for better scaling
     // Function to handle bar clicks
     const handleBarClick = (weekData, site, category) => {
         const dataField = `${site}_${category}_data`; // Use the new data field name
@@ -160,7 +160,7 @@ const FirstSheet = () => {
                     <span className="text-sm">Change Request Amount</span>
                 </div>
                 {/* Y-Axis Labels */}
-                <div className="absolute left-[-20px] top-0 h-full flex flex-col justify-between">
+                <div className="absolute left-[-30px] top-0 h-full flex flex-col justify-between"> {/* Adjusted left value */}
                     {yAxisLabels.map((num, index) => (
                         <div key={index} className="flex items-end">
                             <span className="text-sm">{num}</span>
@@ -183,11 +183,11 @@ const FirstSheet = () => {
                 <div className="absolute bottom-0 left-0 w-full border-t border-gray-700"></div>
 
                 {/* Bars and X-Axis Labels */}
-                <div className="absolute bottom-[-20px] left-2 right-0 flex justify-around space-x-4">
+                <div className="absolute bottom-[-20px] left-2 right-0 flex justify-around"> {/* Removed space-x-4 */}
                     {weeks.map((weekData, weekIndex) => (
                         <div key={weekIndex} className="flex flex-col items-center">
                             {/* Render 3 bars for each site */}
-                            <div className="flex flex-row space-x-1 h-full">
+                            <div className="flex flex-row h-full items-end"> {/* Removed space-x-1 */}
                                 {["aat", "ftm", "fsst"].map((site, siteIndex) => {
                                     const ongoing = weekData[`${site}_ongoing`];
                                     const completed = weekData[`${site}_completed`];
@@ -200,7 +200,7 @@ const FirstSheet = () => {
                                     const rejectedHeight = rejected * scaleFactor;
 
                                     return (
-                                        <div key={siteIndex} className="flex flex-col items-center justify-end h-full">
+                                        <div key={siteIndex} className="flex flex-col items-center justify-end h-full ml-1"> {/* Add ml-1 for space */}
                                             {/* Stack bars for each category */}
                                             <p style={{ transform: 'rotate(-90deg)', marginBottom: "10px", color: 'gray' }}>{site.toUpperCase()}</p>
 
@@ -313,4 +313,3 @@ const FirstSheet = () => {
 };
 
 export default FirstSheet;
-

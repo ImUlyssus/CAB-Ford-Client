@@ -11,6 +11,7 @@ import GlobalTeamContact from "./GlobalTeamContact";
 import CRQSection from "./CRQInputs";
 import { useNavigate } from "react-router-dom";
 import AISuggestionDialog from "./AISuggestionDialog";
+import ScheduleInfo from "../assets/schedule_info.jpg";
 function ChangeRequest() {
     const theme = useTheme();
     const [selectedSites, setSelectedSites] = useState([]);
@@ -28,7 +29,7 @@ function ChangeRequest() {
         FTM: "",
         FSST: "",
     });
-    
+
     const handleRequestorChange = (site, value) => {
         setRequestors((prev) => ({
             ...prev,
@@ -121,22 +122,26 @@ function ChangeRequest() {
         const isCommonChange = selectedSites.length > 1;
         // const change_description = document.getElementById("changeDescription").value || "";
         const change_description = changeDescription || "";
-        const aat_test_plan = document.getElementById("aatTestPlan").value || "";
+        const aat_test_plan = document.getElementById("aatTestPlan")?.value || "";
         const ftm_test_plan = document.getElementById("ftmTestPlan")?.value || "";
         const fsst_test_plan = document.getElementById("fsstTestPlan")?.value || "";
         const rollback_plan = document.getElementById("rollbackPlan")?.value || "";
-        const aat_contact_name = document.getElementById("aatContactName")?.value || "";
+        const aat_contact_name = document.getElementById("aatContactName")?.value ? document.getElementById("aatContactName")?.value.split(" ").join("_") : "";
         const aat_contact_cdsid = document.getElementById("aatContactCdsid")?.value || "";
-        const ftm_contact_name = document.getElementById("ftmContactName")?.value || "";
+        const ftm_contact_name = document.getElementById("ftmContactName")?.value ? document.getElementById("ftmContactName")?.value.split(" ").join("_") : "";
         const ftm_contact_cdsid = document.getElementById("ftmContactCdsid")?.value || "";
-        const fsst_contact_name = document.getElementById("fsstContactName")?.value || "";
+        const fsst_contact_name = document.getElementById("fsstContactName")?.value ? document.getElementById("fsstContactName")?.value.split(" ").join("_") : "";
         const fsst_contact_cdsid = document.getElementById("fsstContactCdsid")?.value || "";
+        const remarks = document.getElementById("remark")?.value || "";
         const aat_it_contact = aat_contact_name.trim() + "," + aat_contact_cdsid.trim();
         const ftm_it_contact = ftm_contact_name.trim() + "," + ftm_contact_cdsid.trim();
         const fsst_it_contact = fsst_contact_name.trim() + "," + fsst_contact_cdsid.trim();
         const aat_crq = crqs['aat'].join(',') || '';
         const ftm_crq = crqs['ftm'].join(',') || '';
         const fsst_crq = crqs['fsst'].join(',') || '';
+        const aat_requestor = requestors['aat'] || '';
+        const ftm_requestor = requestors['ftm'] || '';
+        const fsst_requestor = requestors['fsst'] || '';
 
         console.log(scheduleChanges)
         if (!category || !reason || !impact || !priority || !change_name || selectedSitesString.length < 1) {
@@ -242,9 +247,9 @@ function ChangeRequest() {
             common_change: isCommonChange,
             description: change_description,
             request_change_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-            aat_test_plan,
-            ftm_test_plan,
-            fsst_test_plan,
+            aat_test_plan: selectedSitesString.includes('aat') ? aat_test_plan : "",
+            ftm_test_plan: selectedSitesString.includes('ftm') ? ftm_test_plan : "",
+            fsst_test_plan: selectedSitesString.includes('fsst') ? fsst_test_plan : "",
             rollback_plan,
             achieve_2_week_change_request,
             aat_schedule_change: selectedSitesString.includes('aat') ? aat_schedule_change : "",
@@ -254,11 +259,15 @@ function ChangeRequest() {
             aat_it_contact: selectedSitesString.includes('aat') ? aat_it_contact : "",
             ftm_it_contact: selectedSitesString.includes('ftm') ? ftm_it_contact : "",
             fsst_it_contact: selectedSitesString.includes('fsst') ? fsst_it_contact : "",
+            aat_requestor: selectedSitesString.includes('aat') ? aat_requestor : "",
+            ftm_requestor: selectedSitesString.includes('ftm') ? ftm_requestor : "",
+            fsst_requestor: selectedSitesString.includes('fsst') ? fsst_requestor : "",
             business_team_contact: businessContact,
             global_team_contact: globalContact,
             aat_crq: selectedSitesString.includes('aat') ? aat_crq : "",
             ftm_crq: selectedSitesString.includes('ftm') ? ftm_crq : "",
             fsst_crq: selectedSitesString.includes('fsst') ? fsst_crq : "",
+            remarks,
         };
 
         try {
@@ -305,6 +314,18 @@ function ChangeRequest() {
                     ...prev[type],
                     addedDates: updatedAddedDates, // Update addedDates
                 },
+            };
+        });
+    };
+    const handleRemoveDate = (site, index) => {
+        setScheduleChanges(prevState => {
+            const updatedAddedDates = prevState[site].addedDates.filter((_, i) => i !== index);
+            return {
+                ...prevState,
+                [site]: {
+                    ...prevState[site],
+                    addedDates: updatedAddedDates
+                }
             };
         });
     };
@@ -442,30 +463,30 @@ function ChangeRequest() {
                     </div>
                     {/* Change requestor */}
                     {selectedSites.map((site) => (
-    <div key={site} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
-        <label htmlFor={`${site}Requestor`} style={labelStyle}>
-            {site.toUpperCase()} change requestor:
-        </label>
-        <select
-            id={`${site}Requestor`}
-            style={{ backgroundColor: theme.colors.primary400 }}
-            className="p-2 border border-gray-300 rounded text-white"
-            value={requestors[site] || ""}
-            onChange={(e) => handleRequestorChange(site, e.target.value)}
-        >
-            <option key="_" value="">
-                _
-            </option>
-            {users
-                .filter((user) => user.site === site.toUpperCase()) // 🔥 Filter users by site
-                .map((filteredUser) => (
-                    <option key={filteredUser.email} value={filteredUser.name}>
-                        {filteredUser.name}
-                    </option>
-                ))}
-        </select>
-    </div>
-))}
+                        <div key={site} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
+                            <label htmlFor={`${site}Requestor`} style={labelStyle}>
+                                {site.toUpperCase()} change requestor:
+                            </label>
+                            <select
+                                id={`${site}Requestor`}
+                                style={{ backgroundColor: theme.colors.primary400 }}
+                                className="p-2 border border-gray-300 rounded text-white"
+                                value={requestors[site] || ""}
+                                onChange={(e) => handleRequestorChange(site, e.target.value)}
+                            >
+                                <option key="_" value="">
+                                    _
+                                </option>
+                                {users
+                                    .filter((user) => user.site === site.toUpperCase()) // 🔥 Filter users by site
+                                    .map((filteredUser) => (
+                                        <option key={filteredUser.email} value={filteredUser.name}>
+                                            {filteredUser.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+                    ))}
                     {/* schedule change section */}
                     {selectedSites.map((site) => (
                         <>
@@ -606,7 +627,7 @@ function ChangeRequest() {
                                     placeholder="Enter CDSID (50 char max)"
                                     className="p-2 border border-gray-300 rounded w-full"
                                     maxLength={50}
-                                    onKeyDown={(e) => e.key === ',' && e.preventDefault()} // Block comma input
+                                    onKeyDown={(e) => (e.key === ',' || e.key === " ") && e.preventDefault()} // Block comma input
                                 />
                             </div>
                         </div>
@@ -691,6 +712,8 @@ function ScheduleChangeSection({
     const [title, setTitle] = useState("");
     const [changeStatus, setChangeStatus] = useState("");
     const [statusRemark, setStatusRemark] = useState("");
+    const [helpDialogOpen, setHelpDialogOpen] = useState(false);
+
     // Handle adding a date
     const handleAddDate = () => {
         if (startDateForRange && endDateForRange) {
@@ -716,7 +739,7 @@ function ScheduleChangeSection({
 
                 <div className="grid grid-cols-1 relative">
                     <Button type="button" onClick={() => setOpenDialog("range")}>
-                        Choose date and time
+                        Set up schedule information
                     </Button>
                 </div>
             </div>
@@ -729,7 +752,12 @@ function ScheduleChangeSection({
             /> */}
 
             <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
-                <h4 className="text-md font-semibold mb-2">Schedule Change Information</h4>
+                <div className="flex items-center">
+                    <h4 className="text-md font-semibold mb-2">Schedule Change Information</h4>
+                    <button onClick={() => setHelpDialogOpen(true)} className="mb-2 ml-2 cursor-pointer text-green-700 hover:text-gray-700 focus:outline-none">
+                        <HelpCircle size={20} />
+                    </button>
+                </div>
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-400 mb-1">
                         Schedule title
@@ -780,11 +808,8 @@ function ScheduleChangeSection({
                     >
                         <option value="_">_</option>
                         <option value="Completed with no issue">Completed with no issue</option>
-                        <option value="Cancel change request">Cancel change request</option>
-                        <option value="AAT change cancel">AAT change cancel</option>
-                        <option value="FTM change cancel">FTM change cancel</option>
-                        <option value="FSST change cancel">FSST change cancel</option>
-                        <option value="Common change cancel">Common change cancel</option>
+                        <option value="On plan">On plan</option>
+                        <option value="In progress">In progress</option>
                     </select>
                 </div>
                 <div className="mb-4">
@@ -814,6 +839,21 @@ function ScheduleChangeSection({
                     <Button type="button" onClick={handleAddDate} className="ml-auto">
                         Add
                     </Button>
+                </div>
+            </Dialog>
+
+            {/* Help Dialog */}
+            <Dialog open={helpDialogOpen} onClose={() => setHelpDialogOpen(false)}>
+                <h4 className="text-md font-semibold mb-2">Schedule Change Information</h4>
+                <p className="text-sm mb-4">
+                    Each schedule should have its start date and end date. They are mandatory information. In addition, you can add title, status and remark of the schedule.
+                    But they are optional and will be used in presentation interface as in the photo.
+                    Please note that the status from here will only be used in presentation and it has no affect to 'Dashboard (Data Visualization)' feature. There is
+                    another status field that you will need to enter in the form, which has only three status ('Completed', 'Ongoing,' and 'Canceled/Postponed'), which will be used in Dashboard feature.
+                </p>
+                <img src={ScheduleInfo} alt="Schedule Change Information" className="w-full h-auto mb-2" />
+                <div className="flex justify-end">
+                    <Button onClick={() => setHelpDialogOpen(false)} className="">Close</Button>
                 </div>
             </Dialog>
         </div>

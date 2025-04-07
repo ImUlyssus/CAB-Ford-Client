@@ -3,6 +3,7 @@ import Dialog from "./Dialog";
 import { X } from "lucide-react";  // Import cross icon
 import { useTheme } from "styled-components";
 import AddedCRQsList from "./AddedCRQsList";
+
 function CRQSection({ type, onCRQChange, crqs }) {
     const theme = useTheme();
     const typeLabels = {
@@ -12,28 +13,40 @@ function CRQSection({ type, onCRQChange, crqs }) {
     };
     const label = typeLabels[type] || "CRQ";
     const [openDialog, setOpenDialog] = useState(false);
+    const [crqTitle, setCrqTitle] = useState(""); // State for CRQ Title
     const [crqInput, setCrqInput] = useState("");
     const [addedCRQs, setAddedCRQs] = useState(crqs || []);
+
+    // Helper function to format CRQ entry
+    const formatCRQEntry = (title, crq) => {
+        // Replace spaces in title with underscores
+        const formattedTitle = title.replace(/ /g, "_");
+        return `${title}!${crq}`; // Title!CRQ
+    };
+
     // Handle adding CRQ
     const handleAddCRQ = () => {
-        if(addedCRQs.length == 5){
-            alert("You can only add up to 5 CRQs.")
-        }else{
-            if (crqInput.trim() !== "") {
-                const updatedCRQs = [...addedCRQs, crqInput.trim()];
+        if (addedCRQs.length === 10) {
+            alert("You can only add up to 10 CRQs.");
+        } else {
+            if (crqInput.trim() !== "" && crqTitle.trim() !== "") {
+                const formattedEntry = formatCRQEntry(crqTitle.trim(), crqInput.trim());
+                const updatedCRQs = [...addedCRQs, formattedEntry];
                 setAddedCRQs(updatedCRQs);
                 setCrqInput("");  // Clear input after adding
+                setCrqTitle(""); // Clear title after adding
                 onCRQChange(updatedCRQs); // Send updated CRQs to parent
+            } else {
+                alert("Please enter both CRQ Title and CRQ value.");
             }
         }
         setOpenDialog(false);
     };
-    // useEffect(() => {
-    //         setSelectedSites(request.change_sites.split(','));
-    //     }, [scheduleChanges])
-    useEffect(()=>{
+
+    useEffect(() => {
         setAddedCRQs(crqs || []);
-    })
+    }, [crqs]);
+
     // Handle removing CRQ
     const handleRemoveCRQ = (index) => {
         const updatedCRQs = addedCRQs.filter((_, i) => i !== index);
@@ -71,15 +84,33 @@ function CRQSection({ type, onCRQChange, crqs }) {
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-opacity-90">
                 <div className={`p-6 rounded shadow-lg relative`} style={{ backgroundColor: theme.colors.primary400 }}>
                     <h2 className="text-xl mb-4">Enter {label} CRQ</h2>
+
+                    {/* CRQ Title Input */}
                     <input
                         type="text"
-                        placeholder="Enter CRQ (15 char max)"
+                        placeholder="Enter CRQ Title (max 20 chars)"
+                        value={crqTitle}
+                        onChange={(e) => {
+                            // Disallow underscores
+                            if (!e.target.value.includes("_") && e.target.value.length <= 20) {
+                                setCrqTitle(e.target.value);
+                            }
+                        }}
+                        className="p-2 border border-gray-300 rounded w-full mb-2"
+                        maxLength={20}
+                    />
+
+                    {/* CRQ Value Input */}
+                    <input
+                        type="text"
+                        placeholder="Enter CRQ Value (max 15 chars)"
                         value={crqInput}
                         onChange={(e) => setCrqInput(e.target.value)}
                         className="p-2 border border-gray-300 rounded w-full mb-4"
                         maxLength={15}
                         onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()}
                     />
+
                     <div className="flex justify-end gap-2">
                         <button
                             onClick={handleAddCRQ}
