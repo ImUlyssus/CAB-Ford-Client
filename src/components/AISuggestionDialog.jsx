@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Dialog from "../components/Dialog";
 import Button from "../components/Button";
 
-function AISuggestionDialog({ isOpen, onClose, onDescriptionChange }) {
+function AISuggestionDialog({ isOpen, onClose, onDescriptionChange, value }) {
     const [input1, setInput1] = useState("");
     const [input2, setInput2] = useState("");
     const [input3, setInput3] = useState("");
@@ -14,7 +14,13 @@ function AISuggestionDialog({ isOpen, onClose, onDescriptionChange }) {
         // const ampersandCount = (value.match(/&/g) || []).length;
         setter(value);
     };
-    
+    if(value){
+        const [input1Value, input2Value, input3Value, input4Value] = value.split("!");
+        setInput1(input1Value);
+        setInput2(input2Value);
+        setInput3(input3Value);
+        setInput4(input4Value);
+    }
 
     const handleGetAISuggestion = async () => {
         setFirstRevise(false);

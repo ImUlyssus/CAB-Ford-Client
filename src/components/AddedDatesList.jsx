@@ -30,7 +30,6 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
         setIsEditDialogOpen(false); // Close the dialog
         setEditingIndex(null);
     };
-
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
             <label
@@ -134,11 +133,8 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
                     >
                         <option value="_">_</option>
                         <option value="Completed with no issue">Completed with no issue</option>
-                        <option value="Cancel change request">Cancel change request</option>
-                        <option value="AAT change cancel">AAT change cancel</option>
-                        <option value="FTM change cancel">FTM change cancel</option>
-                        <option value="FSST change cancel">FSST change cancel</option>
-                        <option value="Common change cancel">Common change cancel</option>
+                        <option value="On plan">On plan</option>
+                        <option value="In progress">In progress</option>
                     </select>
                 </div>
                 <div className="mb-1">

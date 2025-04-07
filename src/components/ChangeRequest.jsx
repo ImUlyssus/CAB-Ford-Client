@@ -580,7 +580,7 @@ function ChangeRequest() {
                                 id="rollbackPlan"
                                 style={{ backgroundColor: theme.colors.primary400 }}
                                 className="p-2 border border-gray-300 rounded text-white w-full"
-                                placeholder="Enter value (500 characters max)"
+                                placeholder="Enter value (max 500 characters)"
                                 rows={4}
                                 maxLength={500}
                             />
