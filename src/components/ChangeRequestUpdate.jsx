@@ -66,7 +66,7 @@ function ChangeRequestUpdate() {
             ...changeRequestData,
             [name]: value, // Dynamically set the correct field based on the name
         });
-        if (name == "change_status" && (value == "Completed with no issue" || value == "")) {
+        if (name == "change_status" && (value !== "Postponed/Rejected")) {
             setChangeRequestData({
                 ...changeRequestData,
                 cancel_change_category: "",
@@ -163,7 +163,7 @@ function ChangeRequestUpdate() {
     const handleRequestorChange = (site, value) => {
         setRequestors((prev) => ({
             ...prev,
-            [site]: value,
+            [site.toUpperCase()]: value,
         }));
     };
     useEffect((prev) => {
@@ -289,10 +289,11 @@ function ChangeRequestUpdate() {
         const aat_it_contact = changeRequestData.aat_it_contact_person.trim() + "," + changeRequestData.aat_it_contact_cdsid.trim();
         const ftm_it_contact = changeRequestData.ftm_it_contact_person.trim() + "," + changeRequestData.ftm_it_contact_cdsid.trim();
         const fsst_it_contact = changeRequestData.fsst_it_contact_person.trim() + "," + changeRequestData.fsst_it_contact_cdsid.trim();
-        const aat_requestor = requestors['aat'] || '';
-        const ftm_requestor = requestors['ftm'] || '';
-        const fsst_requestor = requestors['fsst'] || '';
-        console.log(aat_requestor, ftm_requestor, fsst_requestor);
+        const aat_requestor = requestors['AAT'] || '';
+        const ftm_requestor = requestors['FTM'] || '';
+        const fsst_requestor = requestors['FSST'] || '';
+        // console.log(aat_crq, ftm_crq, fsst_crq);
+        // console.log(aat_requestor, ftm_requestor, fsst_requestor);
         if (!changeRequestData.category || !changeRequestData.reason || !changeRequestData.impact || !changeRequestData.priority || !changeRequestData.change_name || selectedSitesString.length < 1) {
             alert("❌ A change request must include those fields: category, reason, impact, priority, change name and change site to submit.");
             return;
@@ -385,7 +386,12 @@ function ChangeRequestUpdate() {
             fsst_schedule_change: selectedSitesString.includes('fsst') ? fsst_schedule_change : "",
             latest_schedule_date,
             description: changeRequestData.description,
-            test_plan: changeRequestData.test_plan,
+            aat_test_plan: selectedSitesString.includes('aat') ? changeRequestData.aat_test_plan:"",
+            ftm_test_plan: selectedSitesString.includes('ftm') ?changeRequestData.ftm_test_plan:"",
+            fsst_test_plan: selectedSitesString.includes('fsst') ? changeRequestData.fsst_test_plan:"",
+            aat_requestor: selectedSitesString.includes('aat') ? aat_requestor:"",
+            ftm_requestor: selectedSitesString.includes('ftm') ? ftm_requestor:"",
+            fsst_requestor: selectedSitesString.includes('fsst') ? fsst_requestor:"",
             rollback_plan: changeRequestData.rollback_plan,
             achieve_2_week_change_request,
             aat_it_contact: selectedSitesString.includes('aat') ? aat_it_contact : "",
@@ -398,31 +404,33 @@ function ChangeRequestUpdate() {
             fsst_crq: selectedSitesString.includes('fsst') ? fsst_crq : "",
             approval,
             change_status: changeStatus,
-            cancel_change_category: changeStatus == "Completed with no issue" || changeStatus == "" ? "" : changeRequestData.cancel_change_category,
-            cancel_change_reason: changeStatus == "Completed with no issue" || changeStatus == "" ? "" : changeRequestData.cancel_change_reason,
+            cancel_change_category: changeStatus !== "Postponed/Rejected" ? "" : changeRequestData.cancel_change_category,
+            cancel_change_reason: changeStatus !== "Postponed/Rejected" ? "" : changeRequestData.cancel_change_reason,
             lesson_learnt: changeRequestData.lesson_learnt,
             reschedule_reason: changeRequestData.reschedule_reason,
-            is_someone_updating
+            is_someone_updating,
+            remarks: changeRequestData.remarks,
         }
-        // try {
-        //     const response = await axiosPrivate.put(`/change-requests`, requestData, {
-        //         headers: { "Content-Type": "application/json" },
-        //     });
+        console.log(requestData);
+        try {
+            const response = await axiosPrivate.put(`/change-requests`, requestData, {
+                headers: { "Content-Type": "application/json" },
+            });
 
-        //     alert("✅ Change Request updated successfully");
-        //     // there will be an error in the console every time you make a change request bc of this refresh, related to access and refresh token. Don't worry about it.
-        //     navigate(-1);
-        // } catch (error) {
-        //     if (error.response) {
-        //         console.error("❌ Error submitting Change Request", error.message);
-        //         alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
-        //     } else if (error.request) {
-        //         alert("❌ No response received. Please try again later.");
-        //     } else {
-        //         console.error("❌ Error submitting Change Request", error.message);
-        //         alert("❌ Something went wrong. Please try again later.");
-        //     }
-        // }
+            alert("✅ Change Request updated successfully");
+            // there will be an error in the console every time you make a change request bc of this refresh, related to access and refresh token. Don't worry about it.
+            navigate(-1);
+        } catch (error) {
+            if (error.response) {
+                console.error("❌ Error submitting Change Request", error.message);
+                alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
+            } else if (error.request) {
+                alert("❌ No response received. Please try again later.");
+            } else {
+                console.error("❌ Error submitting Change Request", error.message);
+                alert("❌ Something went wrong. Please try again later.");
+            }
+        }
     };
 
 
@@ -678,10 +686,11 @@ function ChangeRequestUpdate() {
                     {/* Test Plan Field */}
                     {selectedSites.map((site) => (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start m-2">
-                            <label htmlFor={`${site}TestPlan`} style={{ marginLeft: 'auto', marginRight: '10rem' }}>{site.toUpperCase()} Test plan:</label>
+                            <label htmlFor={`${site}_test_plan`} style={{ marginLeft: 'auto', marginRight: '10rem' }}>{site.toUpperCase()} Test plan:</label>
                             <div className="relative w-full">
                                 <textarea
-                                    id={`${site}TestPlan`}
+                                    id={`${site}_test_plan`}
+                                    name={`${site}_test_plan`}
                                     style={{ backgroundColor: theme.colors.primary400 }}
                                     className="p-2 border border-gray-300 rounded text-white w-full"
                                     placeholder="Enter value (max 500 characters)"
@@ -848,7 +857,7 @@ function ChangeRequestUpdate() {
                         </select>
                     </div>
                     {/* Change cancel category */}
-                    {changeStatus == "Completed with no issue" || changeStatus != "" && (
+                    {changeStatus == "Postponed/Rejected" && (
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2">
                                 <label htmlFor="cancel_change_category" style={labelStyle}>Cancel change category:</label>
@@ -880,6 +889,7 @@ function ChangeRequestUpdate() {
                                         rows={4}
                                         value={changeRequestData.cancel_change_reason}
                                         onChange={handleChange}
+                                        maxLength={500}
                                     />
                                 </div>
                             </div>
@@ -899,6 +909,7 @@ function ChangeRequestUpdate() {
                                 rows={4}
                                 value={changeRequestData.lesson_learnt}
                                 onChange={handleChange}
+                                maxLength={500}
                             />
 
                             {/* Style your text dialog button */}
@@ -932,6 +943,7 @@ function ChangeRequestUpdate() {
                                 rows={4}
                                 value={changeRequestData.reschedule_reason}
                                 onChange={handleChange}
+                                maxLength={500}
                             />
 
                             {/* Style your text dialog button */}

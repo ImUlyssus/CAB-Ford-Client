@@ -92,7 +92,7 @@ function CRQSection({ type, onCRQChange, crqs }) {
                         value={crqTitle}
                         onChange={(e) => {
                             // Disallow underscores
-                            if (!e.target.value.includes("_") && e.target.value.length <= 20) {
+                            if (!e.target.value.includes("_") && !e.target.value.includes(",") && !e.target.value.includes("!") && !e.target.value.includes("_") && e.target.value.length <= 20) {
                                 setCrqTitle(e.target.value);
                             }
                         }}
@@ -108,7 +108,7 @@ function CRQSection({ type, onCRQChange, crqs }) {
                         onChange={(e) => setCrqInput(e.target.value)}
                         className="p-2 border border-gray-300 rounded w-full mb-4"
                         maxLength={15}
-                        onKeyDown={(e) => (e.key === ',' || e.key === ' ') && e.preventDefault()}
+                        onKeyDown={(e) => (e.key === ',' || e.key === ' ' || e.key === '!') && e.preventDefault()}
                     />
 
                     <div className="flex justify-end gap-2">
