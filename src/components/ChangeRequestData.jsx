@@ -178,7 +178,7 @@ export default function ChangeRequestData() {
                                         <th className={thStyle3}>Change Name</th>
                                         <th className={thStyle1}>Change Sites</th>
                                         <th className={thStyle1}>Common Change</th>
-                                        <th className={thStyle1}>Change Request Date</th>
+                                        <th className={thStyle1}>Request Date</th>
                                         <th className={thStyle4}>Scheduels</th>
                                         <th className={thStyle2}>Achieve 2 Weeks <div>Request Change</div></th>
                                         <th className={thStyle3}>Description</th>
@@ -189,12 +189,12 @@ export default function ChangeRequestData() {
                                         <th className={thStyle2}>CRQ</th>
                                         <th className={thStyle2}>Requestor</th>
                                         <th className="py-2 px-4 border-b border-r">Approval</th>
-                                        <th className={thStyle3}>Change Status</th>
+                                        <th className={thStyle4}>Change Status</th>
                                         <th className={thStyle2}>Cancel Change Reason Category</th>
-                                        <th className={thStyle3}>Cancel Change Reason Description</th>
-                                        <th className={thStyle3}>Reschedule Reason</th>
-                                        <th className={thStyle3}>Lesson Learnt</th>
-                                        {/* <th className={thStyle3}>Remarks</th> */}
+                                        <th className={thStyle2}>Cancel Change Reason Description</th>
+                                        <th className={thStyle2}>Reschedule Reason</th>
+                                        <th className={thStyle2}>Lesson Learnt</th>
+                                        <th className={thStyle3}>Remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -364,6 +364,7 @@ export default function ChangeRequestData() {
                                                     <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.reschedule_reason}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.lesson_learnt}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{request.remarks}</td>
                                                 </tr>
                                             </>
                                         );

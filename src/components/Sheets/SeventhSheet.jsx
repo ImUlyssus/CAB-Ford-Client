@@ -117,7 +117,7 @@ const SixthSheet = () => {
       .attr("y", (d) => yScale(d.count))
       .attr("width", xScale.bandwidth())
       .attr("height", (d) => chartHeight - yScale(d.count))
-      .attr("fill", "#A5BFCC")
+      .attr("fill", "#347928")
       .style("cursor", "pointer")
       .on("click", function (event, d) {
         const filteredData =
