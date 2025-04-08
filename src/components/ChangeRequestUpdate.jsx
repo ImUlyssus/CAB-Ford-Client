@@ -59,9 +59,6 @@ function ChangeRequestUpdate() {
     });
     const [users, setUsers] = useState([]);
     console.log("From update", request);
-    // console.log("From update", localStorage.getItem('authEmail'));
-
-    // Function to handle change in select fields
     const handleChange = (event) => {
         const { name, value } = event.target; // Destructure name and value from the event
 
@@ -292,6 +289,10 @@ function ChangeRequestUpdate() {
         const aat_it_contact = changeRequestData.aat_it_contact_person.trim() + "," + changeRequestData.aat_it_contact_cdsid.trim();
         const ftm_it_contact = changeRequestData.ftm_it_contact_person.trim() + "," + changeRequestData.ftm_it_contact_cdsid.trim();
         const fsst_it_contact = changeRequestData.fsst_it_contact_person.trim() + "," + changeRequestData.fsst_it_contact_cdsid.trim();
+        const aat_requestor = requestors['aat'] || '';
+        const ftm_requestor = requestors['ftm'] || '';
+        const fsst_requestor = requestors['fsst'] || '';
+        console.log(aat_requestor, ftm_requestor, fsst_requestor);
         if (!changeRequestData.category || !changeRequestData.reason || !changeRequestData.impact || !changeRequestData.priority || !changeRequestData.change_name || selectedSitesString.length < 1) {
             alert("❌ A change request must include those fields: category, reason, impact, priority, change name and change site to submit.");
             return;
@@ -403,25 +404,25 @@ function ChangeRequestUpdate() {
             reschedule_reason: changeRequestData.reschedule_reason,
             is_someone_updating
         }
-        try {
-            const response = await axiosPrivate.put(`/change-requests`, requestData, {
-                headers: { "Content-Type": "application/json" },
-            });
+        // try {
+        //     const response = await axiosPrivate.put(`/change-requests`, requestData, {
+        //         headers: { "Content-Type": "application/json" },
+        //     });
 
-            alert("✅ Change Request updated successfully");
-            // there will be an error in the console every time you make a change request bc of this refresh, related to access and refresh token. Don't worry about it.
-            navigate(-1);
-        } catch (error) {
-            if (error.response) {
-                console.error("❌ Error submitting Change Request", error.message);
-                alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
-            } else if (error.request) {
-                alert("❌ No response received. Please try again later.");
-            } else {
-                console.error("❌ Error submitting Change Request", error.message);
-                alert("❌ Something went wrong. Please try again later.");
-            }
-        }
+        //     alert("✅ Change Request updated successfully");
+        //     // there will be an error in the console every time you make a change request bc of this refresh, related to access and refresh token. Don't worry about it.
+        //     navigate(-1);
+        // } catch (error) {
+        //     if (error.response) {
+        //         console.error("❌ Error submitting Change Request", error.message);
+        //         alert(`❌ Error: ${error.response.data.message || "An error occurred"}`);
+        //     } else if (error.request) {
+        //         alert("❌ No response received. Please try again later.");
+        //     } else {
+        //         console.error("❌ Error submitting Change Request", error.message);
+        //         alert("❌ Something went wrong. Please try again later.");
+        //     }
+        // }
     };
 
 
@@ -614,8 +615,8 @@ function ChangeRequestUpdate() {
                                     </option>
                                 {users?.filter((user) => user.site === site.toUpperCase()) // 🔥 Filter users by site
                                     .map((filteredUser) => (
-                                        <option key={filteredUser.email} value={filteredUser.name}>
-                                            {filteredUser.name}
+                                        <option key={filteredUser.email} value={`${filteredUser.name} ${filteredUser.email}`}>
+                                            {filteredUser.name} ({filteredUser.email})
                                         </option>
                                     ))}
                             </select>
@@ -657,33 +658,6 @@ function ChangeRequestUpdate() {
                             />
                         </>
                     ))}
-                    {/* {selectedSites.map((site) => (
-                        <ScheduleChangeSection
-                            key={site}
-                            type={site}
-                            startDateForRange={scheduleChanges[site].startDateForRange}
-                            endDateForRange={scheduleChanges[site].endDateForRange}
-                            addedDates={scheduleChanges[site].addedDates}
-                            onScheduleChange={(field, value) => setScheduleChanges((prev) => ({
-                                ...prev,
-                                [site]: { ...prev[site], [field]: value },
-                            }))}
-                            onAddDate={(newDate) => setScheduleChanges((prev) => ({
-                                ...prev,
-                                [site]: {
-                                    ...prev[site],
-                                    addedDates: [...prev[site].addedDates, newDate],
-                                },
-                            }))}
-                            onRemoveDate={(index) => setScheduleChanges((prev) => ({
-                                ...prev,
-                                [site]: {
-                                    ...prev[site],
-                                    addedDates: prev[site].addedDates.filter((_, i) => i !== index),
-                                },
-                            }))}  // Handle removing dates dynamically
-                        />
-                    ))} */}
 
 
                     {/* Change Description Field */}
@@ -869,8 +843,8 @@ function ChangeRequestUpdate() {
                         >
                             <option value="_">_</option>
                         <option value="Completed with no issue">Completed with no issue</option>
-                        <option value="On plan">On plan</option>
-                        <option value="In progress">In progress</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Postponed/Rejected">Postponed/Rejected</option>
                         </select>
                     </div>
                     {/* Change cancel category */}
@@ -1091,9 +1065,14 @@ function ScheduleChangeSection({
             <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
                 <div className="flex items-center">
                     <h4 className="text-md font-semibold mb-2">Schedule Change Information</h4>
-                    <button onClick={() => setHelpDialogOpen(true)} className="mb-2 ml-2 cursor-pointer text-green-700 hover:text-gray-700 focus:outline-none">
-                        <HelpCircle size={20} />
-                    </button>
+                    <button
+  type="button"
+  onClick={() => setHelpDialogOpen(true)}
+  className="mb-2 ml-2 cursor-pointer text-green-700 hover:text-gray-700 focus:outline-none"
+>
+  <HelpCircle size={20} />
+</button>
+
                 </div>
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-400 mb-1">
@@ -1163,15 +1142,6 @@ function ScheduleChangeSection({
                         onKeyDown={(e) => (e.key === '!' || e.key === '_') && e.preventDefault()}
                     />
                 </div>
-                {/* <div className="mb-4">
-                    <input
-                        type="number"
-                        value={duration || ""}
-                        onChange={(e) => onScheduleChange("duration", e.target.value)}
-                        placeholder="Choose duration in hour"
-                        className="p-2 border border-gray-300 rounded w-full"
-                    />
-                </div> */}
                 <div className="flex">
                     <Button type="button" onClick={handleAddDate} className="ml-auto">
                         Add
@@ -1196,107 +1166,5 @@ function ScheduleChangeSection({
         </div>
     );
 }
-
-// function ScheduleChangeSection({
-//     type,
-//     startDateForRange,
-//     endDateForRange,
-//     addedDates,
-//     onScheduleChange,
-//     onAddDate,
-//     onRemoveDate
-// }) {
-//     const typeLabels = {
-//         aat: "AAT",
-//         ftm: "FTM",
-//         fsst: "FSST",
-//     };
-//     const label = typeLabels[type] || "Schedule";
-//     const [openDialog, setOpenDialog] = useState(null);
-
-//     // Handle adding a date
-//     const handleAddDate = () => {
-//         if (startDateForRange && endDateForRange) {
-//             const newDate = { start: startDateForRange, end: endDateForRange };
-//             if (addedDates.length < 5) {
-//                 onAddDate(newDate);  // Pass the added date to the parent
-//             } else {
-//                 alert("You can only add up to 5 date ranges.");
-//             }
-//         }
-//         setOpenDialog(null);
-//     };
-
-//     return (
-//         <div>
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center m-2 relative">
-//                 <label
-//                     htmlFor={`${type}ScheduleChange`}
-//                     style={{ marginLeft: "auto", marginRight: "10rem" }}
-//                 >
-//                     Choose {label} schedule change date:
-//                 </label>
-
-//                 <div className="grid grid-cols-1 relative">
-//                     <Button type="button" onClick={() => setOpenDialog("range")}>
-//                         Choose date and time
-//                     </Button>
-//                 </div>
-//             </div>
-
-//             {/* Display the list of added dates */}
-//             <AddedDatesList
-//                 addedDates={addedDates}
-//                 label={label}
-//                 onRemove={(index) => onRemoveDate(index)}  // Use the new prop
-//             />
-
-//             <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
-//                 <h4 className="text-md font-semibold mb-2">Select Date Range</h4>
-//                 <div className="grid grid-cols-2 gap-4 mb-4">
-//                     <div className="relative">
-//                         <label className="block text-sm font-medium text-gray-400 mb-1">
-//                             Start date and time
-//                         </label>
-//                         <input
-//                             type="datetime-local"
-//                             value={startDateForRange || ""}
-//                             onChange={(e) => onScheduleChange("startDateForRange", e.target.value)}
-//                             className="p-2 border border-gray-300 rounded w-full"
-//                         />
-//                     </div>
-//                     <div className="relative">
-//                         <label className="block text-sm font-medium text-gray-400 mb-1">
-//                             End date and time
-//                         </label>
-//                         <input
-//                             type="datetime-local"
-//                             value={endDateForRange || ""}
-//                             onChange={(e) => onScheduleChange("endDateForRange", e.target.value)}
-//                             className="p-2 border border-gray-300 rounded w-full"
-//                         />
-
-//                     </div>
-//                 </div>
-
-//                 {/* <div className="mb-4">
-//                     <input
-//                         type="number"
-//                         value={duration || ""}
-//                         onChange={(e) => onScheduleChange("duration", e.target.value)}
-//                         placeholder="Choose duration in hour"
-//                         className="p-2 border border-gray-300 rounded w-full"
-//                     />
-//                 </div> */}
-//                 <div className="flex">
-//                     <Button type="button" onClick={handleAddDate} className="ml-auto">
-//                         Add
-//                     </Button>
-//                 </div>
-//             </Dialog>
-//         </div>
-//     );
-// }
-
 
 export default ChangeRequestUpdate;

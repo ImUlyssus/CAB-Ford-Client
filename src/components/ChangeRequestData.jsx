@@ -187,6 +187,7 @@ export default function ChangeRequestData() {
                                         <th className={thStyle2}>General Information</th>
                                         <th className={thStyle4}>Contact</th>
                                         <th className={thStyle2}>CRQ</th>
+                                        <th className={thStyle2}>Requestor</th>
                                         <th className="py-2 px-4 border-b border-r">Approval</th>
                                         <th className={thStyle3}>Change Status</th>
                                         <th className={thStyle2}>Cancel Change Reason Category</th>
@@ -335,6 +336,26 @@ export default function ChangeRequestData() {
                                                                     <div>{item.trim().split('!')[1]}</div>
                                                                 </div>
                                                             ))}
+                                                    </td>
+                                                    <td className="py-2 px-2 border-b border-r text-center">
+                                                        {request.aat_requestor !== null && <p className="font-semibold text-center text-[#beef70]">AAT</p>}
+                                                        {request.aat_requestor &&
+                                                                <div className="mb-1">
+                                                                    {request.aat_requestor}
+                                                                </div>
+                                                            }
+                                                        {request.ftm_requestor !== null && <p className="font-semibold text-center text-[#beef70]">FTM</p>}
+                                                        {request.ftm_requestor &&
+                                                                <div className="mb-1">
+                                                                    {request.ftm_requestor}
+                                                                </div>
+                                                            }
+                                                            {request.fsst_requestor !== null && <p className="font-semibold text-center text-[#beef70]">FSST</p>}
+                                                        {request.fsst_requestor &&
+                                                                <div className="mb-1">
+                                                                    {request.fsst_requestor}
+                                                                </div>
+                                                            }
                                                     </td>
                                                     {/* <td className="py-2 px-4 border-b border-r">{request.common_crq}</td> */}
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.approval}</td>

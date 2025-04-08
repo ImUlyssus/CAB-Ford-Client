@@ -480,8 +480,8 @@ function ChangeRequest() {
                                 {users
                                     .filter((user) => user.site === site.toUpperCase()) // 🔥 Filter users by site
                                     .map((filteredUser) => (
-                                        <option key={filteredUser.email} value={filteredUser.name}>
-                                            {filteredUser.name}
+                                        <option key={filteredUser.email} value={`${filteredUser.name} ${filteredUser.email}`}>
+                                            {filteredUser.name} ({filteredUser.email})
                                         </option>
                                     ))}
                             </select>
@@ -754,7 +754,7 @@ function ScheduleChangeSection({
             <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
                 <div className="flex items-center">
                     <h4 className="text-md font-semibold mb-2">Schedule Change Information</h4>
-                    <button onClick={() => setHelpDialogOpen(true)} className="mb-2 ml-2 cursor-pointer text-green-700 hover:text-gray-700 focus:outline-none">
+                    <button type='button' onClick={() => setHelpDialogOpen(true)} className="mb-2 ml-2 cursor-pointer text-green-700 hover:text-gray-700 focus:outline-none">
                         <HelpCircle size={20} />
                     </button>
                 </div>
@@ -826,15 +826,6 @@ function ScheduleChangeSection({
                         onKeyDown={(e) => (e.key === '!' || e.key === '_') && e.preventDefault()}
                     />
                 </div>
-                {/* <div className="mb-4">
-                    <input
-                        type="number"
-                        value={duration || ""}
-                        onChange={(e) => onScheduleChange("duration", e.target.value)}
-                        placeholder="Choose duration in hour"
-                        className="p-2 border border-gray-300 rounded w-full"
-                    />
-                </div> */}
                 <div className="flex">
                     <Button type="button" onClick={handleAddDate} className="ml-auto">
                         Add
