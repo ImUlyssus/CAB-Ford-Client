@@ -34,6 +34,7 @@ export default function Carousel() {
   const [isCustomDateOpen, setIsCustomDateOpen] = useState(false);
   const [customDate, setCustomDate] = useState(false);
   const [changeRequests, setChangeRequests] = useState([]);
+  const [processedChangeRequests, setProcessedChangeRequests] = useState({ approved: [], toApprove: [] });
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
 
@@ -80,7 +81,60 @@ export default function Carousel() {
     };
     getThisWeekData();
   }, []);
-
+  useEffect(() => {
+    // Function to process schedule data
+    const processScheduleData = (requests) => {
+      return requests.map(request => {
+        const processedRequest = { ...request }; // Create a copy
+        const statuses = [];
+  
+        const sites = ['aat', 'ftm', 'fsst'];
+        sites.forEach(site => {
+          const scheduleKey = `${site}_schedule_change`;
+          if (processedRequest[scheduleKey]) {
+            processedRequest[scheduleKey] = processedRequest[scheduleKey]
+              .split(' ')
+              .map(schedule => {
+                const [startdate, enddate, schedule_title, status, comment] = schedule.split('!');
+                const cleanedStatus = status ? status.replace(/_/g, ' ') : null; // Clean the status
+                statuses.push(cleanedStatus);
+                return {
+                  startdate: startdate || null,
+                  enddate: enddate || null,
+                  schedule_title: schedule_title ? schedule_title.replace(/_/g, ' ') : null,
+                  status: cleanedStatus, // Use cleaned status
+                  comment: comment ? comment.replace(/_/g, ' ') : null
+                };
+              });
+          }
+        });
+  
+        // Determine final status
+        let finalStatus = null;
+        const uniqueStatuses = [...new Set(statuses)]; // Get unique statuses
+  
+        if (uniqueStatuses.length === 1) {
+          finalStatus = uniqueStatuses[0]; // Case 1: All statuses are the same
+        } else if (statuses.includes("Postponed/Canceled")) {
+          finalStatus = "Postponed/Canceled"; // Case 2: One status is Postponed/Canceled
+        } else if (uniqueStatuses.every(status => ["Completed with no issue", "In progress", "On plan"].includes(status))) {
+          finalStatus = "On plan"; // Case 3: Combination of "Completed with no issue", "In progress", "On plan"
+        } else if (uniqueStatuses.every(status => ["In progress", "On plan"].includes(status))) {
+          finalStatus = "On plan"; // Case 3: Combination of "Completed with no issue", "In progress", "On plan"
+        }
+  
+        processedRequest.final_status = finalStatus; // Add final status to the object
+        return processedRequest;
+      });
+    };
+  
+    // Process both approved and toApprove arrays
+    setProcessedChangeRequests({
+      approved: changeRequests.approved ? processScheduleData(changeRequests.approved) : [],
+      toApprove: changeRequests.toApprove ? processScheduleData(changeRequests.toApprove) : []
+    });
+  }, [changeRequests]);
+  
   const handleSave = async (start, end) => {
     setIsCustomDateOpen(false); // Close the dialog
     setCustomDate(true);
@@ -103,9 +157,9 @@ export default function Carousel() {
       console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
     }
   };
-
+  console.log(processedChangeRequests);
   // Common props for slides
-  const slideProps = { theme, changeRequests };
+  const slideProps = { theme, changeRequests: processedChangeRequests };
 
   // Fullscreen presentation view
   if (isFullscreen) {

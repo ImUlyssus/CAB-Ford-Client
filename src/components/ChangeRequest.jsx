@@ -810,6 +810,7 @@ function ScheduleChangeSection({
                         <option value="Completed with no issue">Completed with no issue</option>
                         <option value="On plan">On plan</option>
                         <option value="In progress">In progress</option>
+                        <option value="Postponed/Canceled">Postponed/Canceled</option>
                     </select>
                 </div>
                 <div className="mb-4">

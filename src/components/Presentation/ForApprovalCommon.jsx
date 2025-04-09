@@ -1,6 +1,23 @@
 import React from 'react';
 import Ford_Logo from '../../assets/ford_logo.png';
-const ForApprovalCommon = () => {
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+    const formatter = new Intl.DateTimeFormat('en-US', { // Or your desired locale
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Bangkok' // Set the timezone
+    });
+
+    return formatter.format(date);
+};
+const ForApprovalCommon = ({ changeRequests }) => {
     return (
         <div className="w-full h-full bg-white p-8">
             {/* Title */}
@@ -27,18 +44,107 @@ const ForApprovalCommon = () => {
                         </tr>
                     </thead>
                     <tbody className="text-black text-xs">
-                        {/* Row 1 */}
-                        <tr>
-                            <td className="border border-gray-300 px-4 py-2">Microsoft SQL Database Security Patch update</td>
-                            <td className="border border-gray-300 text-center">Sat, 17 Aug 24 <div>13:00 – 19:00</div></td>
-                            <td className="border border-gray-300 px-2">Hi, how are you? I hope you are well. I have a girlfriend. Do you? NO? Haha! Not surprised.</td>
-                            <td className="border border-gray-300 px-2">This is test plan. this is test plan.</td>
-                            <td className="border border-gray-300 text-center">Rollback plan nakub</td>
-                            <td className="border border-gray-300 text-center">Minor/<div>Medium</div></td>
-                            <td className="border border-gray-300 text-center">AAT Site IT Kyaw (KSWARHEI)</td>
-                            <td className="border border-gray-300 px-2 text-center">CRQ392797439820923</td>
-                            <td className="border border-gray-300 text-center"></td>
-                        </tr>
+                        {changeRequests?.toApprove?.filter(request => request.change_sites.split(',').length > 1)
+                            .map((request, index) => (
+                                <tr key={index}>
+                                    <td className="border border-gray-300 px-4 py-2 align-top">{request.change_name}</td>
+                                    <td className="border border-gray-300 px-2 py-2 text-center min-w-[210px] max-w-[300px] align-top">
+                                        <div className="flex flex-col justify-start gap-4">
+                                            {[
+                                                ...(request?.aat_schedule_change || []).map(s => ({ ...s, site: 'AAT' })),
+                                                ...(request?.ftm_schedule_change || []).map(s => ({ ...s, site: 'FTM' })),
+                                                ...(request?.fsst_schedule_change || []).map(s => ({ ...s, site: 'FSST' })),
+                                            ].map((schedule, index2) => (
+                                                <div key={index2} className="space-y-1">
+                                                    <div className="font-bold text-blue-500">{schedule.schedule_title}</div>
+                                                    <div>{formatDate(schedule.startdate)} - </div>
+                                                    <div> {formatDate(schedule.enddate)}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </td>
+                                    <td className="border border-gray-300 px-2">{request.description}</td>
+                                    <td className="border border-gray-300 px-2">
+                                        {request.aat_test_plan?.length > 0 &&
+                                        <div className='mb-2'>
+                                            <div className="font-bold text-blue-500">AAT</div>
+                                            <div className="text-sm">{request.aat_test_plan}</div>
+                                        </div>}
+                                        {request.ftm_test_plan?.length > 0 &&
+                                        <div className='mb-2'>
+                                            <div className="font-bold text-blue-500">FTM</div>
+                                            <div className="text-sm">{request.ftm_test_plan}</div>
+                                        </div>}
+                                        {request.fsst_test_plan?.length > 0 &&
+                                        <div className='mb-2'>
+                                            <div className="font-bold text-blue-500">FSST</div>
+                                            <div className="text-sm">{request.fsst_test_plan}</div>
+                                        </div>}
+                                    </td>
+                                    <td className="border border-gray-300 text-center">{request?.rollback_plan || ""}</td>
+                                    <td className="border border-gray-300 text-center align-top">{request.impact}/<div>{request.priority}</div></td>
+                                    <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px]">
+                                        {request?.aat_it_contact?.length > 0 &&
+                                            <>
+                                                <div className='font-bold text-blue-500'>AAT</div>
+                                                <div>{request.aat_it_contact.split(',')[0].replace(/_/g, ' ')}</div>
+                                                <div className='mb-2'>{request.aat_it_contact.split(',')[1]}</div>
+                                            </>
+                                        }
+                                        {request?.ftm_it_contact?.length > 0 &&
+                                            <>
+                                                <div className='font-bold text-blue-500'>FTM</div>
+                                                <div>{request.ftm_it_contact.split(',')[0].replace(/_/g, ' ')}</div>
+                                                <div className='mb-2'>{request.ftm_it_contact.split(',')[1]}</div>
+                                            </>
+                                        }
+                                        {request?.fsst_it_contact?.length > 0 &&
+                                            <>
+                                                <div className='font-bold text-blue-500'>FSST</div>
+                                                <div>{request.fsst_it_contact.split(',')[0].replace(/_/g, ' ')}</div>
+                                                <div className='mb-2'>{request.fsst_it_contact.split(',')[1]}</div>
+                                            </>
+                                        }
+                                        {request?.business_team_contact?.length > 0 &&
+                                            <>
+                                                <div className='font-bold text-blue-500'>FSST</div>
+                                                <div>{request.business_team_contact.split(',')[0].replace(/_/g, ' ')}</div>
+                                                <div className='mb-2'>{request.business_team_contact.split(',')[1]}</div>
+                                            </>
+                                        }
+                                        {request?.global_team_contact?.length > 0 &&
+                                            <>
+                                                <div className='font-bold text-blue-500'>FSST</div>
+                                                <div>{request.global_team_contact.split(',')[0].replace(/_/g, ' ')}</div>
+                                                <div className='mb-2'>{request.global_team_contact.split(',')[1]}</div>
+                                            </>
+                                        }
+                                    </td>
+                                    <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top">
+                                        {request?.aat_crq?.length > 1 &&
+                                            <>
+                                                <div className='font-bold text-blue-500'>AAT</div>
+                                                <div>{request.aat_crq.split(',')[0].replace(/_/g, ' ')}</div>
+                                                <div className='mb-2'>{request.aat_crq.split(',')[1]}</div>
+                                            </>
+                                        }
+                                        {request?.ftm_crq?.length > 1 &&
+                                            <>
+                                                <div className='font-bold text-blue-500'>FTM</div>
+                                                <div>{request.ftm_crq.split(',')[0].replace(/_/g, ' ')}</div>
+                                                <div className='mb-2'>{request.ftm_crq.split(',')[1]}</div>
+                                            </>
+                                        }
+                                        {request?.fsst_crq?.length > 1 &&
+                                            <>
+                                                <div className='font-bold text-blue-500'>FSST</div>
+                                                <div>{request.fsst_crq.split(',')[0].replace(/_/g, ' ')}</div>
+                                                <div className='mb-2'>{request.fsst_crq.split(',')[1]}</div>
+                                            </>
+                                        }
+                                    </td>
+                                    <td className="border border-gray-300 text-center">{request.approval}</td>
+                                </tr>))}
                     </tbody>
                 </table>
             </div>
