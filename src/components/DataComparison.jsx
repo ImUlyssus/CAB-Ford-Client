@@ -15,15 +15,11 @@ export default function DataComparison({ requests }) {
         if (!scheduleString) return { scheduleArray: [] }; // Return empty array if no schedule
         const parts = scheduleString.split(" "); // Split by space
         const scheduleArray = [];
-        let duration = 0;
-        for (let i = 0; i < parts.length; i += 2) {
-            if (i + 1 < parts.length) { // Ensure there's a valid start, end, and duration
-                let start = parts[i].replace(/-/g, "/").replace(/['"]/g, ""); // Replace - with /
-                let end = parts[i + 1].replace(/-/g, "/").replace(/['"]/g, "");
-
-                scheduleArray.push(`${start} TO ${end}`);
-            }
-        }
+        parts.forEach((part) => {
+            let start = part.split("!")[0];
+            let end = part.split("!")[1];
+            scheduleArray.push(`${start} TO ${end}`);
+        })
 
         return { scheduleArray }; // Always return an object
     };

@@ -13,6 +13,7 @@ import ForApprovalFSST from "./Presentation/ForApprovalFSST";
 import Summary from "./Presentation/Summary";
 import CustomDateDialog from './CustomDateDialog';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
 const slides = [
   CoverPage,
   BusinessCalendarSlide,
@@ -35,6 +36,7 @@ export default function Carousel() {
   const [changeRequests, setChangeRequests] = useState([]);
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
+
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? slides.length - 1 : prevIndex - 1));
   };
@@ -64,120 +66,122 @@ export default function Carousel() {
     };
   }, []);
 
-  useEffect(()=>{
-      const getThisWeekData = async () => {
-        try {
-            const response = await axiosPrivate.get('/change-requests/get-this-week-data');
-            console.log(response.data)
-            setChangeRequests(response.data);
-        } catch (err) {
-            console.error("Error fetching this week data:", err.response ? err.response.data : err.message); // Debugging
-            // setError(err.response ? err.response.data.message : err.message);
-            navigate('/login', { state: { from: location }, replace: true });
-        }
+  useEffect(() => {
+    const getThisWeekData = async () => {
+      try {
+        const response = await axiosPrivate.get('/change-requests/get-this-week-data');
+        console.log(response.data);
+        setChangeRequests(response.data);
+      } catch (err) {
+        console.error("Error fetching this week data:", err.response ? err.response.data : err.message); // Debugging
+        // setError(err.response ? err.response.data.message : err.message);
+        navigate('/login', { state: { from: location }, replace: true });
+      }
     };
     getThisWeekData();
-    },[])
+  }, []);
+
+  const handleSave = async (start, end) => {
+    setIsCustomDateOpen(false); // Close the dialog
+    setCustomDate(true);
+
+    // Format start and end dates to include time
+    const formattedStartDate = `${start} 00:00:00`;
+    const formattedEndDate = `${end} 23:59:59`;
+    console.log("Selected Dates:", formattedStartDate, formattedEndDate);
+    try {
+      const response = await axiosPrivate.get("/change-requests/custom-date", {
+        params: {
+          start: formattedStartDate,
+          end: formattedEndDate,
+        },
+      });
+
+      console.log("📥 Custom Date Data:", response.data);
+      setChangeRequests(response.data); // Update state with filtered data
+    } catch (err) {
+      console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
+    }
+  };
+
+  // Common props for slides
+  const slideProps = { theme, changeRequests };
 
   // Fullscreen presentation view
-  // In your fullscreen presentation view (replace the existing code)
-if (isFullscreen) {
-  return (
-    <div className="fixed inset-0 bg-white flex items-center justify-center z-50"> {/* Changed bg-black to bg-white */}
-      <div className="w-full h-[80%] relative">
-      {slides.map((SlideComponent, index) => (
-  <div
-    key={index}
-    className={`w-[90%] absolute inset-y-0 left-1/2 transform -translate-x-1/2 transition-opacity duration-500 ease-in-out ${
-      index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
-    }`}
-  >
-    {React.createElement(SlideComponent, { theme, changeRequests })}
-  </div>
-))}
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div className="w-full h-[80%] relative">
+          {slides.map((SlideComponent, index) => (
+            <div
+              key={index}
+              className={`w-[90%] absolute inset-y-0 left-1/2 transform -translate-x-1/2 transition-opacity duration-500 ease-in-out ${index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
+                }`}
+            >
+              {React.createElement(SlideComponent, slideProps)}
+            </div>
+          ))}
 
-        
-        {/* Fullscreen controls (keep existing) */}
+          {/* Fullscreen controls (keep existing) */}
+          <button
+            onClick={prevSlide}
+            className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-black/30 p-4 rounded-full text-white hover:bg-black/50 transition text-3xl"
+          >
+            ❮
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-black/30 p-4 rounded-full text-white hover:bg-black/50 transition text-3xl"
+          >
+            ❯
+          </button>
+        </div>
         <button
-          onClick={prevSlide}
-          className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-black/30 p-4 rounded-full text-white hover:bg-black/50 transition text-3xl"
-        >
-          ❮
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-black/30 p-4 rounded-full text-white hover:bg-black/50 transition text-3xl"
-        >
-          ❯
-        </button>
-      </div>
-      <button
           onClick={toggleFullscreen}
           className="absolute top-4 right-4 bg-black/30 p-3 rounded-full text-white hover:bg-black/50 transition"
         >
           Exit
         </button>
-    </div>
-  );
-}
-const handleSave = async (start, end) => {
-  setIsCustomDateOpen(false); // Close the dialog
-  setCustomDate(true);
-
-  // Format start and end dates to include time
-  const formattedStartDate = `${start} 00:00:00`;
-  const formattedEndDate = `${end} 23:59:59`;
-  console.log("Selected Dates:", formattedStartDate, formattedEndDate);
-  try {
-      const response = await axiosPrivate.get("/change-requests/custom-date", {
-          params: {
-              start: formattedStartDate,
-              end: formattedEndDate,
-          },
-      });
-
-      console.log("📥 Custom Date Data:", response.data);
-      setChangeRequests(response.data); // Update state with filtered data
-  } catch (err) {
-      console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
+      </div>
+    );
   }
-};
+
   // Normal view
   return (
     <>
       <div className="flex justify-between items-center mt-2">
         <h1 className="m-0 font-bold text-xl">This week presentation</h1>
         <div className="flex space-x-3">
-        {customDate ? 
+          {customDate ?
             <button
-                className="bg-gray-500 hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
-                onClick={() => {
-                    setCustomDate(false);
-                }}
+              className="bg-gray-500 hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
+              onClick={() => {
+                setCustomDate(false);
+              }}
             >
-                Clear Custom Date
+              Clear Custom Date
             </button>
             : <button
-                className="border-1 border-[#beef00] hover:bg-[#beef70] hover:text-black text-[#beef70] font-bold py-2 px-4 rounded"
-                onClick={() => {
-                    setIsCustomDateOpen(true);
-                    setCustomDate(true);
-                }
-                }
+              className="border-1 border-[#beef00] hover:bg-[#beef70] hover:text-black text-[#beef70] font-bold py-2 px-4 rounded"
+              onClick={() => {
+                setIsCustomDateOpen(true);
+                setCustomDate(true);
+              }
+              }
             >
-                Custom Date
+              Custom Date
             </button>}
 
-            {/* Dialog for selecting dates */}
-            <CustomDateDialog open={isCustomDateOpen} onClose={() => {
-                setCustomDate(false);
-                setIsCustomDateOpen(false);
-                }} onSave={handleSave}
-                 />
-          <button 
+          {/* Dialog for selecting dates */}
+          <CustomDateDialog open={isCustomDateOpen} onClose={() => {
+            setCustomDate(false);
+            setIsCustomDateOpen(false);
+          }} onSave={handleSave}
+          />
+          <button
             onClick={toggleFullscreen}
-            className="px-4 py-2 rounded cursor-pointer font-bold" 
-            style={{backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500}}
+            className="px-4 py-2 rounded cursor-pointer font-bold"
+            style={{ backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500 }}
           >
             Present now
           </button>
@@ -192,11 +196,10 @@ const handleSave = async (start, end) => {
           {slides.map((SlideComponent, index) => (
             <div
               key={index}
-              className={`absolute top-0 left-0 w-full h-full flex items-center justify-center transition-opacity duration-700 ease-in-out ${
-                index === currentIndex ? "opacity-100 visible" : "opacity-0 invisible"
-              }`}
+              className={`absolute top-0 left-0 w-full h-full flex items-center justify-center transition-opacity duration-700 ease-in-out ${index === currentIndex ? "opacity-100 visible" : "opacity-0 invisible"
+                }`}
             >
-              {React.createElement(SlideComponent, { theme })}
+              {React.createElement(SlideComponent, slideProps)}
             </div>
           ))}
         </div>
@@ -207,9 +210,8 @@ const handleSave = async (start, end) => {
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-4 h-4 rounded-full bg-gray-400 transition-all ${
-                currentIndex === index ? "bg-blue-600 scale-110" : "opacity-50"
-              }`}
+              className={`w-4 h-4 rounded-full bg-gray-400 transition-all ${currentIndex === index ? "bg-blue-600 scale-110" : "opacity-50"
+                }`}
             />
           ))}
         </div>

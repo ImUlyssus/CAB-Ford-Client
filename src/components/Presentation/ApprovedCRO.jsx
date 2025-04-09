@@ -28,7 +28,7 @@ const ApprovedCRO = ({changeRequests}) => {
                     </thead>
                     <tbody className="text-black text-xs">
                         {changeRequests?.toApproved
-                            ?.filter(request => request.change_status === "") // Filtering step
+                            ?.filter(request => request.change_status === "Ongoing") // Filtering step
                             .map((request, index) => {
                                 return (
                                     <tr key={index}>

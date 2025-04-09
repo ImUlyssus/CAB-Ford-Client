@@ -814,15 +814,15 @@ function ScheduleChangeSection({
                 </div>
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-400 mb-1">
-                        Status remark
+                        Comment/Issue
                     </label>
                     <input
                         type="text"
                         value={statusRemark}
                         onChange={(e) => setStatusRemark(e.target.value)}
-                        placeholder="Enter remark (50 characters max)"
+                        placeholder="Enter remark (100 characters max)"
                         className="p-2 border border-gray-300 rounded w-full"
-                        maxLength={50}
+                        maxLength={100}
                         onKeyDown={(e) => (e.key === '!' || e.key === '_') && e.preventDefault()}
                     />
                 </div>
@@ -840,7 +840,7 @@ function ScheduleChangeSection({
                     Each schedule should have its start date and end date. They are mandatory information. In addition, you can add title, status and remark of the schedule.
                     But they are optional and will be used in presentation interface as in the photo.
                     Please note that the status from here will only be used in presentation and it has no affect to 'Dashboard (Data Visualization)' feature. There is
-                    another status field that you will need to enter in the form, which has only three status ('Completed', 'Ongoing,' and 'Canceled/Postponed'), which will be used in Dashboard feature.
+                    another status field that you will need to enter in the form, which has only three status ('Completed with no issue', 'Ongoing,' and 'Canceled/Postponed'), which will be used in Dashboard feature.
                 </p>
                 <img src={ScheduleInfo} alt="Schedule Change Information" className="w-full h-auto mb-2" />
                 <div className="flex justify-end">

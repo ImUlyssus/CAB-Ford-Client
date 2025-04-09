@@ -35,11 +35,11 @@ function ChangeRequestUpdate() {
         ftm_it_contact_cdsid: request?.ftm_it_contact?.split(',')[1] || "",
         fsst_it_contact_person: request?.fsst_it_contact?.split(',')[0] || "",
         fsst_it_contact_cdsid: request?.fsst_it_contact?.split(',')[1] || "",
-        cancel_change_category: request.cancel_change_category || "",
-        cancel_change_reason: request.cancel_change_reason || "",
-        lesson_learnt: request.lesson_learnt == null ? "" : request.lesson_learnt,
-        reschedule_reason: request.reschedule_reason == null ? "" : request.reschedule_reason,
-        remarks: request.remarks == null ? "" : request.remarks,
+        cancel_change_category: request?.cancel_change_category || "",
+        cancel_change_reason: request?.cancel_change_reason || "",
+        lesson_learnt: request?.lesson_learnt == null ? "" : request.lesson_learnt,
+        reschedule_reason: request?.reschedule_reason == null ? "" : request.reschedule_reason,
+        remarks: request?.remarks == null ? "" : request.remarks,
     });
     const theme = useTheme();
     const [changeStatus, setChangeStatus] = useState(request.change_status ?? "");
@@ -58,7 +58,7 @@ function ChangeRequestUpdate() {
         FSST: '',
     });
     const [users, setUsers] = useState([]);
-    console.log("From update", request);
+    console.log("From update", changeRequestData);
     const handleChange = (event) => {
         const { name, value } = event.target; // Destructure name and value from the event
 
@@ -300,15 +300,32 @@ function ChangeRequestUpdate() {
         }
         // Transform scheduleChanges into space-separated strings for each site
         const aat_schedule_change = scheduleChanges.aat?.addedDates
-            ?.map(date => `${date.start} ${date.end}`)
+            ?.map(date => {
+                const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+                const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+
+                const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+            })
             .join(' ') || '';
 
         const ftm_schedule_change = scheduleChanges.ftm?.addedDates
-            ?.map(date => `${date.start} ${date.end}`)
+            ?.map(date => {
+                const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+                const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+                const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+            })
             .join(' ') || '';
 
         const fsst_schedule_change = scheduleChanges.fsst?.addedDates
-            ?.map(date => `${date.start} ${date.end}`)
+            ?.map(date => {
+                const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+                const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
+
+                const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+            })
             .join(' ') || '';
         // Convert request_change_date to a Date object
         const requestChangeDate = new Date();
@@ -324,8 +341,8 @@ function ChangeRequestUpdate() {
             if (!scheduleStr) return [];
 
             return scheduleStr
-                .split(' ') // Split by space
-                .filter((_, index) => index % 3 === 1) // Extract every second value (end date)
+                .split('!') // Split by space
+                .filter((_, index) => index % 5 === 1) // Extract every second value (end date)
                 .map(dateStr => new Date(dateStr)) // Convert to Date objects
                 .filter(date => !isNaN(date)); // Remove invalid dates
         };
@@ -349,10 +366,10 @@ function ChangeRequestUpdate() {
             if (!scheduleString) return []; // Handle empty or undefined case
 
             // Convert string schedule to an array and parse as Date objects
-            const scheduleArray = scheduleString.split(" ").map(dateStr => new Date(dateStr));
+            const scheduleArray = scheduleString.split("!").map(dateStr => new Date(dateStr));
 
             // Extract every second date (index 1, 3, 5, ...)
-            return scheduleArray.filter((_, index) => index % 2 === 1);
+            return scheduleArray.filter((dateStr, index) => index % 5 === 1 && !isNaN(new Date(dateStr)));
         };
 
         // Extract second dates from each site's schedule
@@ -411,7 +428,6 @@ function ChangeRequestUpdate() {
             is_someone_updating,
             remarks: changeRequestData.remarks,
         }
-        console.log(requestData);
         try {
             const response = await axiosPrivate.put(`/change-requests`, requestData, {
                 headers: { "Content-Type": "application/json" },
@@ -1142,15 +1158,15 @@ function ScheduleChangeSection({
                 </div>
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-400 mb-1">
-                        Status remark
+                        Comment/Issue
                     </label>
                     <input
                         type="text"
                         value={statusRemark}
                         onChange={(e) => setStatusRemark(e.target.value)}
-                        placeholder="Enter remark (max 50 characters)"
+                        placeholder="Enter remark (max 100 characters)"
                         className="p-2 border border-gray-300 rounded w-full"
-                        maxLength={50}
+                        maxLength={100}
                         onKeyDown={(e) => (e.key === '!' || e.key === '_') && e.preventDefault()}
                     />
                 </div>
@@ -1168,7 +1184,7 @@ function ScheduleChangeSection({
                     Each schedule should have its start date and end date. They are mandatory information. In addition, you can add title, status and remark of the schedule.
                     But they are optional and will be used in presentation interface as in the photo.
                     Please note that the status from here will only be used in presentation and it has no affect to 'Dashboard (Data Visualization)' feature. There is
-                    another status field that you will need to enter in the form, which has only three status ('Completed', 'Ongoing,' and 'Canceled/Postponed'), which will be used in Dashboard feature.
+                    another status field that you will need to enter in the form, which has only three status ('Completed with no issue', 'Ongoing,' and 'Canceled/Postponed'), which will be used in Dashboard feature.
                 </p>
                 <img src={ScheduleInfo} alt="Schedule Change Information" className="w-full h-auto mb-2" />
                 <div className="flex justify-end">
