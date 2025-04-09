@@ -47,8 +47,8 @@ const ForApprovalCommon = ({ changeRequests }) => {
                         {changeRequests?.toApprove?.filter(request => request.change_sites.split(',').length > 1)
                             .map((request, index) => (
                                 <tr key={index}>
-                                    <td className="border border-gray-300 px-4 py-2 align-top">{request.change_name}</td>
-                                    <td className="border border-gray-300 px-2 py-2 text-center min-w-[210px] max-w-[300px] align-top">
+                                    <td className="border border-gray-300 px-4 py-2 align-top min-w-[140px] max-w-[160px]">{request.change_name}</td>
+                                    <td className="border border-gray-300 px-2 py-2 text-center max-w-[120px] align-top">
                                         <div className="flex flex-col justify-start gap-4">
                                             {[
                                                 ...(request?.aat_schedule_change || []).map(s => ({ ...s, site: 'AAT' })),
@@ -63,8 +63,8 @@ const ForApprovalCommon = ({ changeRequests }) => {
                                             ))}
                                         </div>
                                     </td>
-                                    <td className="border border-gray-300 px-2">{request.description}</td>
-                                    <td className="border border-gray-300 px-2">
+                                    <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">{request.description}</td>
+                            <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">
                                         {request.aat_test_plan?.length > 0 &&
                                         <div className='mb-2'>
                                             <div className="font-bold text-blue-500">AAT</div>
@@ -107,14 +107,14 @@ const ForApprovalCommon = ({ changeRequests }) => {
                                         }
                                         {request?.business_team_contact?.length > 0 &&
                                             <>
-                                                <div className='font-bold text-blue-500'>FSST</div>
+                                                <div className='font-bold text-blue-500'>Business</div>
                                                 <div>{request.business_team_contact.split(',')[0].replace(/_/g, ' ')}</div>
                                                 <div className='mb-2'>{request.business_team_contact.split(',')[1]}</div>
                                             </>
                                         }
                                         {request?.global_team_contact?.length > 0 &&
                                             <>
-                                                <div className='font-bold text-blue-500'>FSST</div>
+                                                <div className='font-bold text-blue-500'>Global</div>
                                                 <div>{request.global_team_contact.split(',')[0].replace(/_/g, ' ')}</div>
                                                 <div className='mb-2'>{request.global_team_contact.split(',')[1]}</div>
                                             </>
