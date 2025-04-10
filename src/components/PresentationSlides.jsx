@@ -12,7 +12,7 @@ import ForApprovalFTM from "./Presentation/ForApprovalFTM";
 import ForApprovalFSST from "./Presentation/ForApprovalFSST";
 import Summary from "./Presentation/Summary";
 import QandAPage from "./Presentation/QandAPage";
-import CustomDateDialog from './CustomDateDialog';
+import CustomDateDialog from './PresentationCustomDateDialog';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const slides = [
@@ -68,19 +68,18 @@ export default function Carousel() {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
-
+  const getThisWeekData = async () => {
+    try {
+      const response = await axiosPrivate.get('/change-requests/get-this-week-data');
+      console.log(response.data);
+      setChangeRequests(response.data);
+    } catch (err) {
+      console.error("Error fetching this week data:", err.response ? err.response.data : err.message); // Debugging
+      // setError(err.response ? err.response.data.message : err.message);
+      navigate('/login', { state: { from: location }, replace: true });
+    }
+  };
   useEffect(() => {
-    const getThisWeekData = async () => {
-      try {
-        const response = await axiosPrivate.get('/change-requests/get-this-week-data');
-        console.log(response.data);
-        setChangeRequests(response.data);
-      } catch (err) {
-        console.error("Error fetching this week data:", err.response ? err.response.data : err.message); // Debugging
-        // setError(err.response ? err.response.data.message : err.message);
-        navigate('/login', { state: { from: location }, replace: true });
-      }
-    };
     getThisWeekData();
   }, []);
   useEffect(() => {
@@ -137,29 +136,30 @@ export default function Carousel() {
     });
   }, [changeRequests]);
   
-  const handleSave = async (start, end) => {
-    setIsCustomDateOpen(false); // Close the dialog
-    setCustomDate(true);
+  const handleSave = async (startDate, presentationDate, endDate) => {
+    const formattedStartDate = `${startDate} 00:00:00`;
+    const formattedPresentationDate = `${presentationDate} 00:00:00`;
+    const formattedEndDate = `${endDate} 23:59:59`;
+    console.log("Formatted Dates:", formattedStartDate, formattedPresentationDate, formattedEndDate);
 
-    // Format start and end dates to include time
-    const formattedStartDate = `${start} 00:00:00`;
-    const formattedEndDate = `${end} 23:59:59`;
-    console.log("Selected Dates:", formattedStartDate, formattedEndDate);
     try {
-      const response = await axiosPrivate.get("/change-requests/custom-date", {
-        params: {
-          start: formattedStartDate,
-          end: formattedEndDate,
-        },
-      });
+        const response = await axiosPrivate.get("/change-requests/custom-date-presentation", {
+            params: {
+                start: formattedStartDate,
+                presentation: formattedPresentationDate,
+                end: formattedEndDate,
+            },
+        });
 
-      console.log("📥 Custom Date Data:", response.data);
-      setChangeRequests(response.data); // Update state with filtered data
+        console.log("📥 Custom Date Data:", response.data);
+        setChangeRequests(response.data); // Update state with filtered data
+        setIsCustomDateOpen(false);
+        setCustomDate(true);
     } catch (err) {
-      console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
+        console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
     }
-  };
-  console.log(processedChangeRequests);
+};
+  // console.log(changeRequests);
   // Common props for slides
   const slideProps = { theme, changeRequests: processedChangeRequests };
   useEffect(() => {
@@ -229,6 +229,7 @@ export default function Carousel() {
               className="bg-gray-500 hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
               onClick={() => {
                 setCustomDate(false);
+                getThisWeekData();
               }}
             >
               Clear Custom Date
