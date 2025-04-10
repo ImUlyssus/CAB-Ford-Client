@@ -11,6 +11,7 @@ import ForApprovalAAT from "./Presentation/ForApprovalAAT";
 import ForApprovalFTM from "./Presentation/ForApprovalFTM";
 import ForApprovalFSST from "./Presentation/ForApprovalFSST";
 import Summary from "./Presentation/Summary";
+import QandAPage from "./Presentation/QandAPage";
 import CustomDateDialog from './CustomDateDialog';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
@@ -24,7 +25,8 @@ const slides = [
   ForApprovalAAT,
   ForApprovalFTM,
   ForApprovalFSST,
-  Summary
+  Summary,
+  QandAPage
 ];
 
 export default function Carousel() {
@@ -160,7 +162,23 @@ export default function Carousel() {
   console.log(processedChangeRequests);
   // Common props for slides
   const slideProps = { theme, changeRequests: processedChangeRequests };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (isFullscreen) {
+        if (event.key === 'ArrowRight') {
+          nextSlide();
+        } else if (event.key === 'ArrowLeft') {
+          prevSlide();
+        }
+      }
+    };
 
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullscreen, nextSlide, prevSlide]);
   // Fullscreen presentation view
   if (isFullscreen) {
     return (
@@ -169,7 +187,7 @@ export default function Carousel() {
           {slides.map((SlideComponent, index) => (
             <div
               key={index}
-              className={`w-[90%] absolute inset-y-0 left-1/2 transform -translate-x-1/2 transition-opacity duration-500 ease-in-out ${index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
+              className={`w-[100%] absolute inset-y-0 left-1/2 transform -translate-x-1/2 transition-opacity duration-500 ease-in-out ${index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
                 }`}
             >
               {React.createElement(SlideComponent, slideProps)}

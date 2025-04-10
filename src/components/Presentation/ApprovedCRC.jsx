@@ -29,7 +29,7 @@ const ApprovedCRR = ({ changeRequests }) => {
         <div className="w-full h-full bg-white p-8">
             {/* Title */}
             <h1 className="text-2xl font-bold mb-6 text-[#003478] border-b-2 border-gray-300 pb-2">
-                Approved Change Requests Status (Completed)
+                Approved Change Requests Status <span className="text-blue-700">(Completed)</span>
             </h1>
             <div className='flex absolute top-2 right-2'>
                 <img src={Ford_Logo} className='h-5 w-15' alt="Ford Logo" />
