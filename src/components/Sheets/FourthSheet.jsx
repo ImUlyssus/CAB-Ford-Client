@@ -157,7 +157,7 @@ const DonutChart = ({ data }) => {
                     .append("tspan")
                     .attr("x", 0) // Center horizontally
                     .attr("dy", "-0.6em") // Move up slightly
-                    .text(label);
+                    .text(label + " " + d.data);
 
                 textElement
                     .append("tspan")

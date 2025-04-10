@@ -7,6 +7,7 @@ import FourthSheet from './Sheets/FourthSheet';
 import FifthSheet from './Sheets/FifthSheet';
 import SixthSheet from './Sheets/SixthSheet';
 import SevenSheet from './Sheets/SeventhSheet';
+import EightSheet from './Sheets/EightSheet';
 const Dashboard = () => {
   const sheetStyle = "p-6 bg-white rounded-[15px]"
 return (
@@ -27,10 +28,13 @@ return (
       <SixthSheet />
     </div>
     <div className={sheetStyle}>
-      <ThirdSheet />
+      <EightSheet />
     </div>
     <div className={sheetStyle}>
       <FourthSheet />
+    </div>
+    <div className={sheetStyle}>
+      <ThirdSheet />
     </div>
   </div>
 );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useTheme } from "styled-components";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Dialog from "./Dialog";
 import FilteredBar from "./FilteredBar";
@@ -15,7 +15,6 @@ export default function ChangeRequestData() {
     const [error, setError] = useState(null);
     const theme = useTheme();
     const navigate = useNavigate();
-    const location = useLocation();
     const axiosPrivate = useAxiosPrivate();
     const [dialogOpen, setDialogOpen] = useState(false);
     const [currentRow, setCurrentRow] = useState();

@@ -40,7 +40,7 @@ export default function DeletedData({requests}) {
                                     <th className={thStyle3}>Change Name</th>
                                     <th className={thStyle2}>Change Sites</th>
                                     <th className={thStyle2}>Common Change</th>
-                                    <th className={thStyle1}>Request Change</th>
+                                    <th className={thStyle1}>Request Date</th>
                                     <th className={thStyle1}>FTM Schedule Change</th>
                                     <th className={thStyle1}>AAT Schedule Change</th>
                                     <th className={thStyle1}>FSST Schedule Change</th>
