@@ -90,7 +90,7 @@ const FifthSheet = () => {
     svg.selectAll("*").remove();
 
     const width = 600,
-      height = 220;
+      height = 400;
     const barHeight = 20,
       spacing = 5;
 
@@ -168,13 +168,13 @@ const FifthSheet = () => {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-3 text-center text-[#beef70]">
+      <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
         Change Requests by Reason
       </h1>
 
       {/* Site Selection Dropdown */}
-      <div className="flex justify-center mb-2">
-        <label htmlFor="site-select" className="mr-2">
+      <div className="flex justify-center mb-2 text-[#003478]">
+        <label htmlFor="site-select" className="mr-2 mt-1">
           Select Site:
         </label>
         <select

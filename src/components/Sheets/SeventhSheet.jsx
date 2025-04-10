@@ -81,10 +81,10 @@ const SixthSheet = () => {
     svg.selectAll("*").remove();
 
     const width = 600,
-      height = 400; // Increased height for vertical bars and labels
+      height = 370;
     const barWidth = 20,
       spacing = 5;
-    const margin = { top: 20, right: 20, bottom: 100, left: 60 }; // Added margins
+    const margin = { top: 20, right: 20, bottom: 60, left: 60 }; // Added margins
 
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
@@ -142,20 +142,28 @@ const SixthSheet = () => {
       .attr("fill", "white")
       .text((d) => d.count);
 
-    // X-axis labels (vertical)
-    chart
-      .append("g")
-      .attr("transform", `translate(0, ${chartHeight})`)
-      .call(d3.axisBottom(xScale))
-      .selectAll("text")
-      .style("text-anchor", "end")
-      .attr("dx", "-.8em")
-      .attr("dy", ".15em")
-      .attr("transform", "rotate(-50)"); // Rotate labels
+     // X-axis labels (vertical)
+     chart
+     .append("g")
+     .attr("transform", `translate(0, ${chartHeight})`)
+     .call(d3.axisBottom(xScale))
+     .selectAll("text")
+     .text(d => d.split('@')[0]) // Extract username
+     .attr("fill", "#347928")
+     .style("text-anchor", "end")
+     .attr("dx", "-.8em")
+     .attr("dy", ".15em")
+     .attr("transform", "rotate(-50)") // Rotate labels
+     .selectAll(".domain") // Select the X-axis line
+     .attr("stroke", "#347928"); // Set the line color
 
     // Y-axis labels
-    chart.append("g").call(d3.axisLeft(yScale));
+    chart.append("g").call(d3.axisLeft(yScale)).selectAll("text")
+      .attr("fill", "#347928")
+      .selectAll(".domain") // Select the Y-axis line
+      .attr("stroke", "#347928"); // Set the line color
   }, [aggregatedData, selectedSite]);
+
 
   const handleSiteChange = (event) => {
     setSelectedSite(event.target.value);
@@ -163,13 +171,13 @@ const SixthSheet = () => {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-3 text-center text-[#beef70]">
+      <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
         Requestor Occurrence by Site
       </h1>
 
       {/* Site Selection Dropdown */}
-      <div className="flex justify-center">
-        <label htmlFor="site-select" className="mr-2">
+      <div className="flex justify-center text-[#003478]">
+        <label htmlFor="site-select" className="mr-2 mt-1">
           Select Site:
         </label>
         <select

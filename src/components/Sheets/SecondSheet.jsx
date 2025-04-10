@@ -147,50 +147,46 @@ const SecondSheet = () => {
         <div className="grid grid-cols-5">
             {/* First column */}
             <div className="col-span-2 bg-transparent p-4">
-                <h2 className="text-xl font-semibold mb-6 text-center text-[#beef70]">All 3 sites</h2>
+                <h2 className="text-xl font-semibold mb-6 text-center text-[#003478]">All 3 sites</h2>
 
-                <div className="space-y-6">
+                <div className="space-y-4">
                     {/* Card 1 - Total */}
                     <div
-                        className="bg-transparent p-2 rounded-lg shadow-md text-center border-2 border-blue-500 text-blue-500 cursor-pointer"
+                        className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-blue-500 text-blue-500 cursor-pointer"
                         onClick={() => openDialog("total")}
                     >
-                        <p className="text-sm font-medium">Total</p>
-                        <p className="text-sm font-xl font-bold">{aggregatedData.aat_total + aggregatedData.ftm_total + aggregatedData.fsst_total}</p>
+                        <p className="text-2xl font-bold">Total {aggregatedData.aat_total + aggregatedData.ftm_total + aggregatedData.fsst_total}</p>
                     </div>
 
                     {/* Card 2 - Completed */}
                     <div
-                        className="bg-transparent p-2 rounded-lg shadow-md text-center border-2 border-green-500 text-green-500 cursor-pointer"
+                        className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-green-500 text-green-500 cursor-pointer"
                         onClick={() => openDialog("completed")}
                     >
-                        <p className="text-sm font-medium">Completed</p>
-                        <p className="text-sm font-xl font-bold">{aggregatedData.aat_completed + aggregatedData.ftm_completed + aggregatedData.fsst_completed}</p>
+                        <p className="text-2xl font-bold">Completed {aggregatedData.aat_completed + aggregatedData.ftm_completed + aggregatedData.fsst_completed}</p>
                     </div>
 
                     {/* Card 3 - Ongoing */}
                     <div
-                        className="bg-transparent p-2 rounded-lg shadow-md text-center border-2 border-yellow-500 text-yellow-500 cursor-pointer"
+                        className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-yellow-500 text-yellow-500 cursor-pointer"
                         onClick={() => openDialog("ongoing")}
                     >
-                        <p className="text-sm font-medium">Ongoing</p>
-                        <p className="text-sm font-xl font-bold">{aggregatedData.aat_ongoing + aggregatedData.ftm_ongoing + aggregatedData.fsst_ongoing}</p>
+                        <p className="text-2xl font-bold">Ongoing {aggregatedData.aat_ongoing + aggregatedData.ftm_ongoing + aggregatedData.fsst_ongoing}</p>
                     </div>
 
                     {/* Card 4 - Rejected */}
                     <div
-                        className="bg-transparent p-2 rounded-lg shadow-md text-center border-2 border-red-500 text-red-500 cursor-pointer"
+                        className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-red-500 text-red-500 cursor-pointer"
                         onClick={() => openDialog("rejected")}
                     >
-                        <p className="text-sm font-medium">Rejected</p>
-                        <p className="text-sm font-xl font-bold">{aggregatedData.aat_rejected + aggregatedData.ftm_rejected + aggregatedData.fsst_rejected}</p>
+                        <p className="text-2xl font-bold">Rejected {aggregatedData.aat_rejected + aggregatedData.ftm_rejected + aggregatedData.fsst_rejected}</p>
                     </div>
                 </div>
             </div>
 
             {/* Fourth column (merged into one) */}
             <div className="col-span-3 p-4">
-                <h2 className="text-xl font-semibold mb-1 text-center text-[#beef70]">Change request distribution by site</ h2>
+                <h2 className="text-xl font-semibold mb-1 text-center text-[#003478]">Change request distribution by site</ h2>
                 {/* <LayeredDonutChart aggregatedData={aggregatedData} /> */}
                 <TwoLayerDonutChart data={aggregatedData} />
             </div>
@@ -261,7 +257,7 @@ const TwoLayerDonutChart = ({ data }) => {
             .append("path")
             .attr("d", innerArc)
             .attr("fill", (d, i) => ["#22177A", "#FF2DF1", "#2196F3"][i]) // Different colors
-            .attr("stroke", "#111827")
+            .attr("stroke", "white")
             .attr("stroke-width", 2)
             .style("cursor", "pointer")
             .on("click", function (event, d) {
@@ -294,7 +290,7 @@ const TwoLayerDonutChart = ({ data }) => {
             .append("path")
             .attr("d", outerArc)
             .attr("fill", (d, i) => outerColors[i]) // Gradient color
-            .attr("stroke", "#111827")
+            .attr("stroke", "white")
             .attr("stroke-width", 2)
             .style("cursor", "pointer")
             .on("click", function (event, d) {
@@ -341,7 +337,7 @@ const TwoLayerDonutChart = ({ data }) => {
                 textElement.append("tspan")
                     .attr("x", 0)
                     .attr("dy", "-0.6em")
-                    .text(labels[i]);
+                    .text(labels[i] + " " + d.data);
 
                 textElement.append("tspan")
                     .attr("x", 0)
@@ -392,7 +388,7 @@ const TwoLayerDonutChart = ({ data }) => {
 
     }, [data]);
     return (
-        <div className="flex justify-center items-center bg-gray-900 p-4">
+        <div className="flex justify-center items-center p-4">
             <svg ref={svgRef}></svg>
             {/* Dialog for displaying data */}
             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>

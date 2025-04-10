@@ -149,9 +149,9 @@ const FirstSheet = () => {
 
     return (
         <div className='p-4'>
-    <h1 className="text-xl font-bold mb-2 text-center text-[#beef70]">Change request summary from last 4 weeks and current week</h1>
+    <h1 className="text-xl font-bold mb-2 text-center text-[#003478]">Change request summary from last 4 weeks and current week</h1>
     {/* Legend */}
-    <div className="flex justify-center space-x-4">
+    <div className="flex justify-center space-x-4  text-[#003478]">
             {/* Completed */}
             <div className="flex items-center">
                 <div className="w-4 h-4 bg-green-500 mr-2 rounded-[50%]"></div>
@@ -170,7 +170,7 @@ const FirstSheet = () => {
                 <span className="text-sm">Ongoing</span>
             </div>
         </div>
-    <div className="relative w-full h-64 border-l border-b border-gray-700 ml-3 mt-5">
+    <div className="relative w-full h-64 border-l border-b border-gray-700 ml-3 mt-5  text-[#003478]">
         {/* Vertical Y-Axis Label */}
         <div
             className="absolute left-[-40px] bottom-4 transform -translate-y-1/2 -rotate-90 whitespace-nowrap"
@@ -195,7 +195,7 @@ const FirstSheet = () => {
                 key={index}
                 className="absolute w-full border-t border-gray-700"
                 style={{
-                    top: `${(index / (yAxisLabels.length - 1)) * 100}%`,
+                    top: `${(index / (yAxisLabels.length)) * 100}%`,
                     transform: "translateY(-50%)",
                 }}
             />
@@ -216,9 +216,9 @@ const FirstSheet = () => {
                             const totalHeight = ongoing + completed + rejected;
 
                             // Scale the bar heights to match the Y-axis
-                            const ongoingHeight = ongoing * scaleFactor - 1;
-                            const completedHeight = completed * scaleFactor - 1;
-                            const rejectedHeight = rejected * scaleFactor - 1;
+                            const ongoingHeight = ongoing * scaleFactor;
+                            const completedHeight = completed * scaleFactor;
+                            const rejectedHeight = rejected * scaleFactor;
 
                             return (
                                 <div key={siteIndex} className="flex flex-col items-center justify-end h-full">

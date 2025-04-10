@@ -152,12 +152,12 @@ const SixthSheet = () => {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-3 text-center text-[#beef70]">
+      <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
         Change Requests by Priority
       </h1>
 
       {/* Site Selection Dropdown */}
-      <div className="flex justify-center mb-2">
+      <div className="flex justify-center mb-2 text-[#003478]">
         <label htmlFor="site-select" className="mr-2">
           Select Site:
         </label>

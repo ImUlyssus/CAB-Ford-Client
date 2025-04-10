@@ -60,7 +60,7 @@ const FourthSheet = () => {
     }, [auth.filteredData]);
     return (
         <div>
-            <h1 className="text-xl font-bold mb-2 text-center text-[#beef70]">Cancelled change summary</h1>
+            <h1 className="text-xl font-bold mb-2 text-center text-[#003478]">Cancelled change summary</h1>
             <div className="grid grid-cols-2 gap-4">
                 <div className='p-2'>
                     <DonutChart data={aggregatedData} />
@@ -96,18 +96,6 @@ const DonutChart = ({ data }) => {
 
         // Clear existing content
         svg.selectAll("*").remove();
-
-        // If there are no cancellations, display a message
-        // if (totalInner === 0) {
-        //     svg.append("text")
-        //         .attr("x", 0)
-        //         .attr("y", 0)
-        //         .attr("text-anchor", "middle")
-        //         .attr("fill", "white")
-        //         .attr("font-size", "16px")
-        //         .text("No cancellations to display");
-        //     return; // Exit the effect early
-        // }
 
         // Create pie generators
         const innerPie = d3.pie().sort(null);
@@ -184,7 +172,7 @@ const DonutChart = ({ data }) => {
             .attr("x", 0)
             .attr("y", -height / 2 - 10)  // Position the title above the chart
             .attr("text-anchor", "middle")
-            .attr("fill", "white")
+            .attr("fill", "#003478")
             .attr("font-size", "18px")
             .text("Cancel change distribution by site");  // Replace with your dynamic title if needed
 
@@ -193,7 +181,7 @@ const DonutChart = ({ data }) => {
     return (
         <>
         { totalInner !==0 ?
-             <div className="flex justify-center items-center bg-gray-900">
+             <div className="flex justify-center items-center">
              <svg ref={svgRef}></svg>
              {/* Dialog for displaying data */}
              <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
@@ -213,7 +201,7 @@ const DonutChart = ({ data }) => {
              </Dialog>
          </div>
              : <div className="flex justify-center items-center bg-gray-900 mt-[40%]">
-             <h1 className="text-white">No cancel change for this period.</h1>
+             <h1 className="text-[#003478]">No cancel change for this period.</h1>
              </div>
         }
         </>
@@ -309,7 +297,7 @@ const BarChart = ({ data }) => {
         <>
         { totalCancel !==0 ?
         <div>
-        <h1 className="mb-3 text-center text-md">Change Request Summary</h1>
+        <h1 className="mb-3 text-center text-md text-[#003478]">Change Request Summary</h1>
 
         {/* Dialog */}
         <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
@@ -331,7 +319,7 @@ const BarChart = ({ data }) => {
         <svg ref={svgRef}></svg>
     </div>:
     <div className="flex justify-center items-center bg-gray-900 mt-[40%]">
-        <h1 className="text-white">No cancel change for this period.</h1>
+        <h1 className="text-[#003478]">No cancel change for this period.</h1>
     </div>
         }
         </>

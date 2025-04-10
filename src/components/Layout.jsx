@@ -12,9 +12,9 @@ const Layout = () => {
     // Listen for fullscreen changes
     useEffect(() => {
         const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement || 
-                          !!document.webkitFullscreenElement || 
-                          !!document.msFullscreenElement);
+            setIsFullscreen(!!document.fullscreenElement ||
+                !!document.webkitFullscreenElement ||
+                !!document.msFullscreenElement);
         };
 
         document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -32,7 +32,7 @@ const Layout = () => {
     const hideNavbarAndFooter = location.pathname === "/change-request-update" || isFullscreen;
 
     return (
-        <div style={{ 
+        <div style={{
             color: theme.colors.secondary500,
             // Add this to ensure full height in fullscreen mode
             height: isFullscreen ? '100vh' : 'auto',
@@ -41,20 +41,23 @@ const Layout = () => {
             {/* Conditionally render Navbar */}
             {!hideNavbarAndFooter && <NavBar />}
 
-            <main style={{ 
-                minHeight: "80vh", 
+            <main style={{
+                minHeight: "80vh",
                 padding: isFullscreen ? "0" : "40px",
-                backgroundColor: isFullscreen ? theme.colors.secondary500 : theme.colors.primary500, 
+                backgroundColor:
+                    isFullscreen
+                        ? theme.colors.secondary500
+                        : location.pathname === "/data-visualization" ? "#F2EFE7":theme.colors.primary500,
                 marginTop: !hideNavbarAndFooter ? "60px" : "0",
-                // Add these to ensure full coverage in fullscreen
                 height: isFullscreen ? '100vh' : 'auto',
                 width: isFullscreen ? '100vw' : 'auto',
                 position: isFullscreen ? 'fixed' : 'relative',
                 top: isFullscreen ? 0 : 'auto',
                 left: isFullscreen ? 0 : 'auto'
             }}>
-                <Outlet /> {/* This renders the child components */}
+                <Outlet />
             </main>
+
 
             {/* Conditionally render Footer */}
             {!hideNavbarAndFooter && <Footer />}

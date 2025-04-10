@@ -6,7 +6,7 @@ import { useTheme } from 'styled-components';
 const DataVisualization = () => {
     const theme = useTheme();
     return (
-        <div style={{ paddingTop: "80px" }}> {/* Add padding to prevent content from being hidden behind the fixed FilteredBar */}
+        <div style={{ paddingTop: "80px" }}>
             <div style={{
                 position: "fixed", // Make FilteredBar stick to the top
                 top: "83px",

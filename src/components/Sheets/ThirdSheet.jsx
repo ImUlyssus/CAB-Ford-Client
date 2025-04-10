@@ -247,10 +247,10 @@ const ThirdSheet = () => {
 
     return (
         <div>
-            <h1 className="text-xl font-bold mb-3 text-center text-[#beef70]">Achieved two-week change request or not</h1>
+            <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">Achieved two-week change request or not</h1>
 
             {/* Add legend here below the title */}
-            <div className="flex justify-center mb-2">
+            <div className="flex justify-center mb-2 text-[#003478]">
                 <div className="flex items-center mr-4">
                     <div className="w-4 h-4 bg-[#3498db] mr-2 rounded-[50%]"></div>
                     <span className="text-sm">Not-achieved</span>
@@ -290,3 +290,4 @@ const ThirdSheet = () => {
 
 
 export default ThirdSheet;
+
