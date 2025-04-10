@@ -155,7 +155,7 @@ function ChangeRequest() {
                 const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
 
                 const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
-                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}!${date.duration}`;
             })
             .join(' ') || '';
 
@@ -164,7 +164,7 @@ function ChangeRequest() {
                 const title = (date.title || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
                 const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
                 const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
-                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}!${date.duration}`;
             })
             .join(' ') || '';
 
@@ -174,7 +174,7 @@ function ChangeRequest() {
                 const statusRemark = (date.statusRemark || "").replace(/ /g, "_") || "_"; // Replace spaces with underscores, default to "_"
 
                 const status = (date.changeStatus || "").replace(/ /g, "_") || "_";
-                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}`;
+                return `${date.start}!${date.end}!${title}!${status}!${statusRemark}!${date.duration}`;
             })
             .join(' ') || '';
 
@@ -193,7 +193,7 @@ function ChangeRequest() {
 
             return scheduleStr
                 .split('!') // Split by space
-                .filter((_, index) => index % 5 === 1) // Extract every second value (end date)
+                .filter((_, index) => index % 6 === 1) // Extract every second value (end date)
                 .map(dateStr => new Date(dateStr)) // Convert to Date objects
                 .filter(date => !isNaN(date)); // Remove invalid dates
         };
@@ -218,7 +218,7 @@ function ChangeRequest() {
             const scheduleArray = scheduleString.split("!").map(dateStr => new Date(dateStr));
 
             // Extract every second date (index 1, 3, 5, ...)
-            return scheduleArray.filter((dateStr, index) => index % 5 === 1 && !isNaN(new Date(dateStr)));
+            return scheduleArray.filter((dateStr, index) => index % 6 === 1 && !isNaN(new Date(dateStr)));
         };
 
         // Extract second dates from each site's schedule
@@ -692,7 +692,7 @@ function ChangeRequest() {
 }
 
 
-function ScheduleChangeSection({
+const ScheduleChangeSection = ({
     type,
     addedDates,
     startDateForRange,
@@ -700,7 +700,7 @@ function ScheduleChangeSection({
     onScheduleChange,
     onAddDate,
     onRemoveDate
-}) {
+}) => {
     const typeLabels = {
         aat: "AAT",
         ftm: "FTM",
@@ -712,17 +712,25 @@ function ScheduleChangeSection({
     const [title, setTitle] = useState("");
     const [changeStatus, setChangeStatus] = useState("");
     const [statusRemark, setStatusRemark] = useState("");
+    const [duration, setDuration] = useState(""); // Initialize as string, allow decimals
     const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
     // Handle adding a date
     const handleAddDate = () => {
         if (startDateForRange && endDateForRange) {
-            const newDate = { start: startDateForRange, end: endDateForRange, title: title, changeStatus: changeStatus, statusRemark: statusRemark };
-            if (addedDates.length < 5) {
+            if (!duration || duration.trim() === "") {
+                alert("Please enter a duration.");
+                return;
+            }
+
+            const newDate = { start: startDateForRange, end: endDateForRange, title: title, changeStatus: changeStatus, statusRemark: statusRemark, duration: duration };
+            if (addedDates.length < 10) {
                 onAddDate(newDate);  // Pass the added date to the parent
             } else {
-                alert("You can only add up to 5 date ranges.");
+                alert("You can only add up to 10 date ranges.");
             }
+        } else {
+            alert("Please fill in start and end dates.");
         }
         setOpenDialog(null);
     };
@@ -744,13 +752,6 @@ function ScheduleChangeSection({
                 </div>
             </div>
 
-            {/* Display the list of added dates */}
-            {/* <AddedDatesList
-                addedDates={addedDates}
-                label={label}
-                onRemove={(index) => onRemoveDate(index)}  // Use the new prop
-            /> */}
-
             <Dialog open={openDialog === "range"} onClose={() => setOpenDialog(null)}>
                 <div className="flex items-center">
                     <h4 className="text-md font-semibold mb-2">Schedule Change Information</h4>
@@ -767,9 +768,9 @@ function ScheduleChangeSection({
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Enter title (20 characters max)"
-                        className="p-2 border border-gray-300 rounded w-full"
-                        onKeyDown={(e) => (e.key === '!' || e.key === '_') && e.preventDefault()}
-                        maxLength={20}
+                        className="p-2 border border-gray-300 rounded w-full mb-2"
+                        maxLength={50}
+                        onKeyDown={(e) => e.key === ',' && e.preventDefault()}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -796,6 +797,30 @@ function ScheduleChangeSection({
                         />
 
                     </div>
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                        Duration (Hours)
+                    </label>
+                    <input
+                        type="number"
+                        value={duration}
+                        onChange={(e) => {
+                            const value = e.target.value;
+
+                            // Allow only numbers and a single decimal point
+                            if (!/^\d{0,3}(\.\d{0,1})?$/.test(value)) {
+                                return; // Reject invalid input
+                            }
+
+                            setDuration(value);
+                        }}
+                        placeholder="Enter duration"
+                        className="p-2 border border-gray-300 rounded w-full"
+                        onKeyDown={(e) => (e.key === 'e' || e.key === '-') && e.preventDefault()}
+                        step="0.1"
+                        min="0" // Ensure the value is not negative
+                    />
                 </div>
                 <div className="w-full mb-4">
                     <label htmlFor="changeStatus" className="block text-sm font-medium text-gray-400 mb-1">Change status</label>
@@ -838,7 +863,7 @@ function ScheduleChangeSection({
             <Dialog open={helpDialogOpen} onClose={() => setHelpDialogOpen(false)}>
                 <h4 className="text-md font-semibold mb-2">Schedule Change Information</h4>
                 <p className="text-sm mb-4">
-                    Each schedule should have its start date and end date. They are mandatory information. In addition, you can add title, status and remark of the schedule.
+                    Each schedule should have its start date, end date, and duration. They are mandatory information. In addition, you can add title, status and remark of the schedule.
                     But they are optional and will be used in presentation interface as in the photo.
                     Please note that the status from here will only be used in presentation and it has no affect to 'Dashboard (Data Visualization)' feature. There is
                     another status field that you will need to enter in the form, which has only three status ('Completed with no issue', 'Ongoing,' and 'Canceled/Postponed'), which will be used in Dashboard feature.
@@ -851,6 +876,7 @@ function ScheduleChangeSection({
         </div>
     );
 }
+
 
 export default ChangeRequest;
 

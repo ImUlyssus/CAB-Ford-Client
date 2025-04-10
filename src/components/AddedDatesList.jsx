@@ -17,14 +17,27 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
     };
 
     const handleInputChange = (e, field) => {
-        setEditedDate({ ...editedDate, [field]: e.target.value });
+        let value = e.target.value;
+
+        if (field === "duration") {
+            // Apply validation for duration
+            if (!/^\d{0,3}(\.\d{0,1})?$/.test(value)) {
+                return; // Reject invalid input
+            }
+        }
+
+        setEditedDate({ ...editedDate, [field]: value });
     };
 
     const handleSaveClick = () => {
-        onEdit(editingIndex, editedDate);
-        setIsEditDialogOpen(false); // Close the dialog
-        setEditingIndex(null);
-    };
+        if (!editedDate.duration || editedDate.duration.trim() === "") {
+            alert("Please enter a duration.");
+            return;
+        }
+            onEdit(editingIndex, editedDate);
+            setIsEditDialogOpen(false); // Close the dialog
+            setEditingIndex(null);
+        };
 
     const handleCancelClick = () => {
         setIsEditDialogOpen(false); // Close the dialog
@@ -56,6 +69,9 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
                             </div>
                             <div className="text-sm text-gray-700">
                                 <span className="font-semibold">Title:</span> {date.title}
+                            </div>
+                            <div className="text-sm text-gray-700">
+                                <span className="font-semibold">Duration:</span> {date.duration}
                             </div>
                             <div className="text-sm text-gray-700">
                                 <span className="font-semibold">Status:</span> {date.changeStatus}
@@ -102,27 +118,47 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
                         value={editedDate.title || ""}
                         onChange={(e) => handleInputChange(e, "title")}
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        maxLength={20}
+                        onKeyDown={(e) => {
+                            if (e.key === '_' || e.key === '!') {
+                                e.preventDefault();
+                            }
+                        }}
                     />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="mb-1">
+                        <label className="block text-sm font-bold mb-1">Start:</label>
+                        <input
+                            type="datetime-local"
+                            value={editedDate.start || ""}
+                            onChange={(e) => handleInputChange(e, "start")}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                    </div>
+                    <div className="mb-1">
+                        <label className="block text-sm font-bold mb-1">End:</label>
+                        <input
+                            type="datetime-local"
+                            value={editedDate.end || ""}
+                            onChange={(e) => handleInputChange(e, "end")}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                    </div>
                 </div>
                 <div className="mb-1">
-                    <label className="block text-sm font-bold mb-1">Start:</label>
-                    <input
-                        type="datetime-local"
-                        value={editedDate.start || ""}
-                        onChange={(e) => handleInputChange(e, "start")}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                </div>
-                <div className="mb-1">
-                    <label className="block text-sm font-bold mb-1">End:</label>
-                    <input
-                        type="datetime-local"
-                        value={editedDate.end || ""}
-                        onChange={(e) => handleInputChange(e, "end")}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                </div>
-                <div className="w-full mb-4">
+                        <label className="block text-sm font-bold mb-1">Duration:</label>
+                        <input
+                            type="number"
+                            value={editedDate.duration || ""}
+                            onChange={(e) => handleInputChange(e, "duration")}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                            step="0.1"
+                            min="0"
+                            onKeyDown={e => {e.key === 'e' && e.preventDefault()}}
+                        />
+                    </div>
+                <div className="w-full">
                     <label htmlFor="changeStatus" className="block text-sm font-bold mb-1">Change status</label>
                     <select
                         id="changeStatus"
@@ -144,6 +180,12 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
                         value={editedDate.statusRemark || ""}
                         onChange={(e) => handleInputChange(e, "statusRemark")}
                         className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                        maxLength={100}
+                        onKeyDown={(e) => {
+                            if (e.key === '_' || e.key === '!') {
+                                e.preventDefault();
+                            }
+                        }}
                     />
                 </div>
                 <div className="flex justify-end mt-4">
@@ -160,4 +202,3 @@ function AddedDatesList({ addedDates, label, onRemove, onEdit }) {
 }
 
 export default AddedDatesList;
-
