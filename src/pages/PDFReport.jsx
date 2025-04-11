@@ -1,91 +1,268 @@
-import React, { useState, useEffect } from "react";
-import { jsPDF } from "jspdf";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import API_BASE_URL from "../config/apiConfig";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useRef, useContext } from 'react';
+import { useTheme } from 'styled-components';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import jsPDF from 'jspdf';
+import FirstSheet from '../components/Sheets/FirstSheet';
+import SecondSheet from '../components/Sheets/SecondSheet';
+import ThirdSheet from '../components/Sheets/ThirdSheet';
+import FourthSheet from '../components/Sheets/FourthSheet';
+import FifthSheet from '../components/Sheets/FifthSheet';
+import SixthSheet from '../components/Sheets/SixthSheet';
+import SevenSheet from '../components/Sheets/SeventhSheet';
+import EightSheet from '../components/Sheets/EightSheet';
+import AuthContext from '../context/AuthProvider';
 
-function PDFReport() {
-  const [data, setData] = useState([]);
-  const axiosPrivate = useAxiosPrivate();
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  // Fetch change request data using axiosPrivate
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axiosPrivate.get(`${API_BASE_URL}/change-requests`);
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        navigate('/login', { state: { from: location }, replace: true });
-      }
+import * as d3 from "d3";
+import html2canvas from "html2canvas";
+
+export default function PDFReport() {
+    const years = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 10 + i);
+    const [activeQuarter, setActiveQuarter] = useState(1);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const theme = useTheme();
+    const axiosPrivate = useAxiosPrivate();
+    const containerRef = useRef();
+    const { auth, setAuth } = useContext(AuthContext);
+    const thirdSheetRef = useRef(null);
+    const [svgGenerated, setSvgGenerated] = useState(false); // new state
+    const quarterMonths = {
+        1: ["January", "February", "March"],
+        2: ["April", "May", "June"],
+        3: ["July", "August", "September"],
+        4: ["October", "November", "December"]
     };
 
-    fetchData();
-  }, [axiosPrivate]);
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
 
-  // Function to generate PDF with background color
-  const generatePDF = () => {
-    const doc = new jsPDF();
-    let y = 20; // Vertical position for text
-    const pageWidth = doc.internal.pageSize.width;
+    const formatDate = (date, isEnd = false) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const time = isEnd ? '23:59:59' : '00:00:00';
+        return `${year}-${month}-${day} ${time}`;
+    };
 
-    // Title
-    doc.setFontSize(18);
-    doc.setFont("helvetica", "bold");
-    doc.text("Change Request Report", 10, 10);
+    const downloadData = async (startDate, endDate, fileName) => {
+      try {
+          const formattedStartDate = formatDate(startDate);
+          const formattedEndDate = formatDate(endDate, true);
 
-    // Loop through each data item
-    data.forEach((item, index) => {
-      const bgColor = index % 2 === 0 ? [230, 240, 255] : [200, 220, 255]; // Light blue shades
+          const response = await axiosPrivate.get("/change-requests/custom-date", {
+              params: {
+                  start: formattedStartDate,
+                  end: formattedEndDate,
+              },
+          });
 
-      // Draw background rectangle
-      doc.setFillColor(...bgColor);
-      doc.rect(5, y - 5, pageWidth - 10, 80, "F"); // (x, y, width, height, fill)
+          setAuth((prev) => ({
+              ...prev,
+              filteredData: response.data
+          }));
 
-      // Set text color and font
-      doc.setTextColor(0, 0, 0); // Black text
-      doc.setFont("helvetica", "bold");
-      doc.text(`Request ${index + 1}:`, 10, y);
-
-      doc.setFont("helvetica", "normal");
-      doc.text(`Category: ${item.category}`, 10, y + 10);
-      doc.text(`Reason: ${item.reason}`, 10, y + 20);
-      doc.text(`Impact: ${item.impact}`, 10, y + 30);
-      doc.text(`Priority: ${item.priority}`, 10, y + 40);
-      doc.text(`Change Name: ${item.change_name}`, 10, y + 50);
-      doc.text(`Change Sites: ${item.change_sites}`, 10, y + 60);
-      y += 70; // Move down for the next item
-
-      // Add new page if content exceeds page height
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
+          // Wait for the SVG to be ready and then generate PDF
+          setTimeout(() => {
+              if (thirdSheetRef.current) {
+                  thirdSheetRef.current.generatePDF();
+              }
+          }, 500);
+      } catch (err) {
+          console.error("❌ Error downloading data:", err.response ? err.response.data : err.message);
       }
-    });
-
-    doc.save("ChangeRequestReport.pdf");
   };
 
-  return (
-    <div>
-      <h1>PDF Report</h1>
-      <button
-        onClick={generatePDF}
-        style={{
-          backgroundColor: "#007bff",
-          color: "white",
-          padding: "10px 15px",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        Download PDF Report
-      </button>
-    </div>
-  );
-}
+    const getWeeksInMonth = (year, monthIndex) => {
+        const weeks = [];
+        const firstDay = new Date(year, monthIndex, 1);
+        const lastDay = new Date(year, monthIndex + 1, 0);
+        let startDate = new Date(firstDay);
 
-export default PDFReport;
+        if (startDate.getDay() !== 6) {
+            startDate.setDate(startDate.getDate() - (startDate.getDay() + 1) % 7);
+        }
+
+        while (startDate <= lastDay) {
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 6);
+
+            const startMonth = startDate.getMonth();
+            const endMonth = endDate.getMonth();
+
+            weeks.push({
+                start: startDate.getDate(),
+                startMonth: startMonth,
+                end: endDate.getDate(),
+                endMonth: endMonth,
+                startDate: new Date(startDate),
+                endDate: new Date(endDate),
+            });
+
+            startDate.setDate(startDate.getDate() + 7);
+        }
+
+        if (weeks.length > 0 && weeks[weeks.length - 1].start > weeks[weeks.length - 1].end) {
+            weeks.pop();
+        }
+
+        return weeks;
+    };
+
+    const getQuarterDates = (year, quarter) => {
+        const monthsInQuarter = quarterMonths[quarter].map(month => months.indexOf(month));
+        const weeks = monthsInQuarter.flatMap(monthIndex => getWeeksInMonth(year, monthIndex));
+        return {
+            start: weeks[0].startDate,
+            end: weeks[weeks.length - 1].endDate
+        };
+    };
+
+    const getYearDates = (year) => {
+        const weeks = Array.from({ length: 12 }, (_, i) => getWeeksInMonth(year, i)).flat();
+        return {
+            start: weeks[0].startDate,
+            end: weeks[weeks.length - 1].endDate
+        };
+    };
+
+    return (
+        <div>
+            <div style={{
+                position: "fixed",
+                top: "83px",
+                left: '20px',
+                right: 0,
+                zIndex: 1000,
+                backgroundColor: theme.colors.primary500,
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                padding: "10px",
+                borderBottom: "1px solid white"
+            }}>
+                <div className="flex space-x-4">
+                    <select
+                        className="p-2 border rounded bg-black text-white"
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    >
+                        {years.map((year) => (
+                            <option key={year} value={year}>{year}</option>
+                        ))}
+                    </select>
+
+                    {Array.from({ length: 4 }, (_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setActiveQuarter(i + 1)}
+                            className={`p-2 border rounded ${activeQuarter === i + 1 ? 'bg-white text-black' : 'bg-black text-white hover:bg-gray-700'}`}
+                        >
+                            Quarter {i + 1}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {activeQuarter && (
+                <div className="mt-[70px]">
+                    {quarterMonths[activeQuarter].map((month, index) => {
+                        const weeks = getWeeksInMonth(selectedYear, months.indexOf(month));
+                        const firstWeek = weeks[0];
+                        const lastWeek = weeks[weeks.length - 1];
+                        const firstDayOfMonth = firstWeek.startDate;
+                        const lastDayOfMonth = lastWeek.endDate;
+
+                        return (
+                            <div key={month} className="mb-4">
+                                <h3 className="text-lg font-bold">{month}</h3>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        className="col-span-2 inline-block px-2 py-1 border rounded bg-blue-200 text-black"
+                                        onClick={() => downloadData(firstDayOfMonth, lastDayOfMonth, `${month}-${selectedYear}`)}
+                                    >
+                                        Download {month} ({formatDate(firstDayOfMonth)} TO {formatDate(lastDayOfMonth, true)})
+                                    </button>
+                                    {weeks.map((week, idx) => (
+                                        <span
+                                            key={idx}
+                                            className="inline-block px-2 py-1 border rounded bg-gray-200 text-black text-center"
+                                            onClick={() => downloadData(week.startDate, week.endDate, `${month}-Week-${idx + 1}-${selectedYear}`)}
+                                        >
+                                            {week.startMonth !== week.endMonth
+                                                ? `${months[week.startMonth]} ${week.start} - ${months[week.endMonth]} ${week.end}`
+                                                : `${months[week.startMonth]} ${week.start} - ${week.end}`}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Download Quarters and Year Data */}
+            <div className="mt-8">
+                <h3 className="text-lg font-bold">Download Quarters and Year Data</h3>
+                {/* Year Download */}
+                <div className="mb-4">
+                    <button
+                        className="w-full inline-block px-2 py-1 border rounded bg-yellow-200 text-black"
+                        onClick={() => {
+                            const { start, end } = getYearDates(selectedYear);
+                            downloadData(start, end, `Year-${selectedYear}`);
+                        }}
+                    >
+                        Download {selectedYear} Data ({formatDate(getYearDates(selectedYear).start)} TO {formatDate(getYearDates(selectedYear).end, true)})
+                    </button>
+                </div>
+
+                {/* Quarter 1 and 2 Download */}
+                <div className="mb-4 grid grid-cols-2 gap-2">
+                    {Array.from({ length: 2 }, (_, i) => {
+                        const quarter = i + 1;
+                        const { start, end } = getQuarterDates(selectedYear, quarter);
+                        return (
+                            <button
+                                key={quarter}
+                                className="inline-block px-2 py-1 border rounded bg-green-200 text-black"
+                                onClick={() => downloadData(start, end, `Quarter-${quarter}-${selectedYear}`)}
+                            >
+                                Download {selectedYear} Quarter {quarter} ({formatDate(start)} TO {formatDate(end, true)})
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Quarter 3 and 4 Download */}
+                <div className="grid grid-cols-2 gap-2">
+                    {Array.from({ length: 2 }, (_, i) => {
+                        const quarter = i + 3;
+                        const { start, end } = getQuarterDates(selectedYear, quarter);
+                        return (
+                            <button
+                                key={quarter}
+                                className="inline-block px-2 py-1 border rounded bg-green-200 text-black"
+                                onClick={() => downloadData(start, end, `Quarter-${quarter}-${selectedYear}`)}
+                            >
+                                Download {selectedYear} Quarter {quarter} ({formatDate(start)} TO {formatDate(end, true)})
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Hidden container for PDF rendering */}
+            <div ref={containerRef} style={{ width: '800px', display: 'none' }}>
+            <ThirdSheet ref={thirdSheetRef} />
+                {/* <FirstSheet />
+                <SecondSheet />
+                <ThirdSheet />
+                <FourthSheet />
+                <FifthSheet />
+                <SixthSheet />
+                <SevenSheet />
+                <EightSheet /> */}
+            </div>
+        </div>
+    );
+}

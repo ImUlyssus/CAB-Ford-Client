@@ -252,7 +252,7 @@ const BarChart = ({ data }) => {
         // Draw bars
         bars.append("rect")
             .attr("height", barHeight)
-            .attr("width", d => xScale(d.value)-40)
+            .attr("width", d => Math.max(0, xScale(d.value) - 40))
             .attr("fill", "#E50046")
             .attr("rx", 10)
             .style("cursor", "pointer")

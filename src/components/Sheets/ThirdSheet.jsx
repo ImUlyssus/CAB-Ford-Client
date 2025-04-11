@@ -1,15 +1,21 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+// ThirdSheet.jsx
+import React, { useContext, useState, useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import * as d3 from "d3";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import AuthContext from "../../context/AuthProvider";
 import Dialog from './Dialog.jsx';
 import DataDetail from "./DataDetail";
-const ThirdSheet = () => {
+
+const ThirdSheet = forwardRef((props, ref) => {  // Use forwardRef
     const { auth } = useContext(AuthContext);
     const [aggregatedData, setAggregatedData] = useState({});
     const [selectedData, setSelectedData] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+    const sheetContentRef = useRef();
+    const [isMounted, setIsMounted] = useState(false);
     const svgRef = useRef();
+    const [svgReady, setSvgReady] = useState(false);
 
     useEffect(() => {
         if (!auth.filteredData) return;
@@ -245,8 +251,65 @@ const ThirdSheet = () => {
         .text((d) => d.name);
     }, [aggregatedData]);
 
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    const downloadPdf = () => {
+        if (!sheetContentRef.current) {
+            console.error("Sheet content ref not found.");
+            return;
+        }
+
+        html2canvas(sheetContentRef.current, {
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: true,
+            scale: 2
+        })
+        .then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'p',
+                unit: 'px',
+                format: [canvas.width, canvas.height]
+            });
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            pdf.save("ThirdSheet-Report.pdf");
+        }).catch((error) => {
+            console.error("Error generating PDF:", error);
+        });
+    };
+
+    const generatePDF = () => {
+        if (isMounted && svgRef.current) {
+            const svg = svgRef.current;
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                const pdf = new jsPDF();
+                const width = pdf.internal.pageSize.getWidth();
+                const height = pdf.internal.pageSize.getHeight();
+
+                pdf.addImage(canvas.toDataURL('JPEG'), 'JPEG', 0, 0, width, height);
+                pdf.save('chart.pdf');
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        }
+    };
+
+    useImperativeHandle(ref, () => ({
+        generatePDF: generatePDF,
+    }));
+
     return (
-        <div>
+        <div ref={sheetContentRef}>
             <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">Achieved two-week change request or not</h1>
 
             {/* Add legend here below the title */}
@@ -283,11 +346,13 @@ const ThirdSheet = () => {
             </Dialog>
 
             <svg ref={svgRef}></svg>
+            {svgReady && (
+                <button onClick={generatePDF}>Download PDF</button>
+            )}
         </div>
-
     );
-};
+});
 
+ThirdSheet.displayName = "ThirdSheet"; // Optional: Useful for debugging
 
 export default ThirdSheet;
-
