@@ -126,11 +126,11 @@ function ChangeRequest() {
         const ftm_test_plan = document.getElementById("ftmTestPlan")?.value || "";
         const fsst_test_plan = document.getElementById("fsstTestPlan")?.value || "";
         const rollback_plan = document.getElementById("rollbackPlan")?.value || "";
-        const aat_contact_name = document.getElementById("aatContactName")?.value ? document.getElementById("aatContactName")?.value.split(" ").join("_") : "";
+        const aat_contact_name = document.getElementById("aatContactName")?.value ? document.getElementById("aatContactName")?.value : "";
         const aat_contact_cdsid = document.getElementById("aatContactCdsid")?.value || "";
-        const ftm_contact_name = document.getElementById("ftmContactName")?.value ? document.getElementById("ftmContactName")?.value.split(" ").join("_") : "";
+        const ftm_contact_name = document.getElementById("ftmContactName")?.value ? document.getElementById("ftmContactName")?.value : "";
         const ftm_contact_cdsid = document.getElementById("ftmContactCdsid")?.value || "";
-        const fsst_contact_name = document.getElementById("fsstContactName")?.value ? document.getElementById("fsstContactName")?.value.split(" ").join("_") : "";
+        const fsst_contact_name = document.getElementById("fsstContactName")?.value ? document.getElementById("fsstContactName")?.value : "";
         const fsst_contact_cdsid = document.getElementById("fsstContactCdsid")?.value || "";
         const remarks = document.getElementById("remark")?.value || "";
         const aat_it_contact = aat_contact_name.trim() + "," + aat_contact_cdsid.trim();

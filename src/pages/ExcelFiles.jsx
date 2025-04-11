@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useTheme } from 'styled-components';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
 
 export default function FilterBar() {
     const years = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 10 + i);
     const [activeQuarter, setActiveQuarter] = useState(1);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const theme = useTheme();
-
+    const axiosPrivate = useAxiosPrivate();
     const quarterMonths = {
         1: ["January", "February", "March"],
         2: ["April", "May", "June"],
@@ -27,9 +30,70 @@ export default function FilterBar() {
         return `${year}-${month}-${day} ${time}`;
     };
 
-    const logDates = (startDate, endDate) => {
-        console.log(`Start date: ${formatDate(startDate)}, End date: ${formatDate(endDate, true)}`);
+    const downloadData = async (startDate, endDate, fileName) => {
+        try {
+            const formattedStartDate = formatDate(startDate);
+            const formattedEndDate = formatDate(endDate, true);
+    
+            const response = await axiosPrivate.get("/change-requests/download-excel", {
+                params: {
+                    start: formattedStartDate,
+                    end: formattedEndDate,
+                },
+            });
+    
+            const data = response.data;
+    
+            // Function to flatten nested objects and arrays
+            const flattenData = (data) => {
+                return data.map(item => {
+                    const flattenedItem = { ...item };
+    
+                    // Flatten schedule changes
+                    ['ftm_schedule_change', 'aat_schedule_change', 'fsst_schedule_change'].forEach(key => {
+                        if (Array.isArray(item[key])) {
+                            flattenedItem[key] = item[key].map(schedule => 
+                                `Start: ${schedule.startDate}\nEnd: ${schedule.endDate}\nTitle: ${schedule.title}\nStatus: ${schedule.status}\nComment: ${schedule.comment}\nDuration: ${schedule.duration}`
+                            ).join(` | `); // Separate each entry by a double newline for clarity
+                        }
+                    });
+    
+                    // Flatten CRQs
+                    ['ftm_crq', 'aat_crq', 'fsst_crq'].forEach(key => {
+                        if (Array.isArray(item[key])) {
+                            flattenedItem[key] = item[key].map(crq => 
+                                `Title: ${crq.title}\nCRQ: ${crq.crq}`
+                            ).join(` | `); // Separate each entry by a double newline
+                        }
+                    });
+    
+                    // Flatten requestors and contacts
+                    ['aat_requestor', 'ftm_requestor', 'fsst_requestor', 'ftm_it_contact', 'aat_it_contact', 'fsst_it_contact', 'global_team_contact', 'business_team_contact'].forEach(key => {
+                        if (item[key]) {
+                            flattenedItem[key] = `Name: ${item[key].name}\nEmail: ${item[key].email}`;
+                        }
+                    });
+    
+                    return flattenedItem;
+                });
+            };
+    
+            const flattenedData = flattenData(data);
+    
+            const worksheet = XLSX.utils.json_to_sheet(flattenedData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+    
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+            saveAs(blob, `${fileName}.xlsx`);
+    
+            console.log("📥 Data downloaded successfully:", flattenedData);
+        } catch (err) {
+            console.error("❌ Error downloading data:", err.response ? err.response.data : err.message);
+        }
     };
+    
 
     const getWeeksInMonth = (year, monthIndex) => {
         const weeks = [];
@@ -88,7 +152,7 @@ export default function FilterBar() {
         <div>
             <div style={{
                 position: "fixed",
-                top: "100px",
+                top: "83px",
                 left: '20px',
                 right: 0,
                 zIndex: 1000,
@@ -135,7 +199,7 @@ export default function FilterBar() {
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
                                         className="col-span-2 inline-block px-2 py-1 border rounded bg-blue-200 text-black"
-                                        onClick={() => logDates(firstDayOfMonth, lastDayOfMonth)}
+                                        onClick={() => downloadData(firstDayOfMonth, lastDayOfMonth, `${month}-${selectedYear}`)}
                                     >
                                         Download {month} ({formatDate(firstDayOfMonth)} TO {formatDate(lastDayOfMonth, true)})
                                     </button>
@@ -143,7 +207,7 @@ export default function FilterBar() {
                                         <span
                                             key={idx}
                                             className="inline-block px-2 py-1 border rounded bg-gray-200 text-black text-center"
-                                            onClick={() => logDates(week.startDate, week.endDate)}
+                                            onClick={() => downloadData(week.startDate, week.endDate, `${month}-Week-${idx + 1}-${selectedYear}`)}
                                         >
                                             {week.startMonth !== week.endMonth
                                                 ? `${months[week.startMonth]} ${week.start} - ${months[week.endMonth]} ${week.end}`
@@ -166,10 +230,10 @@ export default function FilterBar() {
                         className="w-full inline-block px-2 py-1 border rounded bg-yellow-200 text-black"
                         onClick={() => {
                             const { start, end } = getYearDates(selectedYear);
-                            logDates(start, end);
+                            downloadData(start, end, `Year-${selectedYear}`);
                         }}
                     >
-                        Download {selectedYear} ({formatDate(getYearDates(selectedYear).start)} TO {formatDate(getYearDates(selectedYear).end, true)})
+                        Download {selectedYear} Data ({formatDate(getYearDates(selectedYear).start)} TO {formatDate(getYearDates(selectedYear).end, true)})
                     </button>
                 </div>
 
@@ -182,7 +246,7 @@ export default function FilterBar() {
                             <button
                                 key={quarter}
                                 className="inline-block px-2 py-1 border rounded bg-green-200 text-black"
-                                onClick={() => logDates(start, end)}
+                                onClick={() => downloadData(start, end, `Quarter-${quarter}-${selectedYear}`)}
                             >
                                 Download {selectedYear} Quarter {quarter} ({formatDate(start)} TO {formatDate(end, true)})
                             </button>
@@ -199,7 +263,7 @@ export default function FilterBar() {
                             <button
                                 key={quarter}
                                 className="inline-block px-2 py-1 border rounded bg-green-200 text-black"
-                                onClick={() => logDates(start, end)}
+                                onClick={() => downloadData(start, end, `Quarter-${quarter}-${selectedYear}`)}
                             >
                                 Download {selectedYear} Quarter {quarter} ({formatDate(start)} TO {formatDate(end, true)})
                             </button>
