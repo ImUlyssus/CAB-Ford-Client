@@ -192,7 +192,7 @@ export default function FilteredBar() {
         let filteredData = sortedData.filter((req) => {
             const requestDate = new Date(req.request_change_date); // Convert request_change_date to Date object
               // Initialize endDate
-            // ✅ 1. Filter by Year (Compare year and previous year)
+              // 1. Filter by Year (Compare year and previous year)
             const previousYear = parseInt(year) - 1;
             if (requestDate.getFullYear() !== parseInt(year) && requestDate.getFullYear() !== previousYear) return false;
 
@@ -227,13 +227,6 @@ export default function FilteredBar() {
                 endDate.setHours(23, 59, 59, 999); // Set the end time to the last millisecond of the end date
                 setStartDateFinal(startDate);
                 setEndDateFinal(endDate);
-                // console.log("Start Date: ", startDate, "End Date: ", endDate);
-                // setAuth((prev) => ({
-                //     ...prev,
-                //     startDateFinal: startDate,   // Add startDate
-                //     endDateFinal: endDate,
-                //   }));
-                // Compare requestDate with startDate and endDate
                 if (requestDate < startDate || requestDate > endDate) return false;
             }
 
