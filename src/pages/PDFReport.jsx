@@ -15,7 +15,6 @@ import AuthContext from '../context/AuthProvider';
 
 import * as d3 from "d3";
 import html2canvas from "html2canvas";
-
 export default function PDFReport() {
     const years = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 10 + i);
     const [activeQuarter, setActiveQuarter] = useState(1);
@@ -25,7 +24,8 @@ export default function PDFReport() {
     const containerRef = useRef();
     const { auth, setAuth } = useContext(AuthContext);
     const thirdSheetRef = useRef(null);
-    const [svgGenerated, setSvgGenerated] = useState(false); // new state
+    const [dataKey, setDataKey] = useState(0); // Add a key state variable
+
     const quarterMonths = {
         1: ["January", "February", "March"],
         2: ["April", "May", "June"],
@@ -47,32 +47,35 @@ export default function PDFReport() {
     };
 
     const downloadData = async (startDate, endDate, fileName) => {
-      try {
-          const formattedStartDate = formatDate(startDate);
-          const formattedEndDate = formatDate(endDate, true);
+        try {
+            const formattedStartDate = formatDate(startDate);
+            const formattedEndDate = formatDate(endDate, true);
 
-          const response = await axiosPrivate.get("/change-requests/custom-date", {
-              params: {
-                  start: formattedStartDate,
-                  end: formattedEndDate,
-              },
-          });
+            const response = await axiosPrivate.get("/change-requests/custom-date", {
+                params: {
+                    start: formattedStartDate,
+                    end: formattedEndDate,
+                },
+            });
 
-          setAuth((prev) => ({
-              ...prev,
-              filteredData: response.data
-          }));
+            setAuth((prev) => ({
+                ...prev,
+                filteredData: response.data
+            }));
 
-          // Wait for the SVG to be ready and then generate PDF
-          setTimeout(() => {
-              if (thirdSheetRef.current) {
-                  thirdSheetRef.current.generatePDF();
-              }
-          }, 500);
-      } catch (err) {
-          console.error("❌ Error downloading data:", err.response ? err.response.data : err.message);
-      }
-  };
+            // Increment the key to force ThirdSheet to re-render
+            setDataKey(prevKey => prevKey + 1);
+
+            // Wait for a short delay before generating the PDF
+            setTimeout(() => {
+                if (thirdSheetRef.current) {
+                    thirdSheetRef.current.generatePDF();
+                }
+            }, 500);
+        } catch (err) {
+            console.error("❌ Error downloading data:", err.response ? err.response.data : err.message);
+        }
+    };
 
     const getWeeksInMonth = (year, monthIndex) => {
         const weeks = [];
@@ -253,15 +256,7 @@ export default function PDFReport() {
 
             {/* Hidden container for PDF rendering */}
             <div ref={containerRef} style={{ width: '800px', display: 'none' }}>
-            <ThirdSheet ref={thirdSheetRef} />
-                {/* <FirstSheet />
-                <SecondSheet />
-                <ThirdSheet />
-                <FourthSheet />
-                <FifthSheet />
-                <SixthSheet />
-                <SevenSheet />
-                <EightSheet /> */}
+              <ThirdSheet ref={thirdSheetRef} key={dataKey} />
             </div>
         </div>
     );
