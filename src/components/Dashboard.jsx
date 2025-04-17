@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import domtoimage from 'dom-to-image';
 import jsPDF from 'jspdf';
 
+
 import FirstSheet from './Sheets/FirstSheet';
 import SecondSheet from './Sheets/SecondSheet';
 import ThirdSheet from './Sheets/ThirdSheet';
@@ -27,52 +28,9 @@ const Dashboard = () => {
     ThirdSheet,
   ];
 
-  const handleDownload = async () => {
-    console.log("Download button clicked");
-
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-
-    const nodes = pdfContainerRef.current?.children || [];
-
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-      if (!node) continue;
-
-      try {
-        const dataUrl = await domtoimage.toPng(node, { cacheBust: true });
-
-        const img = new Image();
-        img.src = dataUrl;
-
-        await new Promise((resolve) => {
-          img.onload = () => {
-            const imgWidth = pdfWidth;
-            const imgHeight = (img.height * imgWidth) / img.width;
-
-            if (i > 0) pdf.addPage();
-            pdf.addImage(img, 'PNG', 0, 0, imgWidth, imgHeight);
-            resolve();
-          };
-        });
-      } catch (err) {
-        console.error(`Error rendering sheet ${i + 1}:`, err);
-      }
-    }
-
-    pdf.save('dashboard.pdf');
-  };
 
   return (
     <div>
-      {/* Button */}
-      <button
-        onClick={handleDownload}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-      >
-        Download All Sheets
-      </button>
 
       {/* UI - Visible Grid */}
       <div className="grid grid-cols-2 grid-rows-[repeat(4, minmax(150px, 1fr))] gap-4">

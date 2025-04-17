@@ -4,7 +4,7 @@ import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog.jsx";
 import DataDetail from "./DataDetail";
 
-const FifthSheet = () => {
+const FifthSheet = ({exportSite}) => {
   const { auth } = useContext(AuthContext);
   const [aggregatedData, setAggregatedData] = useState({});
   const [selectedData, setSelectedData] = useState(null);
@@ -21,6 +21,11 @@ const FifthSheet = () => {
     "Upgrade",
     "Yearly change",
   ];
+  useEffect(() => {
+    if (exportSite) {
+      setSelectedSite(exportSite); // Lock to export site during PDF generation
+    }
+  }, [exportSite]);
 
   useEffect(() => {
     if (!auth.filteredData) return;
@@ -168,6 +173,11 @@ const FifthSheet = () => {
 
   return (
     <div>
+      {exportSite && (
+  <h2 className="text-lg font-bold text-center text-[#003478]">
+    Change Requests by Reason for <strong>{exportSite.toUpperCase()}</strong>
+  </h2>
+)}
       <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
         Change Requests by Reason
       </h1>

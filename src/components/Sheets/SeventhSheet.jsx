@@ -4,13 +4,18 @@ import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog.jsx";
 import DataDetail from "./DataDetail";
 
-const SixthSheet = () => {
+const SixthSheet = ({ exportSite }) => {
   const { auth } = useContext(AuthContext);
   const [aggregatedData, setAggregatedData] = useState({});
   const [selectedData, setSelectedData] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedSite, setSelectedSite] = useState("aat"); // Default to AAT
   const svgRef = useRef();
+  useEffect(() => {
+    if (exportSite) {
+      setSelectedSite(exportSite); // Lock to export site during PDF generation
+    }
+  }, [exportSite]);
 
   useEffect(() => {
     if (!auth.filteredData) return;
@@ -171,6 +176,11 @@ const SixthSheet = () => {
 
   return (
     <div>
+      {exportSite && (
+  <h2 className="text-lg font-bold text-center text-[#003478]">
+    Requestor Occurrence by Site for <strong>{exportSite.toUpperCase()}</strong>
+  </h2>
+)}
       <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
         Requestor Occurrence by Site
       </h1>

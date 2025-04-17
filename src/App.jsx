@@ -4,6 +4,7 @@ import HomePage from "./pages/Home";
 import ChangeRequest from "./pages/ChangeRequest";
 import ChangeRequestOld from "./components/ChangeRequestOld";
 import PDFReport from "./pages/PDFReport";
+import PDFDownloadHandler from "./pages/PDFDownloadHandler";
 import Presentation from "./pages/Presentation";
 import DataVisualization from "./pages/DataVisualization";
 import ExcelFiles from "./pages/ExcelFiles";
@@ -19,6 +20,7 @@ import EditCalendarPage from "./components/EditCalendarPage";
 function App() {
   return (
     <Router>
+      <PDFDownloadHandler />
       <Routes>
         {/* Wrap all pages inside the Layout */}
         <Route path="/login" element={<LoginPage />} />

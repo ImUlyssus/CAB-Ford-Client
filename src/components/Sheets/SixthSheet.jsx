@@ -4,7 +4,7 @@ import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog.jsx";
 import DataDetail from "./DataDetail";
 
-const SixthSheet = () => {
+const SixthSheet = ({exportSite}) => {
   const { auth } = useContext(AuthContext);
   const [aggregatedData, setAggregatedData] = useState({});
   const [selectedData, setSelectedData] = useState(null);
@@ -14,7 +14,11 @@ const SixthSheet = () => {
 
   // Define possible priorities
   const priorities = ["Critical", "High", "Medium", "Low"];
-
+  useEffect(() => {
+    if (exportSite) {
+      setSelectedSite(exportSite); // Lock to export site during PDF generation
+    }
+  }, [exportSite]);
   useEffect(() => {
     if (!auth.filteredData) return;
 
@@ -152,6 +156,12 @@ const SixthSheet = () => {
 
   return (
     <div>
+      {exportSite && (
+  <h2 className="text-lg font-bold text-center text-[#003478]">
+    Change Requests by Priority for <strong>{exportSite.toUpperCase()}</strong>
+  </h2>
+)}
+
       <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
         Change Requests by Priority
       </h1>

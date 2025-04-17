@@ -21,10 +21,10 @@ export default function PDFReport() {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const theme = useTheme();
     const axiosPrivate = useAxiosPrivate();
-    const containerRef = useRef();
-    const { auth, setAuth } = useContext(AuthContext);
-    const thirdSheetRef = useRef(null);
-    const [dataKey, setDataKey] = useState(0); // Add a key state variable
+    const { auth, setAuth, setTriggerDownload } = useContext(AuthContext);
+    const [loading, setLoading] = useState(false);
+
+    // const { setAuth, setTriggerDownload } = useContext(AuthContext);
 
     const quarterMonths = {
         1: ["January", "February", "March"],
@@ -47,35 +47,33 @@ export default function PDFReport() {
     };
 
     const downloadData = async (startDate, endDate, fileName) => {
+        setLoading(true); // show loader
         try {
             const formattedStartDate = formatDate(startDate);
             const formattedEndDate = formatDate(endDate, true);
-
+    
             const response = await axiosPrivate.get("/change-requests/custom-date", {
                 params: {
                     start: formattedStartDate,
                     end: formattedEndDate,
                 },
             });
-
-            setAuth((prev) => ({
+    
+            setAuth(prev => ({
                 ...prev,
-                filteredData: response.data
+                filteredData: response.data,
+                fileName: fileName
             }));
-
-            // Increment the key to force ThirdSheet to re-render
-            setDataKey(prevKey => prevKey + 1);
-
-            // Wait for a short delay before generating the PDF
-            setTimeout(() => {
-                if (thirdSheetRef.current) {
-                    thirdSheetRef.current.generatePDF();
-                }
-            }, 500);
+    
+            // 👇 Pass a signal that download is starting AND loader should stay
+            setTriggerDownload({ downloading: true, done: () => setLoading(false) });
+    
         } catch (err) {
             console.error("❌ Error downloading data:", err.response ? err.response.data : err.message);
+            setLoading(false);
         }
     };
+    
 
     const getWeeksInMonth = (year, monthIndex) => {
         const weeks = [];
@@ -253,11 +251,16 @@ export default function PDFReport() {
                     })}
                 </div>
             </div>
+            {/* Loading dialog */}
+            {loading && (
+                <div className="fixed inset-0 z-1000 flex items-center justify-center backdrop-blur-sm bg-opacity-90">
+                    <div className="bg-white p-6 rounded shadow-lg text-center">
+                        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <p className="text-lg font-semibold text-black">Generating report, please wait...</p>
+                    </div>
+                </div>
+            )}
 
-            {/* Hidden container for PDF rendering */}
-            <div ref={containerRef} style={{ width: '800px', display: 'none' }}>
-              <ThirdSheet ref={thirdSheetRef} key={dataKey} />
-            </div>
         </div>
     );
 }

@@ -3,7 +3,6 @@ import AuthContext from "../context/AuthProvider";
 
 const useAuth = () => {
     const { auth, setAuth } = useContext(AuthContext);
-    
     // Load the email from localStorage on mount if available
     useEffect(() => {
         const storedEmail = localStorage.getItem('authEmail');
