@@ -37,15 +37,15 @@ const FourthSheet = ({ isPdfMode }) => {
                     result.fsst_cancel++;
                     result.fsst_cancel_data.push(entry);
                 }
-                if (cancel_change_category == "Reason 1" ) {
+                if (cancel_change_category == "Reason 1") {
                     result.reason_1++;
                     result.reason_1_data.push(entry);
                 }
-                if (cancel_change_category == "Reason 2" ) {
+                if (cancel_change_category == "Reason 2") {
                     result.reason_2++;
                     result.reason_2_data.push(entry);
                 }
-                if (cancel_change_category == "Reason 3" ) {
+                if (cancel_change_category == "Reason 3") {
                     result.reason_3++;
                     result.reason_3_data.push(entry);
                 }
@@ -58,6 +58,38 @@ const FourthSheet = ({ isPdfMode }) => {
         console.log(allData)
         setAggregatedData(allData);
     }, [auth.filteredData]);
+
+    const tableData = [
+        {
+            site: 'AAT',
+            cancelled: aggregatedData.aat_cancel,
+        },
+        {
+            site: 'FTM',
+            cancelled: aggregatedData.ftm_cancel,
+        },
+        {
+            site: 'FSST',
+            cancelled: aggregatedData.fsst_cancel,
+        },
+        {
+            site: 'Reason 1',
+            cancelled: aggregatedData.reason_1,
+        },
+        {
+            site: 'Reason 2',
+            cancelled: aggregatedData.reason_2,
+        },
+        {
+            site: 'Reason 3',
+            cancelled: aggregatedData.reason_3,
+        },
+        {
+            site: 'Total',
+            cancelled: aggregatedData.aat_cancel + aggregatedData.ftm_cancel + aggregatedData.fsst_cancel,
+        },
+    ];
+
     return (
         <div>
             <h1 className="text-xl font-bold mb-2 text-center text-[#003478]">Cancelled change summary</h1>
@@ -69,9 +101,61 @@ const FourthSheet = ({ isPdfMode }) => {
                     <BarChart data={aggregatedData} />
                 </div>
             </div>
+
+            {/* Table */}
+            {isPdfMode && (
+                <div className="mt-8">
+                    <h3 className="text-lg font-semibold mb-2 text-center">Cancellation Summary - By Site</h3>
+                    <table className="min-w-full border border-gray-300 pdf-only">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="py-2 px-4 border-b">Site</th>
+                                <th className="py-2 px-4 border-b">Cancelled Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[
+                                { site: 'AAT', cancelled: aggregatedData.aat_cancel },
+                                { site: 'FTM', cancelled: aggregatedData.ftm_cancel },
+                                { site: 'FSST', cancelled: aggregatedData.fsst_cancel },
+                                { site: 'Total', cancelled: aggregatedData.aat_cancel + aggregatedData.ftm_cancel + aggregatedData.fsst_cancel },
+                            ].map((row, index) => (
+                                <tr key={index} className={index % 2 === 0 ? 'bg-white text-center' : 'bg-gray-50 text-center'}>
+                                    <td className="py-2 px-4 border-b">{row.site}</td>
+                                    <td className="py-2 px-4 border-b">{row.cancelled}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    <h3 className="text-lg font-semibold mt-4 mb-2 text-center">Cancellation Summary - By Reason</h3>
+                    <table className="min-w-full border border-gray-300 pdf-only">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="py-2 px-4 border-b">Reason</th>
+                                <th className="py-2 px-4 border-b">Cancelled Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[
+                                { reason: 'Reason 1', cancelled: aggregatedData.reason_1 },
+                                { reason: 'Reason 2', cancelled: aggregatedData.reason_2 },
+                                { reason: 'Reason 3', cancelled: aggregatedData.reason_3 },
+                            ].map((row, index) => (
+                                <tr key={index} className={index % 2 === 0 ? 'bg-white text-center' : 'bg-gray-50 text-center'}>
+                                    <td className="py-2 px-4 border-b">{row.reason}</td>
+                                    <td className="py-2 px-4 border-b">{row.cancelled}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
         </div>
     )
 }
+
 const DonutChart = ({ data }) => {
     const [selectedData, setSelectedData] = useState(null); // State to store the data for the dialog
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control dialog visibility
@@ -180,30 +264,30 @@ const DonutChart = ({ data }) => {
 
     return (
         <>
-        { totalInner !==0 ?
-             <div className="flex justify-center items-center">
-             <svg ref={svgRef}></svg>
-             {/* Dialog for displaying data */}
-             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                 <h2 className="text-lg font-semibold mb-2">
-                     {selectedData?.category.toUpperCase()} Requests
-                 </h2>
-                 <p className="text-sm mb-4">
-                     Showing {selectedData?.filteredData.length} requests for <strong>{selectedData?.site.toUpperCase()}</strong>
-                 </p>
-                 <ul className="list-disc pl-5 space-y-2">
-                     {selectedData?.filteredData ? (
-                         <DataDetail requests={selectedData.filteredData} />
-                     ) : (
-                         <p className="text-gray-500">No data available.</p>
-                     )}
-                 </ul>
-             </Dialog>
-         </div>
-             : <div className="flex justify-center items-center bg-gray-900 mt-[40%]">
-             <h1 className="text-[#003478]">No cancel change for this period.</h1>
-             </div>
-        }
+            {totalInner !== 0 ?
+                <div className="flex justify-center items-center">
+                    <svg ref={svgRef}></svg>
+                    {/* Dialog for displaying data */}
+                    <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                        <h2 className="text-lg font-semibold mb-2">
+                            {selectedData?.category.toUpperCase()} Requests
+                        </h2>
+                        <p className="text-sm mb-4">
+                            Showing {selectedData?.filteredData.length} requests for <strong>{selectedData?.site.toUpperCase()}</strong>
+                        </p>
+                        <ul className="list-disc pl-5 space-y-2">
+                            {selectedData?.filteredData ? (
+                                <DataDetail requests={selectedData.filteredData} />
+                            ) : (
+                                <p className="text-gray-500">No data available.</p>
+                            )}
+                        </ul>
+                    </Dialog>
+                </div>
+                : <div className="flex justify-center items-center bg-gray-900 mt-[40%]">
+                    <h1 className="text-[#003478]">No cancel change for this period.</h1>
+                </div>
+            }
         </>
     );
 };
@@ -240,7 +324,7 @@ const BarChart = ({ data }) => {
         const maxVal = d3.max(reasons, d => d.value);
         const labelWidth = 80;
         // Set up the scale for the bars' width
-        const xScale = d3.scaleLinear().domain([0, maxVal]).range([0, width - labelWidth + 40]); 
+        const xScale = d3.scaleLinear().domain([0, maxVal]).range([0, width - labelWidth + 40]);
 
         // Create bar groups (one per reason)
         const bars = svg.selectAll(".bar-group")
@@ -269,7 +353,7 @@ const BarChart = ({ data }) => {
 
         // Add text labels for values inside the bars (centered)
         bars.append("text")
-            .attr("x", d => xScale(d.value) / 2-20)  // Center the text inside the bar
+            .attr("x", d => xScale(d.value) / 2 - 20)  // Center the text inside the bar
             .attr("y", barHeight / 2)
             .attr("dy", "0.35em")
             .attr("fill", "white")
@@ -290,38 +374,38 @@ const BarChart = ({ data }) => {
             .attr("font-weight", "bold")
             .attr("font-size", "14px")
             .text(d => d.name);
-        
+
     }, [data]);
 
     return (
         <>
-        { totalCancel !==0 ?
-        <div>
-        <h1 className="mb-3 text-center text-md text-[#003478]">Change Request Summary</h1>
+            {totalCancel !== 0 ?
+                <div>
+                    <h1 className="mb-3 text-center text-md text-[#003478]">Change Request Summary</h1>
 
-        {/* Dialog */}
-        <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <h2 className="text-lg font-semibold mb-2">
-                {selectedData?.category.toUpperCase()} Requests
-            </h2>
-            <p className="text-sm mb-4">
-                Showing {selectedData?.filteredData?.length} requests
-            </p>
-            <ul className="list-disc pl-5 space-y-2">
-                {selectedData?.filteredData?.length ? (
-                    <DataDetail requests={selectedData.filteredData} />
-                ) : (
-                    <p className="text-gray-500">No data available.</p>
-                )}
-            </ul>
-        </Dialog>
+                    {/* Dialog */}
+                    <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                        <h2 className="text-lg font-semibold mb-2">
+                            {selectedData?.category.toUpperCase()} Requests
+                        </h2>
+                        <p className="text-sm mb-4">
+                            Showing {selectedData?.filteredData?.length} requests
+                        </p>
+                        <ul className="list-disc pl-5 space-y-2">
+                            {selectedData?.filteredData?.length ? (
+                                <DataDetail requests={selectedData.filteredData} />
+                            ) : (
+                                <p className="text-gray-500">No data available.</p>
+                            )}
+                        </ul>
+                    </Dialog>
 
-        <svg ref={svgRef}></svg>
-    </div>:
-    <div className="flex justify-center items-center bg-gray-900 mt-[40%]">
-        <h1 className="text-[#003478]">No cancel change for this period.</h1>
-    </div>
-        }
+                    <svg ref={svgRef}></svg>
+                </div> :
+                <div className="flex justify-center items-center bg-gray-900 mt-[40%]">
+                    <h1 className="text-[#003478]">No cancel change for this period.</h1>
+                </div>
+            }
         </>
     );
 };

@@ -328,7 +328,7 @@ const FirstSheet = ({ isPdfMode }) => {
     </div>
     {/* Table */}
     {isPdfMode && <div className="mt-[120px] text-xs">
-        <h3 className="font-semibold mb-2">Weekly Summary Table</h3>
+        <h3 className="font-semibold mb-2 text-center">Weekly Change Request Summary Table</h3>
         <table className="min-w-full border border-gray-300 text-center">
             <thead>
                 <tr className="bg-gray-100">
