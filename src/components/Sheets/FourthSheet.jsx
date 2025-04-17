@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog"; // Assuming you're using Material-UI for the dialog
 import DataDetail from './DataDetail'
-const FourthSheet = () => {
+const FourthSheet = ({ isPdfMode }) => {
     const { auth } = useContext(AuthContext);
     const [aggregatedData, setAggregatedData] = useState({});
     const [isDialogOpen, setIsDialogOpen] = useState(false);

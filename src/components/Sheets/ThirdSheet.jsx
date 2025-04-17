@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import AuthContext from "../../context/AuthProvider";
 import Dialog from './Dialog.jsx';
 import DataDetail from "./DataDetail";
-const ThirdSheet = () => {
+const ThirdSheet = ({ isPdfMode }) => {
     const { auth } = useContext(AuthContext);
     const [aggregatedData, setAggregatedData] = useState({});
     const [selectedData, setSelectedData] = useState(null);
@@ -244,7 +244,32 @@ const ThirdSheet = () => {
         .attr("font-weight", "bold")
         .text((d) => d.name);
     }, [aggregatedData]);
-
+    const tableData = [
+      {
+          site: 'AAT',
+          planned: aggregatedData.aat_planned,
+          unplanned: aggregatedData.aat_unplanned,
+          total: aggregatedData.aat_planned + aggregatedData.aat_unplanned,
+      },
+      {
+          site: 'FTM',
+          planned: aggregatedData.ftm_planned,
+          unplanned: aggregatedData.ftm_unplanned,
+          total: aggregatedData.ftm_planned + aggregatedData.ftm_unplanned,
+      },
+      {
+          site: 'FSST',
+          planned: aggregatedData.fsst_planned,
+          unplanned: aggregatedData.fsst_unplanned,
+          total: aggregatedData.fsst_planned + aggregatedData.fsst_unplanned,
+      },
+      {
+          site: 'Total',
+          planned: aggregatedData.aat_planned + aggregatedData.ftm_planned + aggregatedData.fsst_planned,
+          unplanned: aggregatedData.aat_unplanned + aggregatedData.ftm_unplanned + aggregatedData.fsst_unplanned,
+          total: aggregatedData.aat_planned + aggregatedData.ftm_planned + aggregatedData.fsst_planned + aggregatedData.aat_unplanned + aggregatedData.ftm_unplanned + aggregatedData.fsst_unplanned,
+      },
+  ];
     return (
         <div>
             <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">Achieved two-week change request or not</h1>
@@ -283,6 +308,32 @@ const ThirdSheet = () => {
             </Dialog>
 
             <svg ref={svgRef}></svg>
+            {/* Table */}
+            {isPdfMode && 
+            <div className="mt-8 pdf-only">
+                <h3 className="text-lg font-semibold mb-2">Summary Table</h3>
+                <table className="min-w-full border border-gray-300">
+                    <thead>
+                        <tr className="bg-gray-100">
+                            <th className="py-2 px-4 border-b">Sites</th>
+                            <th className="py-2 px-4 border-b">Planned</th>
+                            <th className="py-2 px-4 border-b">Unplanned</th>
+                            <th className="py-2 px-4 border-b">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tableData.map((row, index) => (
+                            <tr key={index} className={index % 2 === 0 ? 'bg-white text-center' : 'bg-gray-50 text-center'}>
+                                <td className="py-2 px-4 border-b">{row.site}</td>
+                                <td className="py-2 px-4 border-b">{row.planned}</td>
+                                <td className="py-2 px-4 border-b">{row.unplanned}</td>
+                                <td className="py-2 px-4 border-b">{row.total}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+}
         </div>
 
     );

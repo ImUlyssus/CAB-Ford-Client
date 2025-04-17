@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import AuthContext from "../../context/AuthProvider";
 
-const EightSheet = () => {
+const EightSheet = ({ isPdfMode }) => {
   const { auth } = useContext(AuthContext);
   const [scheduleHours, setScheduleHours] = useState({
     aat: 0,

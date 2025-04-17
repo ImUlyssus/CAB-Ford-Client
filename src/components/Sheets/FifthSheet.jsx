@@ -4,7 +4,7 @@ import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog.jsx";
 import DataDetail from "./DataDetail";
 
-const FifthSheet = ({exportSite}) => {
+const FifthSheet = ({ exportSite, isPdfMode }) => {
   const { auth } = useContext(AuthContext);
   const [aggregatedData, setAggregatedData] = useState({});
   const [selectedData, setSelectedData] = useState(null);
@@ -173,14 +173,15 @@ const FifthSheet = ({exportSite}) => {
 
   return (
     <div>
-      {exportSite && (
-  <h2 className="text-lg font-bold text-center text-[#003478]">
-    Change Requests by Reason for <strong>{exportSite.toUpperCase()}</strong>
-  </h2>
-)}
-      <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
-        Change Requests by Reason
-      </h1>
+      {exportSite ? (
+        <h2 className="text-lg font-bold text-center text-[#003478]">
+          Change Requests by Reason for <strong>{exportSite.toUpperCase()}</strong>
+        </h2>
+      ) :
+        <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
+          Change Requests by Reason
+        </h1>
+      }
 
       {/* Site Selection Dropdown */}
       <div className="flex justify-center mb-2 text-[#003478]">

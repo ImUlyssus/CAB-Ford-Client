@@ -4,7 +4,7 @@ import { useTheme } from 'styled-components';
 import Dialog from "./Dialog";
 import DataDetail from './DataDetail';
 
-const FirstSheet = () => {
+const FirstSheet = ({ isPdfMode }) => {
     const [weeklyData, setWeeklyData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -146,6 +146,23 @@ const FirstSheet = () => {
         setIsDialogOpen(true);
     };
 
+    const tableData = weeks.map(week => ({
+        date: week.date,
+        aat_completed: week.aat_completed,
+        aat_rejected: week.aat_rejected,
+        aat_ongoing: week.aat_ongoing,
+        aat_total: week.aat_total,
+
+        ftm_completed: week.ftm_completed,
+        ftm_rejected: week.ftm_rejected,
+        ftm_ongoing: week.ftm_ongoing,
+        ftm_total: week.ftm_total,
+
+        fsst_completed: week.fsst_completed,
+        fsst_rejected: week.fsst_rejected,
+        fsst_ongoing: week.fsst_ongoing,
+        fsst_total: week.fsst_total,
+    }));
 
     return (
         <div className='p-4'>
@@ -307,10 +324,54 @@ const FirstSheet = () => {
                 )}
             </ul>
         </Dialog>
+        
     </div>
+    {/* Table */}
+    {isPdfMode && <div className="mt-[120px] text-xs">
+        <h3 className="font-semibold mb-2">Weekly Summary Table</h3>
+        <table className="min-w-full border border-gray-300 text-center">
+            <thead>
+                <tr className="bg-gray-100">
+                    <th className="py-2 px-2 border-b">Date</th>
+                    <th className="py-2 px-2 border-b">AAT Com.</th>
+                    <th className="py-2 px-2 border-b">AAT Rej.</th>
+                    <th className="py-2 px-2 border-b">AAT Ong.</th>
+                    <th className="py-2 px-2 border-b">AAT Total</th>
+                    <th className="py-2 px-2 border-b">FTM Comp.</th>
+                    <th className="py-2 px-2 border-b">FTM Rej.</th>
+                    <th className="py-2 px-2 border-b">FTM Ong.</th>
+                    <th className="py-2 px-2 border-b">FTM Total</th>
+                    <th className="py-2 px-2 border-b">FSST Comp.</th>
+                    <th className="py-2 px-2 border-b">FSST Rej.</th>
+                    <th className="py-2 px-2 border-b">FSST Ong.</th>
+                    <th className="py-2 px-2 border-b">FSST Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {tableData.map((week, index) => (
+                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="py-2 px-4 border-b">{week.date}</td>
+                        <td className="py-2 px-4 border-b">{week.aat_completed}</td>
+                        <td className="py-2 px-4 border-b">{week.aat_rejected}</td>
+                        <td className="py-2 px-4 border-b">{week.aat_ongoing}</td>
+                        <td className="py-2 px-4 border-b">{week.aat_total}</td>
+                        <td className="py-2 px-4 border-b">{week.ftm_completed}</td>
+                        <td className="py-2 px-4 border-b">{week.ftm_rejected}</td>
+                        <td className="py-2 px-4 border-b">{week.ftm_ongoing}</td>
+                        <td className="py-2 px-4 border-b">{week.ftm_total}</td>
+                        <td className="py-2 px-4 border-b">{week.fsst_completed}</td>
+                        <td className="py-2 px-4 border-b">{week.fsst_rejected}</td>
+                        <td className="py-2 px-4 border-b">{week.fsst_ongoing}</td>
+                        <td className="py-2 px-4 border-b">{week.fsst_total}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>}
 </div>
 
     );
 };
+
 
 export default FirstSheet;

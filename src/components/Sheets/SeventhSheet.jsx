@@ -4,7 +4,7 @@ import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog.jsx";
 import DataDetail from "./DataDetail";
 
-const SixthSheet = ({ exportSite }) => {
+const SixthSheet = ({ exportSite, isPdfMode }) => {
   const { auth } = useContext(AuthContext);
   const [aggregatedData, setAggregatedData] = useState({});
   const [selectedData, setSelectedData] = useState(null);
@@ -147,20 +147,20 @@ const SixthSheet = ({ exportSite }) => {
       .attr("fill", "white")
       .text((d) => d.count);
 
-     // X-axis labels (vertical)
-     chart
-     .append("g")
-     .attr("transform", `translate(0, ${chartHeight})`)
-     .call(d3.axisBottom(xScale))
-     .selectAll("text")
-     .text(d => d.split('@')[0]) // Extract username
-     .attr("fill", "#347928")
-     .style("text-anchor", "end")
-     .attr("dx", "-.8em")
-     .attr("dy", ".15em")
-     .attr("transform", "rotate(-50)") // Rotate labels
-     .selectAll(".domain") // Select the X-axis line
-     .attr("stroke", "#347928"); // Set the line color
+    // X-axis labels (vertical)
+    chart
+      .append("g")
+      .attr("transform", `translate(0, ${chartHeight})`)
+      .call(d3.axisBottom(xScale))
+      .selectAll("text")
+      .text(d => d.split('@')[0]) // Extract username
+      .attr("fill", "#347928")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-50)") // Rotate labels
+      .selectAll(".domain") // Select the X-axis line
+      .attr("stroke", "#347928"); // Set the line color
 
     // Y-axis labels
     chart.append("g").call(d3.axisLeft(yScale)).selectAll("text")
@@ -176,14 +176,16 @@ const SixthSheet = ({ exportSite }) => {
 
   return (
     <div>
-      {exportSite && (
-  <h2 className="text-lg font-bold text-center text-[#003478]">
-    Requestor Occurrence by Site for <strong>{exportSite.toUpperCase()}</strong>
-  </h2>
-)}
-      <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
-        Requestor Occurrence by Site
-      </h1>
+      {exportSite ? (
+        <h2 className="text-lg font-bold text-center text-[#003478]">
+          Requestor Occurrence by Site for <strong>{exportSite.toUpperCase()}</strong>
+        </h2>
+      ) :
+        <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
+          Requestor Occurrence by Site
+        </h1>
+      }
+
 
       {/* Site Selection Dropdown */}
       <div className="flex justify-center text-[#003478]">

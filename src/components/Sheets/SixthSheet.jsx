@@ -4,7 +4,7 @@ import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog.jsx";
 import DataDetail from "./DataDetail";
 
-const SixthSheet = ({exportSite}) => {
+const SixthSheet = ({exportSite, isPdfMode }) => {
   const { auth } = useContext(AuthContext);
   const [aggregatedData, setAggregatedData] = useState({});
   const [selectedData, setSelectedData] = useState(null);
@@ -156,15 +156,17 @@ const SixthSheet = ({exportSite}) => {
 
   return (
     <div>
-      {exportSite && (
+      {exportSite ? (
   <h2 className="text-lg font-bold text-center text-[#003478]">
     Change Requests by Priority for <strong>{exportSite.toUpperCase()}</strong>
   </h2>
-)}
-
-      <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
-        Change Requests by Priority
+):
+<h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
+        Change Requests by Priority {exportSite && ` for ${exportSite.toUpperCase()}`}
       </h1>
+}
+
+      
 
       {/* Site Selection Dropdown */}
       <div className="flex justify-center mb-2 text-[#003478]">

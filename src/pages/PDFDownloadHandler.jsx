@@ -2,7 +2,7 @@
 // (e.g., in your main app layout or a dedicated PDFDownloadHandler component).
 // This way, the download is triggered regardless of what route or page the user is on.
 
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import domtoimage from 'dom-to-image';
 import jsPDF from 'jspdf';
 import AuthContext from '../context/AuthProvider';
@@ -36,8 +36,12 @@ const sheets = [
 const PDFDownloadHandler = () => {
   const { auth, triggerDownload, setTriggerDownload } = useContext(AuthContext);
   const pdfContainerRef = useRef(null);
-
+  const [isPdfMode, setIsPdfMode] = useState(false);
   const handleDownload = async () => {
+    setIsPdfMode(true);
+
+    // Add a small delay (e.g., 50ms)
+    await new Promise(resolve => setTimeout(resolve, 50));
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
 
@@ -68,15 +72,8 @@ const PDFDownloadHandler = () => {
 
     const fileName = auth?.fileName || 'dashboard';
     pdf.save(`${fileName}.pdf`);
+    setIsPdfMode(false);
   };
-
-//   useEffect(() => {
-//     if (triggerDownload) {
-//       handleDownload().then(() => {
-//         setTriggerDownload(false);
-//       });
-//     }
-//   }, [triggerDownload]);
 useEffect(() => {
     if (triggerDownload?.downloading) {
         handleDownload().then(() => {
@@ -105,7 +102,7 @@ useEffect(() => {
           className="p-6 bg-white"
           style={{ width: '794px', height: '1123px', marginBottom: '20px' }}
         >
-          <Sheet />
+          <Sheet isPdfMode={isPdfMode} />
         </div>
       ))}
     </div>

@@ -3,7 +3,7 @@ import AuthContext from '../../context/AuthProvider';
 import * as d3 from "d3";
 import Dialog from "./Dialog";
 import DataDetail from './DataDetail';
-const SecondSheet = () => {
+const SecondSheet = ({ isPdfMode }) => {
     const { auth } = useContext(AuthContext);
     const [aggregatedData, setAggregatedData] = useState({});
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -143,65 +143,126 @@ const SecondSheet = () => {
         setSelectedCategory(category);
         setIsDialogOpen(true);
     };
+
+    const tableData = [
+        {
+            site: 'AAT',
+            completed: aggregatedData.aat_completed,
+            ongoing: aggregatedData.aat_ongoing,
+            rejected: aggregatedData.aat_rejected,
+            total: aggregatedData.aat_total,
+        },
+        {
+            site: 'FTM',
+            completed: aggregatedData.ftm_completed,
+            ongoing: aggregatedData.ftm_ongoing,
+            rejected: aggregatedData.ftm_rejected,
+            total: aggregatedData.ftm_total,
+        },
+        {
+            site: 'FSST',
+            completed: aggregatedData.fsst_completed,
+            ongoing: aggregatedData.fsst_ongoing,
+            rejected: aggregatedData.fsst_rejected,
+            total: aggregatedData.fsst_total,
+        },
+        {
+            site: 'Total',
+            completed: aggregatedData.aat_completed + aggregatedData.ftm_completed + aggregatedData.fsst_completed,
+            ongoing: aggregatedData.aat_ongoing + aggregatedData.ftm_ongoing + aggregatedData.fsst_ongoing,
+            rejected: aggregatedData.aat_rejected + aggregatedData.ftm_rejected + aggregatedData.fsst_rejected,
+            total: aggregatedData.aat_total + aggregatedData.ftm_total + aggregatedData.fsst_total,
+        },
+    ];
+
     return (
-        <div className="grid grid-cols-5">
-            {/* First column */}
-            <div className="col-span-2 bg-transparent p-4">
-                <h2 className="text-xl font-semibold mb-6 text-center text-[#003478]">All 3 sites</h2>
+        <div>
+            <div className="grid grid-cols-5">
+                {/* First column */}
+                <div className="col-span-2 bg-transparent p-4">
+                    <h2 className="text-xl font-semibold mb-6 text-center text-[#003478]">All 3 sites</h2>
 
-                <div className="space-y-4">
-                    {/* Card 1 - Total */}
-                    <div
-                        className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-blue-500 text-blue-500 cursor-pointer"
-                        onClick={() => openDialog("total")}
-                    >
-                        <p className="text-2xl font-bold">Total {aggregatedData.aat_total + aggregatedData.ftm_total + aggregatedData.fsst_total}</p>
-                    </div>
+                    <div className="space-y-4">
+                        {/* Card 1 - Total */}
+                        <div
+                            className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-blue-500 text-blue-500 cursor-pointer"
+                            onClick={() => openDialog("total")}
+                        >
+                            <p className="text-2xl font-bold">Total {aggregatedData.aat_total + aggregatedData.ftm_total + aggregatedData.fsst_total}</p>
+                        </div>
 
-                    {/* Card 2 - Completed */}
-                    <div
-                        className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-green-500 text-green-500 cursor-pointer"
-                        onClick={() => openDialog("completed")}
-                    >
-                        <p className="text-2xl font-bold">Completed {aggregatedData.aat_completed + aggregatedData.ftm_completed + aggregatedData.fsst_completed}</p>
-                    </div>
+                        {/* Card 2 - Completed */}
+                        <div
+                            className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-green-500 text-green-500 cursor-pointer"
+                            onClick={() => openDialog("completed")}
+                        >
+                            <p className="text-2xl font-bold">Completed {aggregatedData.aat_completed + aggregatedData.ftm_completed + aggregatedData.fsst_completed}</p>
+                        </div>
 
-                    {/* Card 3 - Ongoing */}
-                    <div
-                        className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-yellow-500 text-yellow-500 cursor-pointer"
-                        onClick={() => openDialog("ongoing")}
-                    >
-                        <p className="text-2xl font-bold">Ongoing {aggregatedData.aat_ongoing + aggregatedData.ftm_ongoing + aggregatedData.fsst_ongoing}</p>
-                    </div>
+                        {/* Card 3 - Ongoing */}
+                        <div
+                            className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-yellow-500 text-yellow-500 cursor-pointer"
+                            onClick={() => openDialog("ongoing")}
+                        >
+                            <p className="text-2xl font-bold">Ongoing {aggregatedData.aat_ongoing + aggregatedData.ftm_ongoing + aggregatedData.fsst_ongoing}</p>
+                        </div>
 
-                    {/* Card 4 - Rejected */}
-                    <div
-                        className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-red-500 text-red-500 cursor-pointer"
-                        onClick={() => openDialog("rejected")}
-                    >
-                        <p className="text-2xl font-bold">Rejected {aggregatedData.aat_rejected + aggregatedData.ftm_rejected + aggregatedData.fsst_rejected}</p>
+                        {/* Card 4 - Rejected */}
+                        <div
+                            className="bg-transparent px-2 py-4 rounded-lg shadow-md text-center border-2 border-red-500 text-red-500 cursor-pointer"
+                            onClick={() => openDialog("rejected")}
+                        >
+                            <p className="text-2xl font-bold">Rejected {aggregatedData.aat_rejected + aggregatedData.ftm_rejected + aggregatedData.fsst_rejected}</p>
+                        </div>
                     </div>
                 </div>
+
+                {/* Fourth column (merged into one) */}
+                <div className="col-span-3 p-4">
+                    <h2 className="text-xl font-semibold mb-1 text-center text-[#003478]">Change request distribution by site</ h2>
+                    {/* <LayeredDonutChart aggregatedData={aggregatedData} /> */}
+                    <TwoLayerDonutChart data={aggregatedData} />
+                </div>
+                {/* Dialog for displaying selected data */}
+                {isDialogOpen && (
+                    <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                        <h2 className="text-lg font-semibold mb-2">{selectedCategory.toUpperCase()} Requests</h2>
+                        <p className="text-sm mb-4">Showing requests for <strong>{selectedCategory}</strong></p>
+                        <DataDetail requests={getSelectedData()?.filteredData || []} />
+                    </Dialog>
+                )}
             </div>
 
-            {/* Fourth column (merged into one) */}
-            <div className="col-span-3 p-4">
-                <h2 className="text-xl font-semibold mb-1 text-center text-[#003478]">Change request distribution by site</ h2>
-                {/* <LayeredDonutChart aggregatedData={aggregatedData} /> */}
-                <TwoLayerDonutChart data={aggregatedData} />
-            </div>
-            {/* Dialog for displaying selected data */}
-            {isDialogOpen && (
-                <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                    <h2 className="text-lg font-semibold mb-2">{selectedCategory.toUpperCase()} Requests</h2>
-                    <p className="text-sm mb-4">Showing requests for <strong>{selectedCategory}</strong></p>
-                    <DataDetail requests={getSelectedData()?.filteredData || []} />
-                </Dialog>
-            )}
+            {/* Table */}
+            {isPdfMode && (
+                <div className="mt-8">
+                <h3 className="text-lg font-semibold mb-2">Summary Table</h3>
+                <table className="min-w-full border border-gray-300">
+                    <thead>
+                        <tr className="bg-gray-100">
+                            <th className="py-2 px-4 border-b">Sites</th>
+                            <th className="py-2 px-4 border-b">Completed</th>
+                            <th className="py-2 px-4 border-b">Ongoing</th>
+                            <th className="py-2 px-4 border-b">Rejected</th>
+                            <th className="py-2 px-4 border-b">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tableData.map((row, index) => (
+                            <tr key={index} className={index % 2 === 0 ? 'bg-white text-center' : 'bg-gray-50 text-center'}>
+                                <td className="py-2 px-4 border-b">{row.site}</td>
+                                <td className="py-2 px-4 border-b">{row.completed}</td>
+                                <td className="py-2 px-4 border-b">{row.ongoing}</td>
+                                <td className="py-2 px-4 border-b">{row.rejected}</td>
+                                <td className="py-2 px-4 border-b">{row.total}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>)}
         </div>
-
     );
-}
+};
 const TwoLayerDonutChart = ({ data }) => {
     const [selectedData, setSelectedData] = useState(null); // State to store the data for the dialog
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control dialog visibility
