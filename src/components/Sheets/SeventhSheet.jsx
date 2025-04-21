@@ -188,7 +188,7 @@ const SixthSheet = ({ exportSite, isPdfMode }) => {
 
 
       {/* Site Selection Dropdown */}
-      <div className="flex justify-center text-[#003478]">
+      {!exportSite && <div className="flex justify-center text-[#003478]">
         <label htmlFor="site-select" className="mr-2 mt-1">
           Select Site:
         </label>
@@ -202,7 +202,7 @@ const SixthSheet = ({ exportSite, isPdfMode }) => {
           <option value="ftm">FTM</option>
           <option value="fsst">FSST</option>
         </select>
-      </div>
+      </div>}
 
       {/* Dialog */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
@@ -237,24 +237,24 @@ const SixthSheet = ({ exportSite, isPdfMode }) => {
               </tr>
             </thead>
             <tbody>
-  {aggregatedData[siteName] &&
-    Object.entries(aggregatedData[siteName]).map(([email, details], index) => {
-      const parts = details.fullName.trim().split(" ");
-      const cdsid = parts[parts.length - 1]; // Last word
-      const name = parts.slice(0, -1).join(" "); // Everything before last word
+              {aggregatedData[siteName] &&
+                Object.entries(aggregatedData[siteName]).map(([email, details], index) => {
+                  const parts = details.fullName.trim().split(" ");
+                  const cdsid = parts[parts.length - 1]; // Last word
+                  const name = parts.slice(0, -1).join(" "); // Everything before last word
 
-      return (
-        <tr
-          key={index}
-          className={index % 2 === 0 ? "bg-white text-center" : "bg-gray-50 text-center"}
-        >
-          <td className="py-2 px-4 border-b">{name}</td>
-          <td className="py-2 px-4 border-b">{cdsid}</td>
-          <td className="py-2 px-4 border-b">{details.count}</td>
-        </tr>
-      );
-    })}
-</tbody>
+                  return (
+                    <tr
+                      key={index}
+                      className={index % 2 === 0 ? "bg-white text-center" : "bg-gray-50 text-center"}
+                    >
+                      <td className="py-2 px-4 border-b">{name}</td>
+                      <td className="py-2 px-4 border-b">{cdsid}</td>
+                      <td className="py-2 px-4 border-b">{details.count}</td>
+                    </tr>
+                  );
+                })}
+            </tbody>
 
           </table>
         </div>

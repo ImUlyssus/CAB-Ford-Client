@@ -166,7 +166,7 @@ const SixthSheet = ({ exportSite, isPdfMode }) => {
         </h1>
       }
       {/* Site Selection Dropdown */}
-      <div className="flex justify-center mb-2 text-[#003478]">
+      {!exportSite && <div className="flex justify-center mb-2 text-[#003478]">
         <label htmlFor="site-select" className="mr-2 mt-1">
           Select Site:
         </label>
@@ -180,7 +180,7 @@ const SixthSheet = ({ exportSite, isPdfMode }) => {
           <option value="ftm">FTM</option>
           <option value="fsst">FSST</option>
         </select>
-      </div>
+      </div>}
 
       {/* Dialog */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>

@@ -146,8 +146,35 @@ const EightSheet = ({ isPdfMode }) => {
         Total Schedule Hours by Site
       </h1>
       <svg ref={svgRef}></svg>
+  
+      {/* Table: Site and Total Work Hours */}
+      <div className="mt-10 px-4">
+        <h2 className="text-lg font-semibold mb-4 text-center text-[#003478]">
+          Site-wise Total Work Hours
+        </h2>
+        <table className="min-w-full border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100 text-center">
+              <th className="py-2 px-4 border-b">Site</th>
+              <th className="py-2 px-4 border-b">Total Work Hours</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(scheduleHours).map(([site, hours], index) => (
+              <tr
+                key={site}
+                className={index % 2 === 0 ? "bg-white text-center" : "bg-gray-50 text-center"}
+              >
+                <td className="py-2 px-4 border-b font-medium uppercase">{site}</td>
+                <td className="py-2 px-4 border-b">{hours.toFixed(1)} Hrs</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
+  
 };
 
 export default EightSheet;
