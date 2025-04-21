@@ -29,7 +29,7 @@ const Layout = () => {
     }, []);
 
     // Hide Navbar and Footer for '/change-request-update' route or when in fullscreen
-    const hideNavbarAndFooter = location.pathname === "/change-request-update" || isFullscreen;
+    const hideNavbarAndFooter = location.pathname === "/change-request-update" || location.pathname === "/change-request" || isFullscreen;
 
     return (
         <div style={{

@@ -4,9 +4,9 @@ import { useContext } from "react";
 import AuthContext from "../context/AuthProvider";
 function Navbar() {
     const theme = useTheme(); // Access theme
-    const { setAuth } = useContext(AuthContext);
+    const { auth, setAuth } = useContext(AuthContext);
     const navigate = useNavigate();
-
+    console.log("Auth context in Navbar:", auth);
     return (
         <nav
             style={{
@@ -36,7 +36,7 @@ function Navbar() {
                         fontWeight: "bold",
                     }}
                 >
-                    Welcome Kyaw
+                    Welcome {auth?.user?.name}
                 </NavLink>
             </h2>
             <div style={{ padding: "10px" }}>

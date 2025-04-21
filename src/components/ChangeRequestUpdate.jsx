@@ -12,6 +12,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AuthContext from '../context/AuthProvider';
 import ScheduleInfo from "../assets/schedule_info.jpg";
 import AISuggestionDialog from "../components/AISuggestionDialog";
+
+const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+const COUNTDOWN_DURATION = 55; // Countdown duration in seconds
 function ChangeRequestUpdate() {
     const location = useLocation();
     const { auth } = useContext(AuthContext);
@@ -58,7 +61,53 @@ function ChangeRequestUpdate() {
         FSST: '',
     });
     const [users, setUsers] = useState([]);
-    console.log("From update", changeRequestData);
+    // console.log("From update", changeRequestData);
+    // Timer and Dialog State
+    const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
+    const [countdown, setCountdown] = useState(COUNTDOWN_DURATION);
+    const [remainingTime, setRemainingTime] = useState(TIMEOUT_DURATION);
+    const timeoutRef = useRef(null);
+    const countdownRef = useRef(null);
+
+    // Function to format time in mm:ss
+    const formatTime = (milliseconds) => {
+        const minutes = Math.floor(milliseconds / 60000);
+        const seconds = ((milliseconds % 60000) / 1000).toFixed(0);
+        return `${minutes}:${(seconds < 10 ? '0' : '')}${seconds}`;
+    };
+
+    // Start Timer on Component Mount
+    useEffect(() => {
+        const startTimer = () => {
+            timeoutRef.current = setTimeout(() => {
+                setShowTimeoutDialog(true);
+                startCountdown();
+            }, remainingTime);
+        };
+
+        const startCountdown = () => {
+            countdownRef.current = setInterval(() => {
+                setCountdown((prev) => prev - 1);
+            }, 1000);
+        };
+
+        const updateRemainingTime = () => {
+            const startTime = Date.now();
+            setInterval(() => {
+                const elapsedTime = Date.now() - startTime;
+                setRemainingTime(TIMEOUT_DURATION - elapsedTime);
+            }, 1000);
+        };
+
+        startTimer();
+        updateRemainingTime();
+
+        // Clear timer and countdown on unmount
+        return () => {
+            clearTimeout(timeoutRef.current);
+            clearInterval(countdownRef.current);
+        };
+    }, [navigate]);
     const handleChange = (event) => {
         const { name, value } = event.target; // Destructure name and value from the event
 
@@ -119,7 +168,7 @@ function ChangeRequestUpdate() {
             controller.abort(); // Cleanup request on unmount
         };
     }, []);
-    console.log("From update", users);
+    // console.log("From update", users);
     const [crqs, setCrqs] = useState({
         aat: [],
         ftm: [],
@@ -281,7 +330,7 @@ function ChangeRequestUpdate() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e?.preventDefault();
         const selectedSitesString = selectedSites.join(',');
         const aat_crq = crqs['aat'].join(',') || '';
         const ftm_crq = crqs['ftm'].join(',') || '';
@@ -450,7 +499,10 @@ function ChangeRequestUpdate() {
         }
     };
 
-
+    const handleSaveAndNavigate = async () => {
+        await handleSubmit(); // Trigger save logic
+        setShowTimeoutDialog(false);
+    };
     const labelStyle = {
         marginLeft: "auto", marginRight: "10rem"
     }
@@ -479,15 +531,28 @@ function ChangeRequestUpdate() {
             console.error("❌ Error: ", error);
         }
     };
+    // Handle Countdown Logic
+    useEffect(() => {
+        if (showTimeoutDialog && countdown <= 0) {
+            clearInterval(countdownRef.current);
+            handleBack(); // Navigate back
+        }
+    }, [countdown, showTimeoutDialog, navigate]);
     // useReleaseLock({id:request.id, email:localStorage.getItem("authEmail").split("@")[0]});
     return (
         <div>
+            <div className="flex justify-space-between">
             <button
                 onClick={handleBack} // Go back to the previous page
                 className="px-4 py-2 bg-gray-500 text-white rounded-lg mb-4 hover:bg-gray-600"
             >
                 ← Back
             </button>
+            {/* Display Remaining Time */}
+            <div className="text-center ml-auto">
+                    Time Remaining: {formatTime(remainingTime)}
+                </div>
+            </div>
             <div className="px-8 py-4 border-1 rounded-lg" style={{ borderColor: theme.colors.secondary500 }}>
                 <div className="flex justify-center">
                     <h1 className="text-2xl font-bold text-center mb-3">Update Change Request</h1>
@@ -1028,6 +1093,31 @@ function ChangeRequestUpdate() {
                     </div>
                 </form>
             </div>
+            {/* Timeout Dialog */}
+            {showTimeoutDialog && (
+                    <div className="fixed inset-0 z-1000 flex items-center justify-center backdrop-blur-sm bg-opacity-90">
+                        <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+                            <h2 className="text-lg font-bold text-center mb-4">Update Timeframe Reached</h2>
+                            <p className="text-sm text-gray-700 mb-4">
+                                Your update timeframe has reached. You have {countdown} seconds to save your changes or you will be redirected.
+                            </p>
+                            <div className="flex justify-center space-x-4">
+                                <button
+                                    onClick={handleSaveAndNavigate}
+                                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    Save change
+                                </button>
+                                <button
+                                    onClick={handleBack}
+                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    Cancel change
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
         </div>
     );
 }

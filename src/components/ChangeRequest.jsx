@@ -342,6 +342,12 @@ function ChangeRequest() {
     };
     return (
         <div>
+            <button
+                onClick={()=>navigate(-1)} // Go back to the previous page
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg mb-4 hover:bg-gray-600"
+            >
+                ← Back
+            </button>
             <div className="px-8 py-4 border-1 rounded-lg" style={{ borderColor: theme.colors.secondary500 }}>
                 <div className="flex justify-center">
                     <h1 className="text-2xl font-bold text-center mb-3">Add Change Request</h1>

@@ -56,10 +56,10 @@ export default function Login() {
                     }
                 );
                 if (response.status === 200) {
-                    const { accessToken } = response.data; // Ensure accessToken exists in the response
+                    const { accessToken, user } = response.data; // Ensure accessToken exists in the response
                     console.log(accessToken);
                     // Store accessToken and email (avoid storing passwords)
-                    setAuth({ email, accessToken });
+                    setAuth({ email, accessToken, user });
                     navigate(from, { replace: true });
                 } else {
                     setApiError("Login failed. Please check your email and password.");
