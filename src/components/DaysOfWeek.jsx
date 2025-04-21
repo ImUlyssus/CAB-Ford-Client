@@ -23,7 +23,7 @@ export default function DaysOfWeek() {
                         className="flex items-center justify-center border text-xs"
                         style={{
                             paddingTop: "6px", paddingBottom: "6px",
-                            background: idx === 0 || idx === 6 ? theme.colors.secondary500 : "#003478",
+                            background: idx === 0 || idx === 6 ? "#EAE2C6" : "#003478",
                             color: idx === 0 || idx === 6 ? "black" : theme.colors.secondary500,
                             textAlign: "center",
                         }}
@@ -40,7 +40,7 @@ export default function DaysOfWeek() {
                     className="flex items-center justify-center border text-xs"
                     style={{
                         paddingTop: "6px", paddingBottom: "6px",
-                        background: idx === 0 ? theme.colors.secondary500 : "#003478", // Sunday is idx 0
+                        background: idx === 0 ? '#EAE2C6' : "#003478", // Sunday is idx 0
                         color: idx === 0 ? "black" : theme.colors.secondary500,
                         textAlign: "center",
                     }}

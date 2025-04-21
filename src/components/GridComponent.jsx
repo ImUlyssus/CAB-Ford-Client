@@ -1,25 +1,25 @@
-
 import { useTheme } from "styled-components";
+import React from "react";
+
+const monthMap = {
+    January: 0,
+    February: 1,
+    March: 2,
+    April: 3,
+    May: 4,
+    June: 5,
+    July: 6,
+    August: 7,
+    September: 8,
+    October: 9,
+    November: 10,
+    December: 11,
+};
+
 export default function GridComponent({ data, activeYear }) {
     const monthName = data["month"];
     const year = activeYear;
     const theme = useTheme();
-
-    // Map month names to zero-indexed numerical values
-    const monthMap = {
-        January: 0,
-        February: 1,
-        March: 2,
-        April: 3,
-        May: 4,
-        June: 5,
-        July: 6,
-        August: 7,
-        September: 8,
-        October: 9,
-        November: 10,
-        December: 11,
-    };
 
     const month = monthMap[monthName];
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -28,11 +28,13 @@ export default function GridComponent({ data, activeYear }) {
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     const emptyCells = Array.from({ length: firstDayOfMonth }, () => null);
 
-    // Extract weekend data from the provided strings
-    const weekendInfo = data.aat.slice(0, daysInMonth); // Replace `aat` if another field holds the correct data
-
-    // Function to determine if a day is a weekend based on the `1`s in the string
-    const isWeekend = (index) => weekendInfo[index] === "1";
+    // Function to determine if a day is a weekend based on the date
+    const isWeekend = (index) => {
+        const dayOfMonth = index + 1; // Day of the month
+        const date = new Date(year, month, dayOfMonth);
+        const dayOfWeek = date.getDay(); // 0 (Sunday) to 6 (Saturday)
+        return dayOfWeek === 0 || dayOfWeek === 6; // Weekend is Sunday or Saturday
+    };
 
     return (
         <div
@@ -61,7 +63,7 @@ export default function GridComponent({ data, activeYear }) {
                     className="flex items-center justify-center border py-2 text-xs"
                     style={{
                         backgroundColor: isWeekend(index)
-                            ? theme.colors.secondary500 // Weekend color
+                            ? '#BFBBA9' // Weekend color
                             : "#003478", // Weekday color
                         color: isWeekend(index) ? "black" : theme.colors.secondary500,
                         borderColor: theme.colors.secondary500,
@@ -78,38 +80,67 @@ export default function GridComponent({ data, activeYear }) {
                 ></div>
             ))}
 
-            <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
-                AAT
-            </div>
+            {/* Render Site Rows */}
+            {["AAT", "FTM", "FSST"].map((label, siteIndex) => {
+                const lowercaseSite = label.toLowerCase(); // Convert label to lowercase
+                const siteData = data[lowercaseSite]; // Access the correct site data using lowercase label
 
-            {Array.from({ length: 1 * 37 }, (_, index) => (
-                <div
-                    key={index}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                ></div>
-            ))}
+                return (
+                    <React.Fragment key={label}>
+                        <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">{label}</div>
 
-            <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
-                FTM
-            </div>
+                        {/* Empty Cells Before Month Starts */}
+                        {emptyCells.map((_, index) => (
+                            <div key={`${label}-empty-${index}`} className="flex items-center justify-center border py-2 text-xs bg-gray-200"></div>
+                        ))}
 
-            {Array.from({ length: 1 * 37 }, (_, index) => (
-                <div
-                    key={index}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                ></div>
-            ))}
+                        {/* Site Data */}
+                        {daysArray.map((_, index) => {
+                            const siteValue = siteData[index];
+                            let backgroundColor;
+                            let textColor;
+                            if (siteValue === '1') {
+                                backgroundColor = '#BFBBA9';
+                                textColor = theme.colors.secondary500;
+                            } else if (siteValue === '0') {
+                                backgroundColor = '#EFEEEA';
+                                textColor = theme.colors.primary200;
+                            }else if (siteValue === '2') {
+                                backgroundColor = '#f005bd';
+                                textColor = theme.colors.primary200;
+                            }else if (siteValue === '3') {
+                                backgroundColor = 'green';
+                                textColor = theme.colors.primary200;
+                            }else if (siteValue === '4') {
+                                backgroundColor = '#10e7f7';
+                                textColor = theme.colors.primary200;
+                            }else if (siteValue === '5') {
+                                backgroundColor = 'white';
+                                textColor = theme.colors.primary200;
+                            }
 
-            <div className="flex items-center justify-center border p-2 text-xs bg-transparent font-bold">
-                FSST
-            </div>
+                            return (
+                                <div
+                                    key={`${label}-${index}`}
+                                    className="flex items-center justify-center border py-2 text-xs"
+                                    style={{
+                                        backgroundColor,
+                                        color: textColor,
+                                        borderColor: theme.colors.secondary500,
+                                    }}
+                                >
+                                    {/* {siteValue !== null ? siteValue : ""} */}
+                                </div>
+                            );
+                        })}
 
-            {Array.from({ length: 1 * 37 }, (_, index) => (
-                <div
-                    key={index}
-                    className="flex items-center justify-center border py-2 text-xs bg-gray-200"
-                ></div>
-            ))}
+                        {/* Fill Remaining Cells */}
+                        {Array.from({ length: 37 - (emptyCells.length + daysArray.length) }, (_, index) => (
+                            <div key={`${label}-remaining-${index}`} className="flex items-center justify-center border py-2 text-xs bg-gray-200"></div>
+                        ))}
+                    </React.Fragment>
+                );
+            })}
         </div>
     );
 }
