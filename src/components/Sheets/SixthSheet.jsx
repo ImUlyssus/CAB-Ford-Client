@@ -91,7 +91,7 @@ const SixthSheet = ({ exportSite, isPdfMode }) => {
       .scaleBand()
       .domain(data.map((d) => d.name))
       .range([0, height])
-      .padding(0.2);
+      .padding(0.3);
 
     const offset = 5;
 

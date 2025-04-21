@@ -136,7 +136,10 @@ const EightSheet = ({ isPdfMode }) => {
     chart
       .append("g")
       .attr("transform", `translate(0, ${chartHeight})`)
-      .call(d3.axisBottom(xScale));
+      .call(d3.axisBottom(xScale))
+      .attr("font-size", "12px")
+      .attr("font-weight", "bold")
+      .attr("color", "#003478");
 
   }, [scheduleHours]);
 
@@ -148,6 +151,7 @@ const EightSheet = ({ isPdfMode }) => {
       <svg ref={svgRef}></svg>
   
       {/* Table: Site and Total Work Hours */}
+      {isPdfMode &&
       <div className="mt-10 px-4">
         <h2 className="text-lg font-semibold mb-4 text-center text-[#003478]">
           Site-wise Total Work Hours
@@ -172,6 +176,7 @@ const EightSheet = ({ isPdfMode }) => {
           </tbody>
         </table>
       </div>
+      }
     </div>
   );
   

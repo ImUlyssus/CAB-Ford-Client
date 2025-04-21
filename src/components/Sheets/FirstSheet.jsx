@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
-import { useTheme } from 'styled-components';
 import Dialog from "./Dialog";
 import DataDetail from './DataDetail';
 
@@ -16,7 +15,6 @@ const FirstSheet = ({ isPdfMode }) => {
     const [week5, setWeek5] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedData, setSelectedData] = useState(null);
-    const theme = useTheme();
 
     useEffect(() => {
         const fetchWeeklyData = async () => {
@@ -79,7 +77,7 @@ const FirstSheet = ({ isPdfMode }) => {
                         result.ftm_ongoing_data.push(entry);
                     } else if (change_status === "Completed with no issue") {
                         result.ftm_completed++;
-                        result.ftm_completed_data.push(entry);
+                        result.aat_completed_data.push(entry);
                     } else {
                         result.ftm_rejected++;
                         result.ftm_rejected_data.push(entry);
@@ -118,7 +116,7 @@ const FirstSheet = ({ isPdfMode }) => {
     useEffect(() => {
         weeks = [week5, week4, week3, week2, week1];
     }, [week5, week1, week2, week3, week4])
-    const chartHeight = 240; // Adjust this value based on your chart's height
+    const chartHeight = 255; // Adjust this value based on your chart's height
     const totals = weeks.flatMap(week =>
         [(week.aat_ongoing ?? 0) + (week.aat_completed ?? 0) + (week.aat_rejected ?? 0),
         (week.ftm_ongoing ?? 0) + (week.ftm_completed ?? 0) + (week.ftm_rejected ?? 0),
@@ -126,11 +124,11 @@ const FirstSheet = ({ isPdfMode }) => {
     );
 
     const maxY = Math.max(...totals);
-    const interval = Math.ceil(maxY / 5); // Divide maxY into 5 intervals
 
-    const yAxisLabels = Array.from({ length: 5 }, (_, index) => interval * index).reverse(); // Reduce the number of labels
+    const yAxisLabels = Array.from({ length: maxY + 1 }, (_, index) => maxY - index); // Create an array from maxY down to 0
+
     // Scale factor to normalize bar heights
-    const scaleFactor = chartHeight / (maxY); // Adding 10% to maxY for better scaling
+    const scaleFactor = chartHeight / maxY; // Adding 10% to maxY for better scaling
     // Function to handle bar clicks
     const handleBarClick = (weekData, site, category) => {
         const dataField = `${site}_${category}_data`; // Use the new data field name
@@ -158,217 +156,233 @@ const FirstSheet = ({ isPdfMode }) => {
         ftm_ongoing: week.ftm_ongoing,
         ftm_total: week.ftm_total,
 
-        fsst_completed: week.fsst_completed,
-        fsst_rejected: week.fsst_rejected,
-        fsst_ongoing: week.fsst_ongoing,
+        fsst_completed: week.fsst_rejected,
+        fsst_ongoing: week.fsst_total,
         fsst_total: week.fsst_total,
     }));
 
     return (
         <div className='p-4'>
-    <h1 className="text-xl font-bold mb-2 text-center text-[#003478]">Change request summary from last 4 weeks and current week</h1>
-    {/* Legend */}
-    <div className="flex justify-center space-x-4  text-[#003478]">
-            {/* Completed */}
-            <div className="flex items-center">
-                <div className="w-4 h-4 bg-green-500 mr-2 rounded-[50%]"></div>
-                <span className="text-sm">Completed</span>
-            </div>
-
-            {/* Rejected */}
-            <div className="flex items-center">
-                <div className="w-4 h-4 bg-red-500 mr-2 rounded-[50%]"></div>
-                <span className="text-sm">Rejected</span>
-            </div>
-
-            {/* Ongoing */}
-            <div className="flex items-center">
-                <div className="w-4 h-4 bg-[#FFEB00] mr-2 rounded-[50%]"></div>
-                <span className="text-sm">Ongoing</span>
-            </div>
-        </div>
-    <div className="relative w-full h-64 border-l border-b border-gray-700 ml-3 mt-5  text-[#003478]">
-        {/* Vertical Y-Axis Label */}
-        <div
-            className="absolute left-[-40px] bottom-4 transform -translate-y-1/2 -rotate-90 whitespace-nowrap"
-            style={{
-                transformOrigin: "left center", // Ensure the text rotates around the correct point
-            }}
-        >
-            <span className="text-sm">Change Request Amount</span>
-        </div>
-        {/* Y-Axis Labels */}
-        <div className="absolute left-[-30px] top-0 h-full flex flex-col justify-between"> {/* Adjusted left value */}
-            {yAxisLabels.map((num, index) => (
-                <div key={index} className="flex items-end">
-                    <span className="text-sm">{num}</span>
+            <h1 className="text-xl font-bold mb-2 text-center text-[#003478]">Change request summary from last 4 weeks and current week</h1>
+            {/* Legend */}
+            <div className="flex justify-center space-x-4  text-[#003478]">
+                {/* Completed */}
+                <div className="flex items-center">
+                    <div className="w-4 h-4 bg-green-500 mr-2 rounded-[50%]"></div>
+                    <span className="text-sm">Completed</span>
                 </div>
-            ))}
-        </div>
 
-        {/* Horizontal Grid Lines */}
-        {yAxisLabels.map((_, index) => (
-            <div
-                key={index}
-                className="absolute w-full border-t border-gray-700"
-                style={{
-                    top: `${(index / (yAxisLabels.length)) * 100}%`,
-                    transform: "translateY(-50%)",
-                }}
-            />
-        ))}
-        {/* X-Axis Line */}
-        <div className="absolute bottom-0 left-0 w-full border-t border-gray-700"></div>
+                {/* Rejected */}
+                <div className="flex items-center">
+                    <div className="w-4 h-4 bg-red-500 mr-2 rounded-[50%]"></div>
+                    <span className="text-sm">Rejected</span>
+                </div>
 
-        {/* Bars and X-Axis Labels */}
-        <div className="absolute bottom-[-20px] left-2 right-0 flex justify-around"> {/* Removed space-x-4 */}
-            {weeks.map((weekData, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col items-center">
-                    {/* Render 3 bars for each site */}
-                    <div className="flex flex-row h-full items-end"> {/* Removed space-x-1 */}
-                        {["aat", "ftm", "fsst"].map((site, siteIndex) => {
-                            const ongoing = weekData[`${site}_ongoing`];
-                            const completed = weekData[`${site}_completed`];
-                            const rejected = weekData[`${site}_rejected`];
-                            const totalHeight = ongoing + completed + rejected;
-
-                            // Scale the bar heights to match the Y-axis
-                            const ongoingHeight = ongoing * scaleFactor;
-                            const completedHeight = completed * scaleFactor;
-                            const rejectedHeight = rejected * scaleFactor;
-
-                            return (
-                                <div key={siteIndex} className="flex flex-col items-center justify-end h-full">
-                                    {/* Stack bars for each category */}
-                                    <p style={{ transform: 'rotate(-90deg)', marginBottom: "10px", color: 'gray' }}>{site.toUpperCase()}</p>
-
-                                    {/* Ongoing Bar with Number */}
-                                    <div
-                                        className="relative w-4 bg-[#FFEB00] flex justify-center items-center cursor-pointer"
-                                        style={{ height: `${ongoingHeight}px` }}
-                                        onClick={() => handleBarClick(weekData, site, "ongoing")}
-                                    >
-                                        {ongoing > 0 && (
-                                            <span
-                                                className="absolute left-3 transform -translate-x-1/2 text-xs text-black"
-                                                style={{ top: "50%", transform: "translate(-50%, -50%)" }}
-                                            >
-                                                {ongoing}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Completed Bar with Number */}
-                                    <div
-                                        className="relative w-4 bg-green-500 flex justify-center items-center cursor-pointer"
-                                        style={{ height: `${completedHeight}px` }}
-                                        onClick={() => handleBarClick(weekData, site, "completed")}
-                                    >
-                                        {completed > 0 && (
-                                            <span
-                                                className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
-                                                style={{ top: "50%", transform: "translate(-50%, -50%)" }}
-                                            >
-                                                {completed}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Rejected Bar with Number */}
-                                    <div
-                                        className="relative w-4 bg-red-500 flex justify-center items-center cursor-pointer"
-                                        style={{ height: `${rejectedHeight}px` }}
-                                        onClick={() => handleBarClick(weekData, site, "rejected")}
-                                    >
-                                        {rejected > 0 && (
-                                            <span
-                                                className="absolute left-3 transform -translate-x-1/2 text-xs text-center"
-                                                style={{ top: "50%", transform: "translate(-50%, -50%)" }}
-                                            >
-                                                {rejected}
-                                            </span>
-                                        )}
-                                    </div>
-
-
+                {/* Ongoing */}
+                <div className="flex items-center">
+                    <div className="w-4 h-4 bg-[#FFEB00] mr-2 rounded-[50%]"></div>
+                    <span className="text-sm">Ongoing</span>
+                </div>
+            </div>
+            {/* Chart Section */}
+            <div className="relative w-full h-64 border-l border-b border-gray-700 ml-3 mt-10  text-[#003478]">
+                {/* Vertical Y-Axis Label */}
+                <div
+                    className="absolute left-[-40px] bottom-4 transform -translate-y-1/2 -rotate-90 whitespace-nowrap"
+                    style={{
+                        transformOrigin: "left center",
+                    }}
+                >
+                    <span className="text-sm">Change Request Amount</span>
+                </div>
+                {/* Y-Axis Labels */}
+                <div className="absolute left-[-20px] top-0 h-full flex flex-col">
+                    {yAxisLabels.map((num, index) => {
+                        const labelTop = `${(index / (yAxisLabels.length - 1)) * 100}%`;
+                        return (
+                            index % 2 === 0 && ( // Only render every second label
+                                <div
+                                    key={index}
+                                    className="absolute flex items-end"
+                                    style={{
+                                        top: labelTop,
+                                        transform: 'translateY(-50%)', // Center the label on the grid line
+                                    }}
+                                >
+                                    <span className="text-sm">{num}</span>
                                 </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* X-Axis Label for Each Week */}
-                    <span className="text-sm mt-auto">
-                        {weeks[weekIndex].date}
-                    </span>
-
+                            )
+                        );
+                    })}
                 </div>
-            ))}
+
+                {/* Horizontal Grid Lines */}
+                {yAxisLabels.map((_, index) => {
+                    return (
+                        index % 2 === 0 && ( // Only render every second grid line
+                            <div
+                                key={index}
+                                className="absolute w-full border-t border-gray-700"
+                                style={{
+                                    top: `${(index / (yAxisLabels.length - 1)) * 100}%`,
+                                    transform: "translateY(-50%)",
+                                }}
+                            />
+                        )
+                    );
+                })}
+                {/* X-Axis Line */}
+                <div className="absolute bottom-0 left-0 w-full border-t border-gray-700"></div>
+
+                {/* Bars and X-Axis Labels */}
+                <div className="absolute bottom-[-20px] left-2 right-0 flex justify-around">
+                    {weeks.map((weekData, weekIndex) => (
+                        <div key={weekIndex} className="flex flex-col items-center">
+                            {/* Render 3 bars for each site */}
+                            <div className="flex flex-row h-full items-end">
+                                {["aat", "ftm", "fsst"].map((site, siteIndex) => {
+                                    const ongoing = weekData[`${site}_ongoing`];
+                                    const completed = weekData[`${site}_completed`];
+                                    const rejected = weekData[`${site}_rejected`];
+                                    const totalHeight = ongoing + completed + rejected;
+
+                                    // Scale the bar heights to match the Y-axis
+                                    const ongoingHeight = ongoing * scaleFactor;
+                                    const completedHeight = completed * scaleFactor;
+                                    const rejectedHeight = rejected * scaleFactor;
+
+                                    return (
+                                        <div key={siteIndex} className="flex flex-col items-center justify-end h-full">
+                                            {/* Stack bars for each category */}
+                                            <p style={{ transform: 'rotate(-90deg)', marginBottom: "10px", color: 'gray' }}>{site.toUpperCase()}</p>
+
+                                            {/* Ongoing Bar with Number */}
+                                            <div
+                                                className="relative w-4 bg-[#FFEB00] flex justify-center items-center cursor-pointer"
+                                                style={{ height: `${ongoingHeight}px` }}
+                                                onClick={() => handleBarClick(weekData, site, "ongoing")}
+                                            >
+                                                {ongoing > 0 && (
+                                                    <span
+                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-black"
+                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+                                                    >
+                                                        {ongoing}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Completed Bar with Number */}
+                                            <div
+                                                className="relative w-4 bg-green-500 flex justify-center items-center cursor-pointer"
+                                                style={{ height: `${completedHeight}px` }}
+                                                onClick={() => handleBarClick(weekData, site, "completed")}
+                                            >
+                                                {completed > 0 && (
+                                                    <span
+                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-white"
+                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+                                                    >
+                                                        {completed}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Rejected Bar with Number */}
+                                            <div
+                                                className="relative w-4 bg-red-500 flex justify-center items-center cursor-pointer"
+                                                style={{ height: `${rejectedHeight}px` }}
+                                                onClick={() => handleBarClick(weekData, site, "rejected")}
+                                            >
+                                                {rejected > 0 && (
+                                                    <span
+                                                        className="absolute left-3 transform -translate-x-1/2 text-xs text-center"
+                                                        style={{ top: "50%", transform: "translate(-50%, -50%)" }}
+                                                    >
+                                                        {rejected}
+                                                    </span>
+                                                )}
+                                            </div>
+
+
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* X-Axis Label for Each Week */}
+                            <span className="text-sm mt-auto">
+                                {weeks[weekIndex].date}
+                            </span>
+
+                        </div>
+                    ))}
+                </div>
+                {/* X-Axis Label - "Date" */}
+                <div className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 text-md">
+                    Date
+                </div>
+                {/* Dialog Component */}
+                <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                    <h2 className="text-lg font-semibold mb-2">
+                        {selectedData?.category.toUpperCase()} Requests ({selectedData?.date})
+                    </h2>
+                    <p className="text-sm mb-4">
+                        Showing requests for <strong>{selectedData?.site.toUpperCase()}</strong>
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2">
+                        {selectedData?.filteredData ? (
+                            <DataDetail requests={selectedData.filteredData} />
+                        ) : (
+                            <p className="text-gray-500">No data available.</p>
+                        )}
+                    </ul>
+                </Dialog>
+
+            </div>
+            {/* Table */}
+            {isPdfMode && <div className="mt-[120px] text-xs">
+                <h3 className="font-semibold mb-2 text-center">Weekly Change Request Summary Table</h3>
+                <table className="min-w-full border border-gray-300 text-center">
+                    <thead>
+                        <tr className="bg-gray-100">
+                            <th className="py-2 px-2 border-b">Date</th>
+                            <th className="py-2 px-2 border-b">AAT Com.</th>
+                            <th className="py-2 px-2 border-b">AAT Rej.</th>
+                            <th className="py-2 px-2 border-b">AAT Ong.</th>
+                            <th className="py-2 px-2 border-b">AAT Total</th>
+                            <th className="py-2 px-2 border-b">FTM Comp.</th>
+                            <th className="py-2 px-2 border-b">FTM Rej.</th>
+                            <th className="py-2 px-2 border-b">FTM Ong.</th>
+                            <th className="py-2 px-2 border-b">FTM Total</th>
+                            <th className="py-2 px-2 border-b">FSST Comp.</th>
+                            <th className="py-2 px-2 border-b">FSST Rej.</th>
+                            <th className="py-2 px-2 border-b">FSST Ong.</th>
+                            <th className="py-2 px-2 border-b">FSST Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tableData.map((week, index) => (
+                            <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                <td className="py-2 px-4 border-b">{week.date}</td>
+                                <td className="py-2 px-4 border-b">{week.aat_completed}</td>
+                                <td className="py-2 px-4 border-b">{week.aat_rejected}</td>
+                                <td className="py-2 px-4 border-b">{week.aat_ongoing}</td>
+                                <td className="py-2 px-4 border-b">{week.aat_total}</td>
+                                <td className="py-2 px-4 border-b">{week.ftm_completed}</td>
+                                <td className="py-2 px-4 border-b">{week.ftm_rejected}</td>
+                                <td className="py-2 px-4 border-b">{week.ftm_ongoing}</td>
+                                <td className="py-2 px-4 border-b">{week.ftm_total}</td>
+                                <td className="py-2 px-4 border-b">{week.fsst_completed}</td>
+                                <td className="py-2 px-4 border-b">{week.fsst_rejected ? week.fsst_rejected: 0}</td>
+                                <td className="py-2 px-4 border-b">{week.fsst_ongoing}</td>
+                                <td className="py-2 px-4 border-b">{week.fsst_total}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>}
         </div>
-        {/* X-Axis Label - "Date" */}
-        <div className="absolute bottom-[-60px] left-1/2 transform -translate-x-1/2 text-md">
-            Date
-        </div>
-        {/* Dialog Component */}
-        <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <h2 className="text-lg font-semibold mb-2">
-                {selectedData?.category.toUpperCase()} Requests ({selectedData?.date})
-            </h2>
-            <p className="text-sm mb-4">
-                Showing requests for <strong>{selectedData?.site.toUpperCase()}</strong>
-            </p>
-            <ul className="list-disc pl-5 space-y-2">
-                {selectedData?.filteredData ? (
-                    <DataDetail requests={selectedData.filteredData} />
-                ) : (
-                    <p className="text-gray-500">No data available.</p>
-                )}
-            </ul>
-        </Dialog>
-        
-    </div>
-    {/* Table */}
-    {isPdfMode && <div className="mt-[120px] text-xs">
-        <h3 className="font-semibold mb-2 text-center">Weekly Change Request Summary Table</h3>
-        <table className="min-w-full border border-gray-300 text-center">
-            <thead>
-                <tr className="bg-gray-100">
-                    <th className="py-2 px-2 border-b">Date</th>
-                    <th className="py-2 px-2 border-b">AAT Com.</th>
-                    <th className="py-2 px-2 border-b">AAT Rej.</th>
-                    <th className="py-2 px-2 border-b">AAT Ong.</th>
-                    <th className="py-2 px-2 border-b">AAT Total</th>
-                    <th className="py-2 px-2 border-b">FTM Comp.</th>
-                    <th className="py-2 px-2 border-b">FTM Rej.</th>
-                    <th className="py-2 px-2 border-b">FTM Ong.</th>
-                    <th className="py-2 px-2 border-b">FTM Total</th>
-                    <th className="py-2 px-2 border-b">FSST Comp.</th>
-                    <th className="py-2 px-2 border-b">FSST Rej.</th>
-                    <th className="py-2 px-2 border-b">FSST Ong.</th>
-                    <th className="py-2 px-2 border-b">FSST Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {tableData.map((week, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="py-2 px-4 border-b">{week.date}</td>
-                        <td className="py-2 px-4 border-b">{week.aat_completed}</td>
-                        <td className="py-2 px-4 border-b">{week.aat_rejected}</td>
-                        <td className="py-2 px-4 border-b">{week.aat_ongoing}</td>
-                        <td className="py-2 px-4 border-b">{week.aat_total}</td>
-                        <td className="py-2 px-4 border-b">{week.ftm_completed}</td>
-                        <td className="py-2 px-4 border-b">{week.ftm_rejected}</td>
-                        <td className="py-2 px-4 border-b">{week.ftm_ongoing}</td>
-                        <td className="py-2 px-4 border-b">{week.ftm_total}</td>
-                        <td className="py-2 px-4 border-b">{week.fsst_completed}</td>
-                        <td className="py-2 px-4 border-b">{week.fsst_rejected}</td>
-                        <td className="py-2 px-4 border-b">{week.fsst_ongoing}</td>
-                        <td className="py-2 px-4 border-b">{week.fsst_total}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>}
-</div>
 
     );
 };
