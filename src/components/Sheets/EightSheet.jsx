@@ -153,7 +153,7 @@ const EightSheet = ({ isPdfMode }) => {
       {/* Table: Site and Total Work Hours */}
       {isPdfMode &&
       <div className="mt-10 px-4">
-        <h2 className="text-lg font-semibold mb-4 text-center text-[#003478]">
+        <h2 className="text-lg font-semibold mb-4 text-center">
           Site-wise Total Work Hours
         </h2>
         <table className="min-w-full border border-gray-300">

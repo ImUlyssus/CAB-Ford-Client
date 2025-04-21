@@ -224,7 +224,7 @@ const FifthSheet = ({ exportSite, isPdfMode }) => {
           {/* Table */}
           {exportSite &&
               <div className="mt-8 pdf-only">
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="text-lg font-semibold mb-2 text-center">
                       Change Request Reasons - {siteName.toUpperCase()}
                   </h3>
                   <table className="min-w-full border border-gray-300">

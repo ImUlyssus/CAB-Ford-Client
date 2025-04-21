@@ -1,20 +1,8 @@
 import React, { useState, useRef, useContext } from 'react';
 import { useTheme } from 'styled-components';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
-import jsPDF from 'jspdf';
-import FirstSheet from '../components/Sheets/FirstSheet';
-import SecondSheet from '../components/Sheets/SecondSheet';
-import ThirdSheet from '../components/Sheets/ThirdSheet';
-import FourthSheet from '../components/Sheets/FourthSheet';
-import FifthSheet from '../components/Sheets/FifthSheet';
-import SixthSheet from '../components/Sheets/SixthSheet';
-import SevenSheet from '../components/Sheets/SeventhSheet';
-import EightSheet from '../components/Sheets/EightSheet';
 import AuthContext from '../context/AuthProvider';
 
-
-import * as d3 from "d3";
-import html2canvas from "html2canvas";
 export default function PDFReport() {
     const years = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 10 + i);
     const [activeQuarter, setActiveQuarter] = useState(1);
@@ -133,7 +121,7 @@ export default function PDFReport() {
             <div style={{
                 position: "fixed",
                 top: "83px",
-                left: '20px',
+                left: '0px',
                 right: 0,
                 zIndex: 1000,
                 backgroundColor: theme.colors.primary500,

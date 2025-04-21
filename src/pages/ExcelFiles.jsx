@@ -153,7 +153,7 @@ export default function ExcelFiles() {
             <div style={{
                 position: "fixed",
                 top: "83px",
-                left: '20px',
+                left: '0px',
                 right: 0,
                 zIndex: 1000,
                 backgroundColor: theme.colors.primary500,

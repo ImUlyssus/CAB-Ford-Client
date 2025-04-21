@@ -311,7 +311,7 @@ const ThirdSheet = ({ isPdfMode }) => {
             {/* Table */}
             {isPdfMode && 
             <div className="mt-8 pdf-only">
-                <h3 className="text-lg font-semibold mb-2">Summary Table</h3>
+                <h3 className="text-lg font-semibold mb-2 text-center">Summary Table</h3>
                 <table className="min-w-full border border-gray-300">
                     <thead>
                         <tr className="bg-gray-100">
