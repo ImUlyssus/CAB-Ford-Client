@@ -173,7 +173,7 @@ const SixthSheet = ({ exportSite, isPdfMode }) => {
   const handleSiteChange = (event) => {
     setSelectedSite(event.target.value);
   };
-
+  const siteName = exportSite ? exportSite : selectedSite;
   return (
     <div>
       {exportSite ? (
@@ -222,6 +222,43 @@ const SixthSheet = ({ exportSite, isPdfMode }) => {
       </Dialog>
 
       <svg ref={svgRef}></svg>
+      {/* Table */}
+      {exportSite &&
+        <div className="mt-8 pdf-only">
+          <h3 className="text-lg font-semibold mb-2">
+            Change Request by Priority - {siteName.toUpperCase()}
+          </h3>
+          <table className="min-w-full border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b">Name</th>
+                <th className="py-2 px-4 border-b">CDSID</th>
+                <th className="py-2 px-4 border-b">Count</th>
+              </tr>
+            </thead>
+            <tbody>
+  {aggregatedData[siteName] &&
+    Object.entries(aggregatedData[siteName]).map(([email, details], index) => {
+      const parts = details.fullName.trim().split(" ");
+      const cdsid = parts[parts.length - 1]; // Last word
+      const name = parts.slice(0, -1).join(" "); // Everything before last word
+
+      return (
+        <tr
+          key={index}
+          className={index % 2 === 0 ? "bg-white text-center" : "bg-gray-50 text-center"}
+        >
+          <td className="py-2 px-4 border-b">{name}</td>
+          <td className="py-2 px-4 border-b">{cdsid}</td>
+          <td className="py-2 px-4 border-b">{details.count}</td>
+        </tr>
+      );
+    })}
+</tbody>
+
+          </table>
+        </div>
+      }
     </div>
   );
 };
