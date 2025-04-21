@@ -49,10 +49,11 @@ export default function DataDetail({ requests }) {
                                         <th className={thStyle2}>Requestor</th>
                                         <th className="py-2 px-4 border-b border-r">Approval</th>
                                         <th className={thStyle2}>Change Status</th>
-                                        <th className={thStyle2}>Cancel Change Reason Category</th>
-                                        <th className={thStyle3}>Cancel Change Reason Description</th>
-                                        <th className={thStyle1}>Reschedule Reason</th>
-                                        <th className={thStyle3}>Lesson Learnt</th>
+                                        <th className={thStyle4}>Cancel Change Reason Category</th>
+                                        <th className={thStyle4}>Cancel Change Reason Description</th>
+                                        <th className={thStyle4}>Reschedule Reason</th>
+                                        <th className={thStyle4}>Lesson Learnt</th>
+                                        <th className={thStyle4}>Remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -217,11 +218,12 @@ export default function DataDetail({ requests }) {
                                                         }
                                                     </td>
                                                     <td className="py-2 px-2 border-b border-r text-center">{request.approval}</td>
-                                                    <td className="py-2 px-2 border-b border-r">{request.change_status}</td>
+                                                    <td className="py-2 px-2 border-b border-r text-center">{request.change_status}</td>
                                                     <td className="py-2 px-2 border-b border-r text-center">{request.cancel_change_category}</td>
                                                     <td className="py-2 px-2 border-b border-r">{request.cancel_change_reason}</td>
                                                     <td className="py-2 px-2 border-b border-r">{request.reschedule_reason}</td>
                                                     <td className="py-2 px-2 border-b border-r">{request.lesson_learnt}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{request.remarks}</td>
                                                 </tr>
                                             </>
                                         );

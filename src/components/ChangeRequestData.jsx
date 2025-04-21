@@ -358,7 +358,7 @@ export default function ChangeRequestData() {
                                                     </td>
                                                     {/* <td className="py-2 px-4 border-b border-r">{request.common_crq}</td> */}
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.approval}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.change_status}</td>
+                                                    <td className="py-2 px-4 border-b border-r text-center">{request.change_status}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.cancel_change_category}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.reschedule_reason}</td>

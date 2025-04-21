@@ -156,10 +156,12 @@ const FirstSheet = ({ isPdfMode }) => {
         ftm_ongoing: week.ftm_ongoing,
         ftm_total: week.ftm_total,
 
-        fsst_completed: week.fsst_rejected,
-        fsst_ongoing: week.fsst_total,
+        fsst_completed: week.fsst_completed,
+        fsst_rejected: week.fsst_rejected,
+        fsst_ongoing: week.fsst_ongoing,
         fsst_total: week.fsst_total,
     }));
+
 
     return (
         <div className='p-4'>
@@ -374,7 +376,7 @@ const FirstSheet = ({ isPdfMode }) => {
                                 <td className="py-2 px-4 border-b">{week.ftm_ongoing}</td>
                                 <td className="py-2 px-4 border-b">{week.ftm_total}</td>
                                 <td className="py-2 px-4 border-b">{week.fsst_completed}</td>
-                                <td className="py-2 px-4 border-b">{week.fsst_rejected ? week.fsst_rejected: 0}</td>
+                                <td className="py-2 px-4 border-b">{week.fsst_rejected}</td>
                                 <td className="py-2 px-4 border-b">{week.fsst_ongoing}</td>
                                 <td className="py-2 px-4 border-b">{week.fsst_total}</td>
                             </tr>
