@@ -222,7 +222,7 @@ const FifthSheet = ({ exportSite, isPdfMode }) => {
           <svg ref={svgRef}></svg>
 
           {/* Table */}
-          {isPdfMode && (
+          {exportSite &&
               <div className="mt-8 pdf-only">
                   <h3 className="text-lg font-semibold mb-2">
                       Change Request Reasons - {siteName.toUpperCase()}
@@ -236,7 +236,7 @@ const FifthSheet = ({ exportSite, isPdfMode }) => {
                       </thead>
                       <tbody>
                           {reasons.map((reason, index) => (
-                              <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                              <tr key={index} className={index % 2 === 0 ? 'bg-white text-center' : 'bg-gray-50 text-center'}>
                                   <td className="py-2 px-4 border-b">{reason}</td>
                                   <td className="py-2 px-4 border-b">
                                       {aggregatedData[siteName]?.[reason]?.count || 0}
@@ -246,7 +246,7 @@ const FifthSheet = ({ exportSite, isPdfMode }) => {
                       </tbody>
                   </table>
               </div>
-          )}
+          }
       </div>
   );
 };
