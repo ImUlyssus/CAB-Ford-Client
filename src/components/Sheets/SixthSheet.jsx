@@ -4,7 +4,7 @@ import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog.jsx";
 import DataDetail from "./DataDetail";
 
-const SixthSheet = ({exportSite, isPdfMode }) => {
+const SixthSheet = ({ exportSite, isPdfMode }) => {
   const { auth } = useContext(AuthContext);
   const [aggregatedData, setAggregatedData] = useState({});
   const [selectedData, setSelectedData] = useState(null);
@@ -153,21 +153,18 @@ const SixthSheet = ({exportSite, isPdfMode }) => {
   const handleSiteChange = (event) => {
     setSelectedSite(event.target.value);
   };
-
+  const siteName = exportSite ? exportSite : selectedSite;
   return (
     <div>
       {exportSite ? (
-  <h2 className="text-lg font-bold text-center text-[#003478]">
-    Change Requests by Priority for <strong>{exportSite.toUpperCase()}</strong>
-  </h2>
-):
-<h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
-        Change Requests by Priority {exportSite && ` for ${exportSite.toUpperCase()}`}
-      </h1>
-}
-
-      
-
+        <h2 className="text-lg font-bold text-center text-[#003478]">
+          Change Requests by Priority for <strong>{exportSite.toUpperCase()}</strong>
+        </h2>
+      ) :
+        <h1 className="text-xl font-bold mb-3 text-center text-[#003478]">
+          Change Requests by Priority {exportSite && ` for ${exportSite.toUpperCase()}`}
+        </h1>
+      }
       {/* Site Selection Dropdown */}
       <div className="flex justify-center mb-2 text-[#003478]">
         <label htmlFor="site-select" className="mr-2 mt-1">
@@ -203,6 +200,32 @@ const SixthSheet = ({exportSite, isPdfMode }) => {
       </Dialog>
 
       <svg ref={svgRef}></svg>
+      {/* Table */}
+      {exportSite &&
+        <div className="mt-8 pdf-only">
+          <h3 className="text-lg font-semibold mb-2">
+            Change Request by Priority - {siteName.toUpperCase()}
+          </h3>
+          <table className="min-w-full border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b">Priority</th>
+                <th className="py-2 px-4 border-b">Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {priorities.map((priority, index) => (
+                <tr key={index} className={index % 2 === 0 ? 'bg-white text-center' : 'bg-gray-50 text-center'}>
+                  <td className="py-2 px-4 border-b">{priority}</td>
+                  <td className="py-2 px-4 border-b">
+                    {aggregatedData[siteName]?.[priority]?.count || 0}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      }
     </div>
   );
 };
