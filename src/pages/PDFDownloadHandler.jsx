@@ -52,7 +52,21 @@ const PDFDownloadHandler = () => {
       if (!node) continue;
 
       try {
-        const dataUrl = await domtoimage.toPng(node, { cacheBust: true });
+        const width = node.offsetWidth;
+        const height = node.offsetHeight;
+
+        const dataUrl = await domtoimage.toJpeg(node, {
+          quality: 0.7,
+          width,
+          height,
+          style: {
+            width: `${width}px`,
+            height: `${height}px`,
+          },
+          cacheBust: true,
+        });
+
+
         const img = new Image();
         img.src = dataUrl;
 
@@ -61,7 +75,8 @@ const PDFDownloadHandler = () => {
             const imgWidth = pdfWidth;
             const imgHeight = (img.height * imgWidth) / img.width;
             if (i > 0) pdf.addPage();
-            pdf.addImage(img, 'PNG', 0, 0, imgWidth, imgHeight);
+            const margin = 5;
+            pdf.addImage(img, 'JPEG', margin, margin, imgWidth - 2 * margin, imgHeight - 2 * margin);
             resolve();
           };
         });
@@ -74,13 +89,13 @@ const PDFDownloadHandler = () => {
     pdf.save(`${fileName}.pdf`);
     setIsPdfMode(false);
   };
-useEffect(() => {
+  useEffect(() => {
     if (triggerDownload?.downloading) {
-        handleDownload().then(() => {
-            triggerDownload.done();
-        });
+      handleDownload().then(() => {
+        triggerDownload.done();
+      });
     }
-}, [triggerDownload]);
+  }, [triggerDownload]);
 
 
   return (

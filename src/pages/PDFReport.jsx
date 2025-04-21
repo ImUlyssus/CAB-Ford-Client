@@ -178,7 +178,7 @@ export default function PDFReport() {
                                 <h3 className="text-lg font-bold">{month}</h3>
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
-                                        className="col-span-2 inline-block px-2 py-1 border rounded bg-blue-200 text-black"
+                                        className="col-span-2 inline-block px-2 py-1 border rounded bg-blue-200 text-black cursor-pointer"
                                         onClick={() => downloadData(firstDayOfMonth, lastDayOfMonth, `${month}-${selectedYear}`)}
                                     >
                                         Download {month} ({formatDate(firstDayOfMonth)} TO {formatDate(lastDayOfMonth, true)})
@@ -186,10 +186,10 @@ export default function PDFReport() {
                                     {weeks.map((week, idx) => (
                                         <span
                                             key={idx}
-                                            className="inline-block px-2 py-1 border rounded bg-gray-200 text-black text-center"
+                                            className="inline-block px-2 py-1 border rounded bg-gray-200 text-black text-center cursor-pointer"
                                             onClick={() => downloadData(week.startDate, week.endDate, `${month}-Week-${idx + 1}-${selectedYear}`)}
                                         >
-                                            {week.startMonth !== week.endMonth
+                                            Download {week.startMonth !== week.endMonth
                                                 ? `${months[week.startMonth]} ${week.start} - ${months[week.endMonth]} ${week.end}`
                                                 : `${months[week.startMonth]} ${week.start} - ${week.end}`}
                                         </span>
@@ -207,7 +207,7 @@ export default function PDFReport() {
                 {/* Year Download */}
                 <div className="mb-4">
                     <button
-                        className="w-full inline-block px-2 py-1 border rounded bg-yellow-200 text-black"
+                        className="w-full inline-block px-2 py-1 border rounded bg-yellow-200 text-black cursor-pointer"
                         onClick={() => {
                             const { start, end } = getYearDates(selectedYear);
                             downloadData(start, end, `Year-${selectedYear}`);
@@ -225,7 +225,7 @@ export default function PDFReport() {
                         return (
                             <button
                                 key={quarter}
-                                className="inline-block px-2 py-1 border rounded bg-green-200 text-black"
+                                className="inline-block px-2 py-1 border rounded bg-green-200 text-black cursor-pointer"
                                 onClick={() => downloadData(start, end, `Quarter-${quarter}-${selectedYear}`)}
                             >
                                 Download {selectedYear} Quarter {quarter} ({formatDate(start)} TO {formatDate(end, true)})
@@ -242,7 +242,7 @@ export default function PDFReport() {
                         return (
                             <button
                                 key={quarter}
-                                className="inline-block px-2 py-1 border rounded bg-green-200 text-black"
+                                className="inline-block px-2 py-1 border rounded bg-green-200 text-black cursor-pointer"
                                 onClick={() => downloadData(start, end, `Quarter-${quarter}-${selectedYear}`)}
                             >
                                 Download {selectedYear} Quarter {quarter} ({formatDate(start)} TO {formatDate(end, true)})
