@@ -288,10 +288,9 @@ function ChangeRequestUpdate() {
             <div className="absolute top-0 right-12 mt-2 w-64 p-3 bg-gray-800 text-white rounded-lg shadow-lg text-sm z-10">
                 <h3 className="font-bold mb-2">Text Styling Syntax:</h3>
                 <ul className="list-disc list-inside">
-                    <li><strong>New Line:</strong> <code>[br]</code></li>
+                <li><strong>New Line:</strong> <code>[br]</code></li>
                     <li><strong>Bold:</strong> <code>[b]text[/b]</code></li>
-                    <li><strong>Center:</strong> <code>[center]text[/center]</code></li>
-                    <li><strong>Bullet Point:</strong> <code>[*] item</code></li>
+                    <li><strong>Center:</strong> <code>[c]text[/c]</code></li>
                 </ul>
                 <button
                     onClick={onClose}

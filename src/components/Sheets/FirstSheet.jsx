@@ -324,8 +324,11 @@ const FirstSheet = ({ isPdfMode }) => {
                 <div className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 text-md">
                     Date
                 </div>
-                {/* Dialog Component */}
-                <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                
+
+            </div>
+            {/* Dialog Component */}
+            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                     <h2 className="text-lg font-semibold mb-2">
                         {selectedData?.category.toUpperCase()} Requests ({selectedData?.date})
                     </h2>
@@ -340,8 +343,6 @@ const FirstSheet = ({ isPdfMode }) => {
                         )}
                     </ul>
                 </Dialog>
-
-            </div>
             {/* Table */}
             {isPdfMode && <div className="mt-[120px] text-xs">
                 <h3 className="font-semibold mb-2 text-center">Weekly Change Request Summary Table</h3>

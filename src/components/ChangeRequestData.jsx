@@ -7,6 +7,7 @@ import FilteredBar from "./FilteredBar";
 import AuthContext from '../context/AuthProvider';
 import VHDrawer from './VHDrawer';
 import { History } from "lucide-react";
+import StyleText from "./StyleText";
 
 export default function ChangeRequestData() {
     const [changeRequests, setChangeRequests] = useState([]);
@@ -255,17 +256,17 @@ export default function ChangeRequestData() {
                                                     <td className="py-2 px-4 border-b border-r">{request.description}</td>
                                                     <td className="px-2 py-2 border-b border-r text-center">
                                                         <div className="max-h-70 overflow-y-auto border-2 border-gray-300 rounded-lg p-2">
-                                                            {request.aat_test_plan !== null && request.aat_test_plan !== '' && <p className="text-xs font-semibold text-center">AAT Test Plan</p>}
+                                                            {request.aat_test_plan !== null && request.aat_test_plan !== '' && <p className="text-xs font-semibold text-center text-[#beef70]">AAT Test Plan</p>}
                                                             {request.aat_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.aat_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.aat_test_plan)}</div>
                                                             }
-                                                            {request.ftm_test_plan !== null && request.ftm_test_plan !== '' && <p className="text-xs font-semibold text-center">FTM Test Plan</p>}
+                                                            {request.ftm_test_plan !== null && request.ftm_test_plan !== '' && <p className="text-xs font-semibold text-center text-[#beef70] mt-2">FTM Test Plan</p>}
                                                             {request.ftm_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.ftm_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.ftm_test_plan)}</div>
                                                             }
-                                                            {request.fsst_test_plan !== null && request.fsst_test_plan !== '' && <p className="text-xs font-semibold text-center">FSST Test Plan</p>}
+                                                            {request.fsst_test_plan !== null && request.fsst_test_plan !== '' && <p className="text-xs font-semibold text-center text-[#beef70] mt-2">FSST Test Plan</p>}
                                                             {request.fsst_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.fsst_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.fsst_test_plan)}</div>
                                                             }
                                                         </div>
                                                     </td>

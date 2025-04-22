@@ -72,8 +72,7 @@ function ChangeRequest() {
                 <ul className="list-disc list-inside">
                     <li><strong>New Line:</strong> <code>[br]</code></li>
                     <li><strong>Bold:</strong> <code>[b]text[/b]</code></li>
-                    <li><strong>Center:</strong> <code>[center]text[/center]</code></li>
-                    <li><strong>Bullet Point:</strong> <code>[*] item</code></li>
+                    <li><strong>Center:</strong> <code>[c]text[/c]</code></li>
                 </ul>
                 <button
                     onClick={onClose}

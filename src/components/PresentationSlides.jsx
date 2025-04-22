@@ -25,7 +25,7 @@ const baseSlides = [
     ForApprovalAAT,
     ForApprovalFTM,
     ForApprovalFSST,
-    Summary,
+    // Summary,
     QandAPage
 ];
 
