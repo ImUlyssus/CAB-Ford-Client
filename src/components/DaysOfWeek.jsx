@@ -1,15 +1,15 @@
 
 import { useTheme } from "styled-components";
 
-export default function DaysOfWeek() {
+export default function DaysOfWeek({isForPresentation}) {
     const theme = useTheme();
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const repetitions = 5; // 5 repetitions of the week
 
     return (
         <div 
-            className="grid" 
-            style={{ gridTemplateColumns: "50px 100px repeat(37, 1fr)" }}
+            className="grid"
+            style={{ gridTemplateColumns: "50px 100px repeat(37, 1fr)",color: isForPresentation ? 'black' : theme.colors.secondary500 }}
         >
             {/* Empty cells for alignment with GridComponent */}
             <div className="bg-transparent"></div>
@@ -20,12 +20,15 @@ export default function DaysOfWeek() {
                 days.map((day, idx) => (
                     <div
                         key={`${day}-${idx}`}
-                        className="flex items-center justify-center border text-xs"
+                        className={`flex items-center justify-center border ${isForPresentation?'text-[10px]':'text-xs'}`}
                         style={{
                             paddingTop: "6px", paddingBottom: "6px",
                             background: idx === 0 || idx === 6 ? "#EAE2C6" : "#003478",
                             color: idx === 0 || idx === 6 ? "black" : theme.colors.secondary500,
                             textAlign: "center",
+                            // paddingLeft: isForPresentation ? "0.5px":'0', paddingRight: isForPresentation ? "1px":'0',
+                            // width: isForPresentation ? '14px' : 'auto',
+                            // height: 'auto',
                         }}
                     >
                         {day}

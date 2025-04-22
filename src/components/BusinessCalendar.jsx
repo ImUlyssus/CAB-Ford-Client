@@ -49,14 +49,14 @@ export default function BusinessCalendar({calendar}) {
             </div>
             {/* Days of week section */}
             <div className="mt-3">
-            <DaysOfWeek />
+                <DaysOfWeek isForPresentation={false} />
             </div>
             <div className="mt-3">
             {/* <Calendar data={filteredCalendarData} /> */}
             <div style={{ height: "450px", overflowY: "auto", paddingBottom: "10px" }}>
                 {filteredCalendarData.map((monthData, index) => (
                     <div key={index} style={{ paddingTop: "10px" }}>
-                        <GridComponent data={monthData} activeYear={activeYear} />
+                        <GridComponent data={monthData} activeYear={activeYear} isForPresentation={false}/>
                     </div>
                 ))}
             </div>

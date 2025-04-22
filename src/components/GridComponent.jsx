@@ -16,7 +16,7 @@ const monthMap = {
     December: 11,
 };
 
-export default function GridComponent({ data, activeYear }) {
+export default function GridComponent({ data, activeYear, isForPresentation }) {
     const monthName = data["month"];
     const year = activeYear;
     const theme = useTheme();
@@ -39,7 +39,7 @@ export default function GridComponent({ data, activeYear }) {
     return (
         <div
             className="grid grid-rows-4 border"
-            style={{ gridTemplateColumns: "90px 60px repeat(37, 1fr)" }}
+            style={{ gridTemplateColumns: "90px 60px repeat(37, 1fr)",color: isForPresentation ? 'black' : theme.colors.secondary500 }}
         >
             <div className="row-span-4 flex items-center text-center justify-center border p-2 text-xs bg-transparent font-bold">
                 {activeYear || "Loading..."} <br />
@@ -126,7 +126,7 @@ export default function GridComponent({ data, activeYear }) {
                                     style={{
                                         backgroundColor,
                                         color: textColor,
-                                        borderColor: theme.colors.secondary500,
+                                        borderColor: isForPresentation ? 'black' : theme.colors.secondary500
                                     }}
                                 >
                                     {/* {siteValue !== null ? siteValue : ""} */}
@@ -136,7 +136,7 @@ export default function GridComponent({ data, activeYear }) {
 
                         {/* Fill Remaining Cells */}
                         {Array.from({ length: 37 - (emptyCells.length + daysArray.length) }, (_, index) => (
-                            <div key={`${label}-remaining-${index}`} className="flex items-center justify-center border py-2 text-xs bg-gray-200"></div>
+                            <div key={`${label}-remaining-${index}`} className="flex items-center justify-center border py-2 text-xs bg-gray-200" style={{ color: isForPresentation ? 'black' : theme.colors.secondary500  }}></div>
                         ))}
                     </React.Fragment>
                 );

@@ -29,7 +29,7 @@ const Presentation = () => {
         <div>
             {/* Presentation Section */}
             <div className="mt-4">
-                <PresentationSlides />
+                <PresentationSlides calendar={calendar} />
             </div>
             {/* <div className="w-full mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div> */}
             {/* Calender Section */}

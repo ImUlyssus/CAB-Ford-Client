@@ -9,294 +9,310 @@ import ApprovedCRR from "./Presentation/ApprovedCRR";
 import ForApprovalCommon from "./Presentation/ForApprovalCommon";
 import ForApprovalAAT from "./Presentation/ForApprovalAAT";
 import ForApprovalFTM from "./Presentation/ForApprovalFTM";
-import ForApprovalFSST from "./Presentation/ForApprovalFSST";
+import ForApprovalFSST from "./Presentation/Summary";
 import Summary from "./Presentation/Summary";
 import QandAPage from "./Presentation/QandAPage";
 import CustomDateDialog from './PresentationCustomDateDialog';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-const slides = [
-  CoverPage,
-  BusinessCalendarSlide,
-  ApprovedCRC,
-  ApprovedCRO,
-  ApprovedCRR,
-  ForApprovalCommon,
-  ForApprovalAAT,
-  ForApprovalFTM,
-  ForApprovalFSST,
-  Summary,
-  QandAPage
+const baseSlides = [
+    CoverPage,
+    BusinessCalendarSlide,
+    ApprovedCRC,
+    ApprovedCRO,
+    ApprovedCRR,
+    ForApprovalCommon,
+    ForApprovalAAT,
+    ForApprovalFTM,
+    ForApprovalFSST,
+    Summary,
+    QandAPage
 ];
 
-export default function Carousel() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const theme = useTheme();
-  const [isCustomDateOpen, setIsCustomDateOpen] = useState(false);
-  const [customDate, setCustomDate] = useState(false);
-  const [changeRequests, setChangeRequests] = useState([]);
-  const [processedChangeRequests, setProcessedChangeRequests] = useState({ approved: [], toApprove: [] });
-  const axiosPrivate = useAxiosPrivate();
-  const navigate = useNavigate();
+export default function Carousel({calendar}) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const theme = useTheme();
+    const [isCustomDateOpen, setIsCustomDateOpen] = useState(false);
+    const [customDate, setCustomDate] = useState(false);
+    const [changeRequests, setChangeRequests] = useState([]);
+    const [processedChangeRequests, setProcessedChangeRequests] = useState({ approved: [], toApprove: [] });
+    const axiosPrivate = useAxiosPrivate();
+    const navigate = useNavigate();
 
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? slides.length - 1 : prevIndex - 1));
-  };
+    const [slides, setSlides] = useState(baseSlides);
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === slides.length - 1 ? 0 : prevIndex + 1));
-  };
-
-  const toggleFullscreen = () => {
-    if (!isFullscreen) {
-      document.documentElement.requestFullscreen?.().catch(err => {
-        console.error(`Error attempting to enable fullscreen: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen?.();
-    }
-  };
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
-  const getThisWeekData = async () => {
-    try {
-      const response = await axiosPrivate.get('/change-requests/get-this-week-data');
-      console.log(response.data);
-      setChangeRequests(response.data);
-    } catch (err) {
-      console.error("Error fetching this week data:", err.response ? err.response.data : err.message); // Debugging
-      // setError(err.response ? err.response.data.message : err.message);
-      navigate('/login', { state: { from: location }, replace: true });
-    }
-  };
-  useEffect(() => {
-    getThisWeekData();
-  }, []);
-  useEffect(() => {
-    // Function to process schedule data
-    const processScheduleData = (requests) => {
-      return requests.map(request => {
-        const processedRequest = { ...request }; // Create a copy
-        const statuses = [];
-  
-        const sites = ['aat', 'ftm', 'fsst'];
-        sites.forEach(site => {
-          const scheduleKey = `${site}_schedule_change`;
-          if (processedRequest[scheduleKey]) {
-            processedRequest[scheduleKey] = processedRequest[scheduleKey]
-              .split(' ')
-              .map(schedule => {
-                const [startdate, enddate, schedule_title, status, comment] = schedule.split('!');
-                const cleanedStatus = status ? status.replace(/_/g, ' ') : null; // Clean the status
-                statuses.push(cleanedStatus);
-                return {
-                  startdate: startdate || null,
-                  enddate: enddate || null,
-                  schedule_title: schedule_title ? schedule_title.replace(/_/g, ' ') : null,
-                  status: cleanedStatus, // Use cleaned status
-                  comment: comment ? comment.replace(/_/g, ' ') : null
-                };
-              });
-          }
-        });
-  
-        // Determine final status
-        let finalStatus = null;
-        const uniqueStatuses = [...new Set(statuses)]; // Get unique statuses
-  
-        if (uniqueStatuses.length === 1) {
-          finalStatus = uniqueStatuses[0]; // Case 1: All statuses are the same
-        } else if (statuses.includes("Postponed/Canceled")) {
-          finalStatus = "Postponed/Canceled"; // Case 2: One status is Postponed/Canceled
-        } else if (uniqueStatuses.every(status => ["Completed with no issue", "In progress", "On plan"].includes(status))) {
-          finalStatus = "On plan"; // Case 3: Combination of "Completed with no issue", "In progress", "On plan"
-        } else if (uniqueStatuses.every(status => ["In progress", "On plan"].includes(status))) {
-          finalStatus = "On plan"; // Case 3: Combination of "Completed with no issue", "In progress", "On plan"
+    useEffect(() => {
+        if (customDate) {
+            // Remove BusinessCalendarSlide from slides array
+            setSlides(prevSlides => prevSlides.filter(slide => slide !== BusinessCalendarSlide));
+        } else {
+            // Restore BusinessCalendarSlide if it was removed
+            if (!slides.includes(BusinessCalendarSlide)) {
+                setSlides(prevSlides => {
+                    const newSlides = [...baseSlides];
+                    return newSlides;
+                });
+            }
         }
-  
-        processedRequest.final_status = finalStatus; // Add final status to the object
-        return processedRequest;
-      });
+    }, [customDate]);
+    const prevSlide = () => {
+        setCurrentIndex((prevIndex) => (prevIndex === 0 ? slides.length - 1 : prevIndex - 1));
     };
-  
-    // Process both approved and toApprove arrays
-    setProcessedChangeRequests({
-      approved: changeRequests.approved ? processScheduleData(changeRequests.approved) : [],
-      toApprove: changeRequests.toApprove ? processScheduleData(changeRequests.toApprove) : []
-    });
-  }, [changeRequests]);
-  
-  const handleSave = async (startDate, presentationDate, endDate) => {
-    const formattedStartDate = `${startDate} 00:00:00`;
-    const formattedPresentationDate = `${presentationDate} 00:00:00`;
-    const formattedEndDate = `${endDate} 23:59:59`;
-    console.log("Formatted Dates:", formattedStartDate, formattedPresentationDate, formattedEndDate);
 
-    try {
-        const response = await axiosPrivate.get("/change-requests/custom-date-presentation", {
-            params: {
-                start: formattedStartDate,
-                presentation: formattedPresentationDate,
-                end: formattedEndDate,
-            },
-        });
+    const nextSlide = () => {
+        setCurrentIndex((prevIndex) => (prevIndex === slides.length - 1 ? 0 : prevIndex + 1));
+    };
 
-        console.log("📥 Custom Date Data:", response.data);
-        setChangeRequests(response.data); // Update state with filtered data
-        setIsCustomDateOpen(false);
-        setCustomDate(true);
-    } catch (err) {
-        console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
-    }
-};
-  // console.log(changeRequests);
-  // Common props for slides
-  const slideProps = { theme, changeRequests: processedChangeRequests };
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (isFullscreen) {
-        if (event.key === 'ArrowRight') {
-          nextSlide();
-        } else if (event.key === 'ArrowLeft') {
-          prevSlide();
+    const toggleFullscreen = () => {
+        if (!isFullscreen) {
+            document.documentElement.requestFullscreen?.().catch(err => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen?.();
         }
-      }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => {
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        };
+    }, []);
+    const getThisWeekData = async () => {
+        try {
+            const response = await axiosPrivate.get('/change-requests/get-this-week-data');
+            console.log(response.data);
+            setChangeRequests(response.data);
+        } catch (err) {
+            console.error("Error fetching this week data:", err.response ? err.response.data : err.message); // Debugging
+            // setError(err.response ? err.response.data.message : err.message);
+            navigate('/login', { state: { from: location }, replace: true });
+        }
     };
-  }, [isFullscreen, nextSlide, prevSlide]);
-  // Fullscreen presentation view
-  if (isFullscreen) {
-    return (
-      <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
-        <div className="w-full h-[80%] relative">
-          {slides.map((SlideComponent, index) => (
-            <div
-              key={index}
-              className={`w-[100%] absolute inset-y-0 left-1/2 transform -translate-x-1/2 transition-opacity duration-500 ease-in-out ${index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
-                }`}
-            >
-              {React.createElement(SlideComponent, slideProps)}
-            </div>
-          ))}
+    useEffect(() => {
+        getThisWeekData();
+    }, []);
+    useEffect(() => {
+        // Function to process schedule data
+        const processScheduleData = (requests) => {
+            return requests.map(request => {
+                const processedRequest = { ...request }; // Create a copy
+                const statuses = [];
 
-          {/* Fullscreen controls (keep existing) */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-black/30 p-4 rounded-full text-white hover:bg-black/50 transition text-3xl"
-          >
-            ❮
-          </button>
-          <button
-            onClick={nextSlide}
-            className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-black/30 p-4 rounded-full text-white hover:bg-black/50 transition text-3xl"
-          >
-            ❯
-          </button>
-        </div>
-        <button
-          onClick={toggleFullscreen}
-          className="absolute top-4 right-4 bg-black/30 p-3 rounded-full text-white hover:bg-black/50 transition"
-        >
-          Exit
-        </button>
-      </div>
-    );
-  }
+                const sites = ['aat', 'ftm', 'fsst'];
+                sites.forEach(site => {
+                    const scheduleKey = `${site}_schedule_change`;
+                    if (processedRequest[scheduleKey]) {
+                        processedRequest[scheduleKey] = processedRequest[scheduleKey]
+                            .split(' ')
+                            .map(schedule => {
+                                const [startdate, enddate, schedule_title, status, comment] = schedule.split('!');
+                                const cleanedStatus = status ? status.replace(/_/g, ' ') : null; // Clean the status
+                                statuses.push(cleanedStatus);
+                                return {
+                                    startdate: startdate || null,
+                                    enddate: enddate || null,
+                                    schedule_title: schedule_title ? schedule_title.replace(/_/g, ' ') : null,
+                                    status: cleanedStatus, // Use cleaned status
+                                    comment: comment ? comment.replace(/_/g, ' ') : null
+                                };
+                            });
+                    }
+                });
 
-  // Normal view
-  return (
-    <>
-      <div className="flex justify-between items-center mt-2">
-        <h1 className="m-0 font-bold text-xl">This week presentation</h1>
-        <div className="flex space-x-3">
-          {customDate ?
-            <button
-              className="bg-gray-500 hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
-              onClick={() => {
-                setCustomDate(false);
-                getThisWeekData();
-              }}
-            >
-              Clear Custom Date
-            </button>
-            : <button
-              className="border-1 border-[#beef00] hover:bg-[#beef70] hover:text-black text-[#beef70] font-bold py-2 px-4 rounded"
-              onClick={() => {
-                setIsCustomDateOpen(true);
-                setCustomDate(true);
-              }
-              }
-            >
-              Custom Date
-            </button>}
+                // Determine final status
+                let finalStatus = null;
+                const uniqueStatuses = [...new Set(statuses)]; // Get unique statuses
 
-          {/* Dialog for selecting dates */}
-          <CustomDateDialog open={isCustomDateOpen} onClose={() => {
-            setCustomDate(false);
+                if (uniqueStatuses.length === 1) {
+                    finalStatus = uniqueStatuses[0]; // Case 1: All statuses are the same
+                } else if (statuses.includes("Postponed/Canceled")) {
+                    finalStatus = "Postponed/Canceled"; // Case 2: One status is Postponed/Canceled
+                } else if (uniqueStatuses.every(status => ["Completed with no issue", "In progress", "On plan"].includes(status))) {
+                    finalStatus = "On plan"; // Case 3: Combination of "Completed with no issue", "In progress", "On plan"
+                } else if (uniqueStatuses.every(status => ["In progress", "On plan"].includes(status))) {
+                    finalStatus = "On plan"; // Case 3: Combination of "Completed with no issue", "In progress", "On plan"
+                }
+
+                processedRequest.final_status = finalStatus; // Add final status to the object
+                return processedRequest;
+            });
+        };
+
+        // Process both approved and toApprove arrays
+        setProcessedChangeRequests({
+            approved: changeRequests.approved ? processScheduleData(changeRequests.approved) : [],
+            toApprove: changeRequests.toApprove ? processScheduleData(changeRequests.toApprove) : []
+        });
+    }, [changeRequests]);
+
+    const handleSave = async (startDate, presentationDate, endDate) => {
+        const formattedStartDate = `${startDate} 00:00:00`;
+        const formattedPresentationDate = `${presentationDate} 00:00:00`;
+        const formattedEndDate = `${endDate} 23:59:59`;
+        console.log("Formatted Dates:", formattedStartDate, formattedPresentationDate, formattedEndDate);
+
+        try {
+            const response = await axiosPrivate.get("/change-requests/custom-date-presentation", {
+                params: {
+                    start: formattedStartDate,
+                    presentation: formattedPresentationDate,
+                    end: formattedEndDate,
+                },
+            });
+
+            console.log("📥 Custom Date Data:", response.data);
+            setChangeRequests(response.data); // Update state with filtered data
             setIsCustomDateOpen(false);
-          }} onSave={handleSave}
-          />
-          <button
-            onClick={toggleFullscreen}
-            className="px-4 py-2 rounded cursor-pointer font-bold"
-            style={{ backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500 }}
-          >
-            Present now
-          </button>
-        </div>
-      </div>
+            setCustomDate(true);
+        } catch (err) {
+            console.error("❌ Error fetching custom date data:", err.response ? err.response.data : err.message);
+        }
+    };
+    // console.log(changeRequests);
+    // Common props for slides
+    const slideProps = { theme, changeRequests: processedChangeRequests, calendar };
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (isFullscreen) {
+                if (event.key === 'ArrowRight') {
+                    nextSlide();
+                } else if (event.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            }
+        };
 
-      <div className="w-340 mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div>
+        window.addEventListener('keydown', handleKeyDown);
 
-      <div className="relative w-250 mx-auto">
-        {/* Carousel Wrapper */}
-        <div className="relative w-full h-0 pb-[56.25%] overflow-hidden bg-gray-100 rounded-lg shadow-lg">
-          {slides.map((SlideComponent, index) => (
-            <div
-              key={index}
-              className={`absolute top-0 left-0 w-full h-full flex items-center justify-center transition-opacity duration-700 ease-in-out ${index === currentIndex ? "opacity-100 visible" : "opacity-0 invisible"
-                }`}
-            >
-              {React.createElement(SlideComponent, slideProps)}
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isFullscreen, nextSlide, prevSlide]);
+    // Fullscreen presentation view
+    if (isFullscreen) {
+        return (
+            <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+                <div className="w-full h-[80%] relative">
+                    {slides.map((SlideComponent, index) => (
+                        <div
+                            key={index}
+                            className={`w-[100%] absolute inset-y-0 left-1/2 transform -translate-x-1/2 transition-opacity duration-500 ease-in-out ${index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
+                                }`}
+                        >
+                            {React.createElement(SlideComponent, slideProps)}
+                        </div>
+                    ))}
+
+                    {/* Fullscreen controls (keep existing) */}
+                    <button
+                        onClick={prevSlide}
+                        className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-black/30 p-4 rounded-full text-white hover:bg-black/50 transition text-3xl"
+                    >
+                        ❮
+                    </button>
+                    <button
+                        onClick={nextSlide}
+                        className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-black/30 p-4 rounded-full text-white hover:bg-black/50 transition text-3xl"
+                    >
+                        ❯
+                    </button>
+                </div>
+                <button
+                    onClick={toggleFullscreen}
+                    className="absolute top-4 right-4 bg-black/30 p-3 rounded-full text-white hover:bg-black/50 transition"
+                >
+                    Exit
+                </button>
             </div>
-          ))}
-        </div>
+        );
+    }
 
-        {/* Indicators */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-4 h-4 rounded-full bg-gray-400 transition-all ${currentIndex === index ? "bg-blue-600 scale-110" : "opacity-50"
-                }`}
-            />
-          ))}
-        </div>
+    // Normal view
+    return (
+        <>
+            <div className="flex justify-between items-center mt-2">
+                <h1 className="m-0 font-bold text-xl">This week presentation</h1>
+                <div className="flex space-x-3">
+                    {customDate ?
+                        <button
+                            className="bg-gray-500 hover:bg-[#beef70] text-black font-bold py-2 px-4 rounded"
+                            onClick={() => {
+                                setCustomDate(false);
+                                getThisWeekData();
+                            }}
+                        >
+                            Clear Custom Date
+                        </button>
+                        : <button
+                            className="border-1 border-[#beef00] hover:bg-[#beef70] hover:text-black text-[#beef70] font-bold py-2 px-4 rounded"
+                            onClick={() => {
+                                setIsCustomDateOpen(true);
+                                setCustomDate(true);
+                            }
+                            }
+                        >
+                            Custom Date
+                        </button>}
 
-        {/* Controls */}
-        <button onClick={prevSlide} className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black/30 p-3 rounded-full text-white hover:bg-black/50 transition">
-          ❮
-        </button>
-        <button onClick={nextSlide} className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black/30 p-3 rounded-full text-white hover:bg-black/50 transition">
-          ❯
-        </button>
-      </div>
-    </>
-  );
+                    {/* Dialog for selecting dates */}
+                    <CustomDateDialog open={isCustomDateOpen} onClose={() => {
+                        setCustomDate(false);
+                        setIsCustomDateOpen(false);
+                    }} onSave={handleSave}
+                    />
+                    <button
+                        onClick={toggleFullscreen}
+                        className="px-4 py-2 rounded cursor-pointer font-bold"
+                        style={{ backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500 }}
+                    >
+                        Present now
+                    </button>
+                </div>
+            </div>
+
+            <div className="w-340 mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div>
+
+            <div className="relative w-250 mx-auto">
+                {/* Carousel Wrapper */}
+                <div className="relative w-full h-0 pb-[56.25%] overflow-hidden bg-gray-100 rounded-lg shadow-lg">
+                    {slides.map((SlideComponent, index) => (
+                        <div
+                            key={index}
+                            className={`absolute top-0 left-0 w-full h-full flex items-center justify-center transition-opacity duration-700 ease-in-out ${index === currentIndex ? "opacity-100 visible" : "opacity-0 invisible"
+                                }`}
+                        >
+                            {React.createElement(SlideComponent, slideProps)}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Indicators */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3">
+                    {slides.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => setCurrentIndex(index)}
+                            className={`w-4 h-4 rounded-full bg-gray-400 transition-all ${currentIndex === index ? "bg-blue-600 scale-110" : "opacity-50"
+                                }`}
+                        />
+                    ))}
+                </div>
+
+                {/* Controls */}
+                <button onClick={prevSlide} className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black/30 p-3 rounded-full text-white hover:bg-black/50 transition">
+                    ❮
+                </button>
+                <button onClick={nextSlide} className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black/30 p-3 rounded-full text-white hover:bg-black/50 transition">
+                    ❯
+                </button>
+            </div>
+        </>
+    );
 }
