@@ -14,6 +14,7 @@ import VerificationPage from "./pages/VerificationPage";
 import ChangeRequestData from "./pages/ChangeRequestDataPage";
 import ChangeRequestUpdate from "./components/ChangeRequestUpdate";
 import EditCalendarPage from "./components/EditCalendarPage";
+import ForgotPassword from "./pages/ForgotPassword";
 
 // import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ function App() {
         {/* Wrap all pages inside the Layout */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verification-page" element={<VerificationPage />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />

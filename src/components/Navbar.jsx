@@ -6,7 +6,6 @@ function Navbar() {
     const theme = useTheme(); // Access theme
     const { auth, setAuth } = useContext(AuthContext);
     const navigate = useNavigate();
-    console.log("Auth context in Navbar:", auth);
     return (
         <nav
             style={{

@@ -9,7 +9,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState({});
-    const [apiError, setApiError] = useState("");  // State to handle API errors
+    const [apiError, setApiError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
     const [attempts, setAttempts] = useState(0);
@@ -52,11 +52,11 @@ export default function Login() {
                     },
                     {
                         headers: { "Content-Type": "application/json" },
-                        withCredentials: true,  // ✅ Fixed typo here
+                        withCredentials: true,
                     }
                 );
                 if (response.status === 200) {
-                    const { accessToken, user } = response.data; // Ensure accessToken exists in the response
+                    const { accessToken, user } = response.data;
                     console.log(accessToken);
                     // Store accessToken and email (avoid storing passwords)
                     setAuth({ email, accessToken, user });
@@ -67,7 +67,7 @@ export default function Login() {
             } catch (err) {
                 setAttempts((prev) => prev + 1);
                 if (attempts + 1 >= 5) {
-                    setIsLocked(true); // ⏳ Lock login
+                    setIsLocked(true); // Lock login
                     alert("Too many failed attempts. Please try again after 5 minutes.");
     
                     // Unlock after 5 minutes
