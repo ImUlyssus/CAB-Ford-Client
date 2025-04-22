@@ -79,7 +79,7 @@ export default function DataDetail({ requests }) {
                                                     key={request.id}
                                                     className="hover:bg-gray-100 hover:text-black text-[8px]">
                                                     {/* <td className="py-2 px-4 border-b border-r text-center">{index + 1}</td> */}
-                                                    <td className="py-2 px-1 border-b border-r">{request.change_name}</td>
+                                                    <td className="py-2 px-1 border-b border-r">{StyleText(request.change_name)}</td>
                                                     <td className="py-2 px-1 border-b border-r text-center">
                                                         {String(request.change_sites || "")
                                                             .split(",")
@@ -124,19 +124,19 @@ export default function DataDetail({ requests }) {
                                                         <div className="max-h-70 overflow-y-auto border-2 border-gray-300 rounded-lg p-2">
                                                             {request.aat_test_plan !== null && request.aat_test_plan !== '' && <p className="font-semibold text-[#beef70] text-center">AAT Test Plan</p>}
                                                             {request.aat_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.aat_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.aat_test_plan)}</div>
                                                             }
                                                             {request.ftm_test_plan !== null && request.ftm_test_plan !== '' && <p className="font-semibold text-[#beef70] text-center">FTM Test Plan</p>}
                                                             {request.ftm_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.ftm_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.ftm_test_plan)}</div>
                                                             }
                                                             {request.fsst_test_plan !== null && request.fsst_test_plan !== '' && <p className="font-semibold text-[#beef70] text-center">FSST Test Plan</p>}
                                                             {request.fsst_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.fsst_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.fsst_test_plan)}</div>
                                                             }
                                                         </div>
                                                     </td>
-                                                    <td className="py-2 px-2 border-b border-r">{request.rollback_plan}</td>
+                                                    <td className="py-2 px-2 border-b border-r">{StyleText(request.rollback_plan)}</td>
                                                     <td className="py-2 px-2 border-b border-r">
                                                         <div className='mb-2'><span className='font-bold text-[#beef70]'>Category: </span><div>{request.category}</div></div>
                                                         <div className='mb-2'><span className='font-bold text-[#beef70]'>Reason: </span><div>{request.reason}</div></div>
@@ -221,9 +221,9 @@ export default function DataDetail({ requests }) {
                                                     <td className="py-2 px-2 border-b border-r text-center">{request.change_status}</td>
                                                     <td className="py-2 px-2 border-b border-r text-center">{request.cancel_change_category}</td>
                                                     <td className="py-2 px-2 border-b border-r">{request.cancel_change_reason}</td>
-                                                    <td className="py-2 px-2 border-b border-r">{request.reschedule_reason}</td>
-                                                    <td className="py-2 px-2 border-b border-r">{request.lesson_learnt}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.remarks}</td>
+                                                    <td className="py-2 px-2 border-b border-r">{StyleText(request.reschedule_reason)}</td>
+                                                    <td className="py-2 px-2 border-b border-r">{StyleText(request.lesson_learnt)}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.remarks)}</td>
                                                 </tr>
                                             </>
                                         );

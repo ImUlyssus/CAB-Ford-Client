@@ -179,7 +179,7 @@ export default function ChangeRequestData() {
                                         <th className={thStyle1}>Change Sites</th>
                                         <th className={thStyle1}>Common Change</th>
                                         <th className={thStyle1}>Request Date</th>
-                                        <th className={thStyle4}>Scheduels</th>
+                                        <th className={thStyle4}>Schedules</th>
                                         <th className={thStyle2}>Achieve 2 Weeks <div>Request Change</div></th>
                                         <th className={thStyle3}>Description</th>
                                         <th className={thStyle3}>Test Plan</th>
@@ -222,7 +222,7 @@ export default function ChangeRequestData() {
                                                     key={request.id}
                                                     className="hover:bg-gray-100 hover:text-black">
                                                     <td className="py-2 px-4 border-b border-r text-center">{index + 1}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.change_name}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.change_name)}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">
                                                         {String(request.change_sites || "")
                                                             .split(",")
@@ -232,19 +232,19 @@ export default function ChangeRequestData() {
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.common_change ? "YES" : "NO"}</td>
                                                     <td className="py-2 px-4 border-b border-r">{new Date(request.request_change_date).toLocaleDateString()}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">
-                                                        {aatSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">AAT</p>}
+                                                        {aatSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center text-[#beef70]">AAT</p>}
                                                         {aatSchedule.scheduleArray.map((item, i) => (
                                                             <div key={i} className="mb-1">
                                                                 <p className="p-1 border border-white rounded-md text-xs">{item}</p>
                                                             </div>
                                                         ))}
-                                                        {ftmSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">FTM</p>}
+                                                        {ftmSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center text-[#beef70]">FTM</p>}
                                                         {ftmSchedule.scheduleArray.map((item, i) => (
                                                             <div key={i} className="mb-1">
                                                                 <p className="p-1 border border-white rounded-md text-xs">{item}</p>
                                                             </div>
                                                         ))}
-                                                        {fsstSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center">FSST</p>}
+                                                        {fsstSchedule.scheduleArray.length > 0 && <p className="text-xs font-semibold text-center text-[#beef70]">FSST</p>}
                                                         {fsstSchedule.scheduleArray.map((item, i) => (
                                                             <div key={i} className="mb-1">
                                                                 <p className="p-1 border border-white rounded-md text-xs">{item}</p>
@@ -270,7 +270,7 @@ export default function ChangeRequestData() {
                                                             }
                                                         </div>
                                                     </td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.rollback_plan}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.rollback_plan)}</td>
                                                     <td className="py-2 px-4 border-b border-r">
                                                         <div className='mb-2'><span className='font-bold text-[#beef70]'>Category: </span><div>{request.category}</div></div>
                                                         <div className='mb-2'><span className='font-bold text-[#beef70]'>Reason: </span><div>{request.reason}</div></div>
@@ -362,9 +362,9 @@ export default function ChangeRequestData() {
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.change_status}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.cancel_change_category}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.reschedule_reason}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.lesson_learnt}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.remarks}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.reschedule_reason)}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.lesson_learnt)}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.remarks)}</td>
                                                 </tr>
                                             </>
                                         );

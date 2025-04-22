@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState } from "react";
 import { useTheme } from "styled-components";
+import StyleText from "./StyleText";
+
 export default function DataComparison({ requests }) {
     // const [changeRequests, setChangeRequests] = useState([]);
     const [error, setError] = useState(null);
@@ -117,7 +119,7 @@ export default function DataComparison({ requests }) {
                                                     <td className="py-2 px-4 border-b border-r">{request.reason}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.impact}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.priority}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.change_name}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.change_name)}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">
                                                         {String(request.change_sites || "")
                                                             .split(",")
@@ -160,23 +162,23 @@ export default function DataComparison({ requests }) {
                                                     </td>
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.achieve_2_week_change_request ? "Yes" : "No"}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.description}</td>
-                                                    <td className="px-2 py-2 border-b border-r">
+                                                    <td className="px-2 py-2 border-b border-r text-center">
                                                         <div className="max-h-70 overflow-y-auto border-2 border-gray-300 rounded-lg p-2">
-                                                            {request.aat_test_plan !== null && request.aat_test_plan !== '' && <p className="font-semibold text-[#beef70] text-center">AAT Test Plan</p>}
+                                                            {request.aat_test_plan !== null && request.aat_test_plan !== '' && <p className="text-xs font-semibold text-center text-[#beef70]">AAT Test Plan</p>}
                                                             {request.aat_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.aat_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.aat_test_plan)}</div>
                                                             }
-                                                            {request.ftm_test_plan !== null && request.ftm_test_plan !== '' && <p className="font-semibold text-[#beef70] text-center">FTM Test Plan</p>}
+                                                            {request.ftm_test_plan !== null && request.ftm_test_plan !== '' && <p className="text-xs font-semibold text-center text-[#beef70] mt-2">FTM Test Plan</p>}
                                                             {request.ftm_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.ftm_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.ftm_test_plan)}</div>
                                                             }
-                                                            {request.fsst_test_plan !== null && request.fsst_test_plan !== '' && <p className="font-semibold text-[#beef70] text-center">FSST Test Plan</p>}
+                                                            {request.fsst_test_plan !== null && request.fsst_test_plan !== '' && <p className="text-xs font-semibold text-center text-[#beef70] mt-2">FSST Test Plan</p>}
                                                             {request.fsst_test_plan == null ? "" :
-                                                                <div className="mb-1">{request.fsst_test_plan}</div>
+                                                                <div className="mb-1">{StyleText(request.fsst_test_plan)}</div>
                                                             }
                                                         </div>
                                                     </td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.rollback_plan}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.rollback_plan)}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">
                                                         {request.ftm_it_contact == null ? "" :
                                                             request.ftm_it_contact.split(',').map((item, i) => (
@@ -228,9 +230,9 @@ export default function DataComparison({ requests }) {
                                                     <td className="py-2 px-4 border-b border-r">{request.change_status}</td>
                                                     <td className="py-2 px-4 border-b border-r text-center">{request.cancel_change_category}</td>
                                                     <td className="py-2 px-4 border-b border-r">{request.cancel_change_reason}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.reschedule_reason}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.lesson_learnt}</td>
-                                                    <td className="py-2 px-4 border-b border-r">{request.remarks}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.reschedule_reason)}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.lesson_learnt)}</td>
+                                                    <td className="py-2 px-4 border-b border-r">{StyleText(request.remarks)}</td>
                                                 </tr>
                                             </>
                                         );
