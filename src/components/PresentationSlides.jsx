@@ -14,6 +14,7 @@ import Summary from "./Presentation/Summary";
 import QandAPage from "./Presentation/QandAPage";
 import CustomDateDialog from './PresentationCustomDateDialog';
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import Informational from "./Presentation/Informational";
 
 const baseSlides = [
     CoverPage,
@@ -25,8 +26,9 @@ const baseSlides = [
     ForApprovalAAT,
     ForApprovalFTM,
     ForApprovalFSST,
+    Informational,
     // Summary,
-    QandAPage
+    QandAPage,
 ];
 
 export default function Carousel({calendar}) {

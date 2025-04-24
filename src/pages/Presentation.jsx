@@ -5,6 +5,7 @@ import API_BASE_URL from '../config/apiConfig';
 import BusinessCalendar from '../components/BusinessCalendar';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { useLocation, useNavigate } from 'react-router-dom';
+import PresentationComponents from '../components/PresentationComponents';
 
 const Presentation = () => {
     
@@ -31,7 +32,7 @@ const Presentation = () => {
             <div className="mt-4">
                 <PresentationSlides calendar={calendar} />
             </div>
-            {/* <div className="w-full mx-auto my-2" style={{ borderBottom: "1px solid", borderBlockColor: theme.colors.primary200 }}></div> */}
+            <PresentationComponents />
             {/* Calender Section */}
             <BusinessCalendar calendar={calendar} />
         </div>
