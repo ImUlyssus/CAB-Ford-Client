@@ -64,6 +64,8 @@ export default function Login() {
                 } else {
                     setApiError("Login failed. Please check your email and password.");
                 }
+                setEmail("");
+                setPassword("");
             } catch (err) {
                 setAttempts((prev) => prev + 1);
                 if (attempts + 1 >= 5) {
@@ -77,6 +79,8 @@ export default function Login() {
                     }, 5 * 60 * 1000);
                 }
                 setApiError("Login failed. Please check your email and password.");
+                setEmail("");
+                setPassword("");
             }
         }
     };

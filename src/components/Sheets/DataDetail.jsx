@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useTheme } from "styled-components";
+import StyleText from "../StyleText";
 export default function DataDetail({ requests }) {
     // const [changeRequests, setChangeRequests] = useState([]);
     const [error, setError] = useState(null);

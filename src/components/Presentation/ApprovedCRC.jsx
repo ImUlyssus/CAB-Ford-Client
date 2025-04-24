@@ -1,5 +1,6 @@
 import React from 'react';
 import Ford_Logo from '../../assets/ford_logo.png';
+import StyleText from '../StyleText';
 // import moment from 'moment-timezone';
 // Function to format the date
 const formatDate = (dateString) => {
@@ -53,7 +54,7 @@ const ApprovedCRR = ({ changeRequests }) => {
                             .map((request, index) => (
                                 <tr key={index}>
                                     <td className="bg-blue-700 text-white border border-gray-300 text-center">C</td>
-                                    <td className="border border-gray-300 px-2 py-2 align-top min-w-[200px] max-w-[300px]">{request.change_name}</td>
+                                    <td className="border border-gray-300 px-2 py-2 align-top min-w-[200px] max-w-[300px]">{StyleText(request.change_name)}</td>
                                     <td className="border border-gray-300 py-2 text-center align-top">
                                         {request.change_sites.split(',').join(", ").toUpperCase()}
                                     </td>
