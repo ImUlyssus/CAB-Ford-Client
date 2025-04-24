@@ -3,12 +3,15 @@ import Three_Dates_Usage from "../assets/three_dates_usage.jpg";
 import { HelpCircle } from "lucide-react";
 import Dialog from "../components/Dialog";
 import Button from "../components/Button";
+
 function CustomDateDialog({ open, onClose, onSave }) {
     const [startDate, setStartDate] = useState("");
     const [presentationDate, setPresentationDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [dateError, setDateError] = useState("");
     const [helpDialogOpen, setHelpDialogOpen] = useState(false);
+
+    const today = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
 
     const validateDates = (start, presentation, end) => {
         if (!start || !presentation || !end) {
@@ -18,6 +21,7 @@ function CustomDateDialog({ open, onClose, onSave }) {
         const startObj = new Date(start);
         const presentationObj = new Date(presentation);
         const endObj = new Date(end);
+        const todayObj = new Date();
 
         if (startObj >= presentationObj) {
             return "Start date must be before presentation date.";
@@ -25,6 +29,18 @@ function CustomDateDialog({ open, onClose, onSave }) {
 
         if (presentationObj >= endObj) {
             return "Presentation date must be before end date.";
+        }
+
+        if (startObj > todayObj) {
+            return "Start date cannot be in the future.";
+        }
+
+        if (presentationObj > todayObj) {
+            return "Presentation date cannot be in the future.";
+        }
+
+        if (endObj > todayObj) {
+            return "End date cannot be in the future.";
         }
 
         const oneDay = 24 * 60 * 60 * 1000; // milliseconds in a day
@@ -81,6 +97,7 @@ function CustomDateDialog({ open, onClose, onSave }) {
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         className="border p-2 rounded w-full"
+                        max={today} // Add max date
                     />
                 </div>
 
@@ -93,6 +110,7 @@ function CustomDateDialog({ open, onClose, onSave }) {
                         onChange={(e) => setPresentationDate(e.target.value)}
                         min={startDate}
                         className="border p-2 rounded w-full"
+                        max={today} // Add max date
                     />
                 </div>
                 {/* End Date Picker */}
@@ -104,6 +122,7 @@ function CustomDateDialog({ open, onClose, onSave }) {
                         onChange={(e) => setEndDate(e.target.value)}
                         min={presentationDate}
                         className="border p-2 rounded w-full"
+                        max={today} // Add max date
                     />
                 </div>
 
