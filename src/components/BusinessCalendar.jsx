@@ -27,7 +27,7 @@ export default function BusinessCalendar({calendar}) {
     // console.log("From business Calendar page:", filteredCalendarData)
     return (
         <div>
-            <div className="flex justify-between items-center mt-10">
+            <div className="flex justify-between items-center mt-3">
                 <h1 className="m-0 font-bold text-xl">Business Calender</h1>
                 <div className="flex space-x-3">
                     <button onClick={handleEditCalendar} className="px-4 py-2 rounded cursor-pointer" style={{backgroundColor: theme.colors.primaryButton, color: theme.colors.primary500}}>Edit calender</button>

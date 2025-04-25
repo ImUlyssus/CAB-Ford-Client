@@ -8,7 +8,7 @@ const SecondSheet = ({ isPdfMode }) => {
     const [aggregatedData, setAggregatedData] = useState({});
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
-    console.log(auth.filteredData);
+    // console.log(auth.filteredData);
     useEffect(() => {
         if (!auth.filteredData) return;  // Assuming filteredData is the data source
         console.log(auth.filteredData);

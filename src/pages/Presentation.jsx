@@ -1,40 +1,76 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import PresentationSlides from '../components/PresentationSlides';
-import API_BASE_URL from '../config/apiConfig';
 import BusinessCalendar from '../components/BusinessCalendar';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PresentationComponents from '../components/PresentationComponents';
 
+const getUpcomingFriday = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    let daysUntilFriday = 5 - dayOfWeek;
+
+    if (dayOfWeek === 5) {
+        daysUntilFriday = 0;
+    } else if (daysUntilFriday < 0) {
+        daysUntilFriday += 7;
+    }
+
+    const upcomingFriday = new Date(today);
+    upcomingFriday.setDate(today.getDate() + daysUntilFriday);
+
+    const year = upcomingFriday.getFullYear();
+    const month = String(upcomingFriday.getMonth() + 1).padStart(2, '0');
+    const day = String(upcomingFriday.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const Presentation = () => {
-    
     const [calendar, setCalendar] = useState([]);
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
     const location = useLocation();
+    const [informationalData, setInformationalData] = useState([]);
+
+    // Cache the upcoming Friday date for the entire day
+    const upcomingFriday = useMemo(() => getUpcomingFriday(), []);
+
     useEffect(() => {
         const year = new Date().getFullYear();
-        axiosPrivate.get(`${API_BASE_URL}/business-calendar/${year}`)
-          .then(response => {
-            // response.data contains the calendar records for previous, current, and next year.
-            setCalendar(response.data);
-          })
-          .catch(err => {
-            console.error(err);
-            navigate('/login', { state: { from: location }, replace: true });
-          });
-      }, []);
+        axiosPrivate.get(`/business-calendar/${year}`)
+            .then(response => {
+                setCalendar(response.data);
+            })
+            .catch(err => {
+                console.error(err);
+                navigate('/login', { state: { from: location }, replace: true });
+            });
+    }, [axiosPrivate, navigate, location]);
+
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                const response = await axiosPrivate.get(`/informational?date=${upcomingFriday}`);
+
+                const parsedData = response.data.map(item => ({
+                    ...item,
+                }));
+                setInformationalData(parsedData);
+            } catch (error) {
+                console.error("Failed to fetch informational data:", error);
+            }
+        };
+
+        fetchInitialData();
+    }, [axiosPrivate, upcomingFriday]);
 
     return (
         <div>
             {/* Presentation Section */}
             <div className="mt-4">
-                <PresentationSlides calendar={calendar} />
+                <PresentationSlides calendar={calendar} informationalData={informationalData} />
             </div>
-            <PresentationComponents />
-            {/* Calender Section */}
-            <BusinessCalendar calendar={calendar} />
+            <PresentationComponents calendar={calendar} informationalData={informationalData} setInformationalData={setInformationalData} />
         </div>
     );
 };

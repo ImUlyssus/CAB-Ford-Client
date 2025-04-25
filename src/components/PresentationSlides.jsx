@@ -31,7 +31,7 @@ const baseSlides = [
     QandAPage,
 ];
 
-export default function Carousel({calendar}) {
+export default function Carousel({calendar, informationalData}) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const theme = useTheme();
@@ -179,7 +179,7 @@ export default function Carousel({calendar}) {
     };
     // console.log(changeRequests);
     // Common props for slides
-    const slideProps = { theme, changeRequests: processedChangeRequests, calendar };
+    const slideProps = { theme, changeRequests: processedChangeRequests, calendar, informationalData };
     useEffect(() => {
         const handleKeyDown = (event) => {
             if (isFullscreen) {

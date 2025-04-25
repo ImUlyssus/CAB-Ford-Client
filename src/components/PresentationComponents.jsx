@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
+import BusinessCalendar from './BusinessCalendar';
+import EditInformational from './EditInformational';
 
-// Dummy Components for each Tab
+const PresentationComponents = ({calendar, informationalData, setInformationalData }) => {
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabClick = (index) => {
+    setActiveTab(index);
+  };
+
 const Tab1Content = () => (
-  <div className="p-4">
-    <h2>Tab 1 Content</h2>
-    <p>This is the content for Tab 1.</p>
-  </div>
+    <BusinessCalendar calendar={calendar} />
 );
 
 const Tab2Content = () => (
-  <div className="p-4">
-    <h2>Tab 2 Content</h2>
-    <p>This is the content for Tab 2.</p>
-  </div>
+  <EditInformational informationalData={informationalData} />
 );
 
 const Tab3Content = () => (
@@ -21,32 +23,25 @@ const Tab3Content = () => (
     <p>This is the content for Tab 3.</p>
   </div>
 );
-
-const PresentationComponents = () => {
-  const [activeTab, setActiveTab] = useState(0);
-
-  const handleTabClick = (index) => {
-    setActiveTab(index);
-  };
-
   return (
-    <div className="w-full">
+    <div className="w-full mt-[40px]">
+        <h1 className="m-0 font-bold text-xl text-center mb-4">Presentation Components</h1>
       {/* Tab Navigation */}
       <div className="flex border-b">
         <button
-          className={`w-1/3 py-2 px-4 font-semibold ${activeTab === 0 ? 'bg-blue-500 text-white border-b-2 border-blue-500' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
+          className={`w-1/3 py-2 px-4 font-semibold ${activeTab === 0 ? 'bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-t-lg' : 'text-white'}`}
           onClick={() => handleTabClick(0)}
         >
-          Tab 1
+          Business Calendar
         </button>
         <button
-          className={`w-1/3 py-2 px-4 font-semibold ${activeTab === 1 ? 'bg-blue-500 text-white border-b-2 border-blue-500' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
+          className={`w-1/3 py-2 px-4 font-semibold ${activeTab === 1 ? 'bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-t-lg' : 'text-white'}`}
           onClick={() => handleTabClick(1)}
         >
-          Tab 2
+          Informational
         </button>
         <button
-          className={`w-1/3 py-2 px-4 font-semibold ${activeTab === 2 ? 'bg-blue-500 text-white border-b-2 border-blue-500' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
+          className={`w-1/3 py-2 px-4 font-semibold ${activeTab === 2 ? 'bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-t-lg' : 'text-white'}`}
           onClick={() => handleTabClick(2)}
         >
           Tab 3
@@ -55,8 +50,8 @@ const PresentationComponents = () => {
 
       {/* Tab Content */}
       <div className="w-full">
-        {activeTab === 0 && <Tab1Content />}
-        {activeTab === 1 && <Tab2Content />}
+        {activeTab === 0 && <BusinessCalendar calendar={calendar} />}
+        {activeTab === 1 && <EditInformational informationalData={informationalData} setInformationalData={setInformationalData} />}
         {activeTab === 2 && <Tab3Content />}
       </div>
     </div>
