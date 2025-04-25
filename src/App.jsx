@@ -16,6 +16,7 @@ import ChangeRequestUpdate from "./components/ChangeRequestUpdate";
 import EditCalendarPage from "./components/EditCalendarPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import InformationalForm from "./components/InformationalForm";
+import RemarksSummaryFormPage from "./components/RemarksSummaryForm";
 
 // import NotFound from "./pages/NotFound";
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="/presentation" element={<Presentation />} />
           <Route path="/data-visualization" element={<DataVisualization />} />
           <Route path="/informational-form" element={<InformationalForm />} />
+          <Route path="/remarks-summary-form" element={<RemarksSummaryFormPage />} />
           {/* <Route path="logout" element={<Contact />} /> */}
           {/* <Route path="*" element={<NotFound />} /> Handles 404 */}
         </Route>

@@ -1,6 +1,64 @@
 import React from 'react';
 import Ford_Logo from '../../assets/ford_logo.png';
-const Summary = () => {
+import StyleText from '../StyleText';
+const Summary = ({ changeRequests, remarksSummary }) => {
+    const toApprove = changeRequests?.toApprove || [];
+    const approved = changeRequests?.approved || [];
+
+    // Function to count occurrences for a specific site
+    const countBySite = (site) => {
+        return toApprove.filter(request => {
+            const sites = request.change_sites.toLowerCase().split(',').map(s => s.trim());
+            return sites.includes(site);
+        }).length;
+    };
+    console.log(remarksSummary);
+    // Function to count approved requests for a specific site
+    const countApprovedBySite = (site) => {
+        return toApprove.filter(request => {
+            const sites = request.change_sites.toLowerCase().split(',').map(s => s.trim());
+            return sites.includes(site) && request.approval === "YES";
+        }).length;
+    };
+
+    // Function to count completed requests for a specific site
+    const countCompletedBySite = (site) => {
+        return toApprove.filter(request => {
+            const sites = request.change_sites.toLowerCase().split(',').map(s => s.trim());
+            return sites.includes(site) && request.change_status === "Completed with no issue";
+        }).length;
+    };
+
+    // Function to count ongoing requests for a specific site
+    const countOngoingBySite = (site) => {
+        return approved.filter(request => {
+            const sites = request.change_sites.toLowerCase().split(',').map(s => s.trim());
+            return sites.includes(site) && (request.change_status === "_" || request.change_status === "Ongoing");
+        }).length;
+    };
+
+    // Function to count cancelled/postponed requests for a specific site
+    const countCancelledPostponedBySite = (site) => {
+        return approved.filter(request => {
+            const sites = request.change_sites.toLowerCase().split(',').map(s => s.trim());
+            return sites.includes(site) && request.change_status === "Postponed/Rejected";
+        }).length;
+    };
+
+    // Function to count rejected requests for a specific site
+    const countRejectedBySite = (site) => {
+        return approved.filter(request => {
+            const sites = request.change_sites.toLowerCase().split(',').map(s => s.trim());
+            return sites.includes(site) && request.approval === "NO";
+        }).length;
+    };
+
+    const commonCount = toApprove.filter(request => request.change_sites.split(',').length > 1).length;
+    const commonApprovedCount = toApprove.filter(request => request.change_sites.split(',').length > 1 && request.approval === "YES").length;
+    const commonCompletedCount = toApprove.filter(request => request.change_sites.split(',').length > 1 && request.change_status === "Completed with no issue").length;
+    const commonOngoingCount = toApprove.filter(request => request.change_sites.split(',').length > 1 && (request.change_status === "_" || request.change_status === "Ongoing")).length;
+    const commonCancelledPostponedCount = toApprove.filter(request => request.change_sites.split(',').length > 1 && request.change_status === "Postponed/Rejected").length;
+    const commonRejectedCount = toApprove.filter(request => request.change_sites.split(',').length > 1 && request.approval === "NO").length;
     return (
         <div className="w-full h-full bg-white p-8">
             {/* Title */}
@@ -8,7 +66,7 @@ const Summary = () => {
                 Summary
             </h1>
             <div className='flex absolute top-2 right-2'>
-                <img src={Ford_Logo} className='h-5 w-15' />
+                <img src={Ford_Logo} className='h-5 w-15' alt="Ford Logo" />
             </div>
             {/* Table */}
             <div className="w-full max-h-[80%] overflow-y-auto border border-gray-300">
@@ -29,13 +87,46 @@ const Summary = () => {
                         {/* Row 1 */}
                         <tr>
                             <td className="border border-gray-300 px-2 py-2 text-center">Common</td>
-                            <td className="border border-gray-300 py-2 text-center">2</td>
-                            <td className="border border-gray-300 py-2 text-center">-</td>
-                            <td className="border border-gray-300 py-2 text-center">1</td>
-                            <td className="border border-gray-300 py-2 text-center">-</td>
-                            <td className="border border-gray-300 py-2 text-center">-</td>
-                            <td className="border border-gray-300 py-2 text-center">-</td>
-                            <td className="border border-gray-300 px-2 py-2 text-center"></td>
+                            <td className="border border-gray-300 py-2 text-center">{commonCount}</td>
+                            <td className="border border-gray-300 py-2 text-center">{commonApprovedCount}</td>
+                            <td className="border border-gray-300 py-2 text-center">{commonCompletedCount}</td>
+                            <td className="border border-gray-300 py-2 text-center">{commonOngoingCount}</td>
+                            <td className="border border-gray-300 py-2 text-center">{commonCancelledPostponedCount}</td>
+                            <td className="border border-gray-300 py-2 text-center">{commonRejectedCount}</td>
+                            <td className="border border-gray-300 px-2 py-2">{StyleText(remarksSummary[0]?.common_remark)}</td>
+                        </tr>
+                        {/* Row 2 */}
+                        <tr>
+                            <td className="border border-gray-300 px-2 py-2 text-center">AAT</td>
+                            <td className="border border-gray-300 py-2 text-center">{countBySite('aat')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countApprovedBySite('aat')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countCompletedBySite('aat')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countOngoingBySite('aat')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countCancelledPostponedBySite('aat')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countRejectedBySite('aat')}</td>
+                            <td className="border border-gray-300 px-2 py-2">{StyleText(remarksSummary[0]?.aat_remark)}</td>
+                        </tr>
+                        {/* Row 3 */}
+                        <tr>
+                            <td className="border border-gray-300 px-2 py-2 text-center">FTM</td>
+                            <td className="border border-gray-300 py-2 text-center">{countBySite('ftm')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countApprovedBySite('ftm')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countCompletedBySite('ftm')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countOngoingBySite('ftm')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countCancelledPostponedBySite('ftm')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countRejectedBySite('ftm')}</td>
+                            <td className="border border-gray-300 px-2 py-2">{StyleText(remarksSummary[0]?.ftm_remark)}</td>
+                        </tr>
+                        {/* Row 4 */}
+                        <tr>
+                            <td className="border border-gray-300 px-2 py-2 text-center">FSST</td>
+                            <td className="border border-gray-300 py-2 text-center">{countBySite('fsst')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countApprovedBySite('fsst')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countCompletedBySite('fsst')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countOngoingBySite('fsst')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countCancelledPostponedBySite('fsst')}</td>
+                            <td className="border border-gray-300 py-2 text-center">{countRejectedBySite('fsst')}</td>
+                            <td className="border border-gray-300 px-2 py-2">{StyleText(remarksSummary[0]?.fsst_remark)}</td>
                         </tr>
                     </tbody>
                 </table>

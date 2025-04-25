@@ -27,11 +27,11 @@ const baseSlides = [
     ForApprovalFTM,
     ForApprovalFSST,
     Informational,
-    // Summary,
+    Summary,
     QandAPage,
 ];
 
-export default function Carousel({calendar, informationalData}) {
+export default function Carousel({calendar, informationalData, remarksSummary}) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const theme = useTheme();
@@ -179,7 +179,7 @@ export default function Carousel({calendar, informationalData}) {
     };
     // console.log(changeRequests);
     // Common props for slides
-    const slideProps = { theme, changeRequests: processedChangeRequests, calendar, informationalData };
+    const slideProps = { theme, changeRequests: processedChangeRequests, calendar, informationalData, remarksSummary };
     useEffect(() => {
         const handleKeyDown = (event) => {
             if (isFullscreen) {
