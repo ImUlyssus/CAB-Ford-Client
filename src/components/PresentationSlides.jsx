@@ -9,7 +9,7 @@ import ApprovedCRR from "./Presentation/ApprovedCRR";
 import ForApprovalCommon from "./Presentation/ForApprovalCommon";
 import ForApprovalAAT from "./Presentation/ForApprovalAAT";
 import ForApprovalFTM from "./Presentation/ForApprovalFTM";
-import ForApprovalFSST from "./Presentation/Summary";
+import ForApprovalFSST from "./Presentation/ForApprovalFSST";
 import Summary from "./Presentation/Summary";
 import QandAPage from "./Presentation/QandAPage";
 import CustomDateDialog from './PresentationCustomDateDialog';

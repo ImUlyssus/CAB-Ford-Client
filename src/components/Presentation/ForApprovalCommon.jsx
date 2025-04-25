@@ -92,7 +92,7 @@ const ForApprovalCommon = ({ changeRequests }) => {
                                             <div className="text-sm">{StyleText(request.fsst_test_plan)}</div>
                                         </div>}
                                     </td>
-                                    <td className="border border-gray-300 text-center">{StyleText(request?.rollback_plan) || ""}</td>
+                                    <td className="border border-gray-300">{StyleText(request?.rollback_plan) || ""}</td>
                                     <td className="border p-1 border-gray-300 text-center align-top">{request.impact}/<div>{request.priority}</div></td>
                                     <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px]">
                                         {request?.aat_it_contact?.length > 0 &&

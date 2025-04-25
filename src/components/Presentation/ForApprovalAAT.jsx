@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import Ford_Logo from '../../assets/ford_logo.png';
 import { Info } from 'lucide-react';
 import AppendixDialog from './AppendixDialog';
+import StyleText from '../StyleText';
 const formatDate = (dateString) => {
     if (!dateString) return '';
 
@@ -56,7 +57,7 @@ const ForApprovalAAT = ({changeRequests}) => {
                     <tbody className="text-black text-xs">
                         {changeRequests.toApprove.filter(request => request.change_sites.includes('aat') && !request.change_sites.includes('ftm') && !request.change_sites.includes('fsst')).map((request, index) => (
                             <tr key={index}>
-                            <td className="border border-gray-300 px-4 py-2 align-top min-w-[140px] max-w-[160px]">{request.change_name}</td>
+                            <td className="border border-gray-300 px-4 py-2 align-top min-w-[140px] max-w-[160px]">{StyleText(request.change_name)}</td>
                             <td className="border border-gray-300 px-2 py-2 text-center max-w-[120px] align-top">
                                 <div className="flex flex-col justify-start gap-4">
                                     {[
@@ -70,15 +71,15 @@ const ForApprovalAAT = ({changeRequests}) => {
                                     ))}
                                 </div>
                             </td>
-                            <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">{request.description}</td>
+                            <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">{StyleText(request.description)}</td>
                             <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">
                                 {request.aat_test_plan?.length > 0 &&
                                 <div className='mb-2'>
                                     <div className="font-bold text-blue-500">AAT</div>
-                                    <div className="text-sm">{request.aat_test_plan}</div>
+                                    <div className="text-sm">{StyleText(request.aat_test_plan)}</div>
                                 </div>}
                             </td>
-                            <td className="border border-gray-300 text-center">{request?.rollback_plan || ""}</td>
+                            <td className="border border-gray-300">{StyleText(request?.rollback_plan) || ""}</td>
                             <td className="border border-gray-300 text-center align-top p-1">{request.impact}/<div>{request.priority}</div></td>
                             <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px]">
                                 {request?.aat_it_contact?.length > 0 &&

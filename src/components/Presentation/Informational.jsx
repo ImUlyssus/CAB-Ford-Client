@@ -50,7 +50,7 @@ const Informational = ({ informationalData }) => {
                                 <th className="border border-gray-300 px-7 py-2">Description</th>
                                 <th className="border border-gray-300 px-4 py-2">Contact</th>
                                 <th className="border border-gray-300 px-4 py-2">Reference #</th>
-                                <th className="border border-gray-300 px-4 py-2">Comment</th>
+                                <th className="border border-gray-300 px-7 py-2">Comment</th>
                             </tr>
                         </thead>
                         <tbody className="text-black text-xs">
@@ -62,10 +62,10 @@ const Informational = ({ informationalData }) => {
                                         {item.startDateTime ? formatDate(item.startDateTime) : 'N/A'} -
                                         {item.endDateTime ? " " + formatDate(item.endDateTime) : 'N/A'}
                                     </td>
-                                    <td className="border border-gray-300 px-7 py-2">{StyleText(item.description)}</td>
+                                    <td className="border border-gray-300 px-2 py-2">{StyleText(item.description)}</td>
                                     <td className="border border-gray-300 px-4 py-2">{StyleText(item.contact)}</td>
                                     <td className="border border-gray-300 px-4 py-2">{StyleText(item.reference)}</td>
-                                    <td className="border border-gray-300 px-4 py-2">{StyleText(item.remarks)}</td>
+                                    <td className="border border-gray-300 px-2 py-2">{StyleText(item.remarks)}</td>
                                 </tr>
                             ))}
                         </tbody>
