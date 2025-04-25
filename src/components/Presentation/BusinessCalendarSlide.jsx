@@ -1,6 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
+import Ford_Logo from '../../assets/ford_logo.png';
 import DaysOfWeek from '../DaysOfWeek';
 import GridComponent from '../GridComponent'; // Import the GridComponent
+import { Info } from 'lucide-react';
+import AppendixDialog from './AppendixDialog';
 
 const monthMap = {
     January: 0,
@@ -18,6 +21,7 @@ const monthMap = {
 };
 
 const BusinessCalendarSlide = ({ theme, calendar }) => {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     console.log("BusinessCalendarSlide", calendar);
     // Get current date and year to retrieve just three months of data
     const currentDate = new Date();
@@ -59,8 +63,18 @@ const BusinessCalendarSlide = ({ theme, calendar }) => {
 
     return (
         <div className="w-full h-full bg-white flex items-center justify-center p-8">
+            <div className='absolute top-2 right-2 items-center'>
+                <img src={Ford_Logo} className='h-5 w-15 mr-2' alt="Ford Logo" />
+                <button
+                    onClick={()=>setIsDialogOpen(true)}
+                    className="flex ml-auto mb-2 mr-2 mt-1 text-blue-500 hover:text-blue-700 focus:outline-none"
+                    aria-label="Show Appendix Information"
+                >
+                    <Info size={15} />
+                </button>
+            </div>
             <div className="w-full">
-                <h2 className="text-3xl font-bold text-center text-black">
+                <h2 className="text-2xl font-bold text-black">
                     Business Calendar
                 </h2>
                 <div className="flex justify-end mt-1 text-sm" style={{ color: theme.colors.primary500 }}>
@@ -80,6 +94,8 @@ const BusinessCalendarSlide = ({ theme, calendar }) => {
                     </div>
                 ))}
             </div>
+            {/* Appendix Dialog */}
+            <AppendixDialog open={isDialogOpen} onClose={()=>setIsDialogOpen(false)} />
         </div>
     );
 };

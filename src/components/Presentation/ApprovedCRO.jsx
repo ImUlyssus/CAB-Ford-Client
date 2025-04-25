@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Ford_Logo from '../../assets/ford_logo.png';
 import StyleText from '../StyleText';
+import { Info } from 'lucide-react';
+import AppendixDialog from './AppendixDialog';
 // import moment from 'moment-timezone';
 // Function to format the date
 const formatDate = (dateString) => {
@@ -22,6 +24,7 @@ const formatDate = (dateString) => {
 };
 
 const ApprovedCRR = ({ changeRequests }) => {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     if (!changeRequests || !changeRequests.approved) {
         return <div className="w-full h-full bg-white p-8">No approved change requests available.</div>;
     }
@@ -32,8 +35,15 @@ const ApprovedCRR = ({ changeRequests }) => {
             <h1 className="text-2xl font-bold mb-6 text-[#003478] border-b-2 border-gray-300 pb-2">
                 Approved Change Requests Status <span className="text-blue-400">(Ongoing)</span>
             </h1>
-            <div className='flex absolute top-2 right-2'>
-                <img src={Ford_Logo} className='h-5 w-15' alt="Ford Logo" />
+            <div className='absolute top-2 right-2 items-center'>
+                <img src={Ford_Logo} className='h-5 w-15 mr-2' alt="Ford Logo" />
+                <button
+                    onClick={()=>setIsDialogOpen(true)}
+                    className="flex ml-auto mb-2 mr-2 mt-1 text-blue-500 hover:text-blue-700 focus:outline-none"
+                    aria-label="Show Appendix Information"
+                >
+                    <Info size={15} />
+                </button>
             </div>
             {/* Table */}
             <div className="w-full max-h-[80%] overflow-y-auto border border-gray-300">
@@ -135,6 +145,8 @@ const ApprovedCRR = ({ changeRequests }) => {
                 <p className="font-semibold mb-2"><span className='px-2 py-1 bg-blue-400 text-white mr-2'>O</span>Approved & ongoing implementation</p>
                 <p className="font-semibold mb-2"><span className='px-2 py-1 bg-red-700 text-white mr-2'>R</span>Postponed / Cancelled</p>
             </div>
+            {/* Appendix Dialog */}
+            <AppendixDialog open={isDialogOpen} onClose={()=>setIsDialogOpen(false)} />
         </div>
     );
 };

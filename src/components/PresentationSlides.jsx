@@ -28,7 +28,7 @@ const baseSlides = [
     ForApprovalFSST,
     Informational,
     Summary,
-    QandAPage,
+    QandAPage
 ];
 
 export default function Carousel({calendar, informationalData, remarksSummary}) {

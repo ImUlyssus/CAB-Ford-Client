@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Ford_Logo from '../../assets/ford_logo.png';
 import StyleText from '../StyleText';
+import { Info } from 'lucide-react';
+import AppendixDialog from './AppendixDialog';
 const formatDate = (dateString) => {
     if (!dateString) return '';
 
@@ -19,14 +21,22 @@ const formatDate = (dateString) => {
     return formatter.format(date);
 };
 const ForApprovalCommon = ({ changeRequests }) => {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     return (
         <div className="w-full h-full bg-white p-8">
             {/* Title */}
             <h1 className="text-2xl font-bold mb-6 text-[#003478] border-b-2 border-gray-300 pb-2">
                 <span className='text-red-500'>Common</span> - Change Requests for Approval
             </h1>
-            <div className='flex absolute top-2 right-2'>
-                <img src={Ford_Logo} className='h-5 w-15' />
+            <div className='absolute top-2 right-2 items-center'>
+                <img src={Ford_Logo} className='h-5 w-15 mr-2' alt="Ford Logo" />
+                <button
+                    onClick={()=>setIsDialogOpen(true)}
+                    className="flex ml-auto mb-2 mr-2 mt-1 text-blue-500 hover:text-blue-700 focus:outline-none"
+                    aria-label="Show Appendix Information"
+                >
+                    <Info size={15} />
+                </button>
             </div>
             {/* Table */}
             <div className="w-full max-h-[80%] overflow-y-auto border border-gray-300">
@@ -149,6 +159,8 @@ const ForApprovalCommon = ({ changeRequests }) => {
                     </tbody>
                 </table>
             </div>
+            {/* Appendix Dialog */}
+            <AppendixDialog open={isDialogOpen} onClose={()=>setIsDialogOpen(false)} />
         </div>
     );
 };
