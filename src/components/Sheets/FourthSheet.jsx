@@ -3,51 +3,62 @@ import * as d3 from "d3";
 import AuthContext from "../../context/AuthProvider";
 import Dialog from "./Dialog"; // Assuming you're using Material-UI for the dialog
 import DataDetail from './DataDetail'
+
 const FourthSheet = ({ isPdfMode }) => {
     const { auth } = useContext(AuthContext);
     const [aggregatedData, setAggregatedData] = useState({});
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+
     useEffect(() => {
         if (!auth.filteredData) return;
-        console.log(auth.filteredData)
+
         const processData = (data) => {
             let result = {
                 aat_cancel: 0, ftm_cancel: 0, fsst_cancel: 0,
                 aat_cancel_data: [], ftm_cancel_data: [], fsst_cancel_data: [],
-                reason_1: 0, reason_2: 0, reason_3: 0,
-                reason_1_data: [], reason_2_data: [], reason_3_data: []
+                cancel_change: 0, postpone_scheduler: 0, encountered_error_during_implementation: 0,
+                revisit_the_issue_and_conduct_a_thorough_analysis: 0, unable_to_contact_implementation_team: 0,
+                cancel_change_data: [], postpone_scheduler_data: [], encountered_error_during_implementation_data: [],
+                revisit_the_issue_and_conduct_a_thorough_analysis_data: [], unable_to_contact_implementation_team_data: [],
             };
 
             data.forEach((entry) => {
-                const { change_sites, approval, cancel_change_category } = entry;
+                const { change_sites, cancel_change_category } = entry;
                 const category_check = cancel_change_category !== null && cancel_change_category !== '';
-                if (change_sites.includes("aat") && category_check) {
+
+                if (change_sites?.includes("aat") && category_check) {
                     result.aat_cancel++;
                     result.aat_cancel_data.push(entry);
-                    console.log(entry.cancel_change_category)
                 }
 
-                if (change_sites.includes("ftm") && category_check) {
+                if (change_sites?.includes("ftm") && category_check) {
                     result.ftm_cancel++;
                     result.ftm_cancel_data.push(entry);
                 }
 
-                if (change_sites.includes("fsst") && category_check) {
+                if (change_sites?.includes("fsst") && category_check) {
                     result.fsst_cancel++;
                     result.fsst_cancel_data.push(entry);
                 }
-                if (cancel_change_category == "Reason 1") {
-                    result.reason_1++;
-                    result.reason_1_data.push(entry);
+
+                if (cancel_change_category === "Cancel change") {
+                    result.cancel_change++;
+                    result.cancel_change_data.push(entry);
                 }
-                if (cancel_change_category == "Reason 2") {
-                    result.reason_2++;
-                    result.reason_2_data.push(entry);
+                if (cancel_change_category === "Postpone scheduler") {
+                    result.postpone_scheduler++;
+                    result.postpone_scheduler_data.push(entry);
                 }
-                if (cancel_change_category == "Reason 3") {
-                    result.reason_3++;
-                    result.reason_3_data.push(entry);
+                if (cancel_change_category === "Encountered error(s) during implementation") {
+                    result.encountered_error_during_implementation++;
+                    result.encountered_error_during_implementation_data.push(entry);
+                }
+                if (cancel_change_category === "Revisit the issue and conduct a thorough analysis") {
+                    result.revisit_the_issue_and_conduct_a_thorough_analysis++;
+                    result.revisit_the_issue_and_conduct_a_thorough_analysis_data.push(entry);
+                }
+                if (cancel_change_category === "Unable to contact to implementation team") {
+                    result.unable_to_contact_implementation_team++;
+                    result.unable_to_contact_implementation_team_data.push(entry);
                 }
             });
 
@@ -55,40 +66,8 @@ const FourthSheet = ({ isPdfMode }) => {
         };
 
         const allData = processData(auth.filteredData);
-        console.log(allData)
         setAggregatedData(allData);
     }, [auth.filteredData]);
-
-    const tableData = [
-        {
-            site: 'AAT',
-            cancelled: aggregatedData.aat_cancel,
-        },
-        {
-            site: 'FTM',
-            cancelled: aggregatedData.ftm_cancel,
-        },
-        {
-            site: 'FSST',
-            cancelled: aggregatedData.fsst_cancel,
-        },
-        {
-            site: 'Reason 1',
-            cancelled: aggregatedData.reason_1,
-        },
-        {
-            site: 'Reason 2',
-            cancelled: aggregatedData.reason_2,
-        },
-        {
-            site: 'Reason 3',
-            cancelled: aggregatedData.reason_3,
-        },
-        {
-            site: 'Total',
-            cancelled: aggregatedData.aat_cancel + aggregatedData.ftm_cancel + aggregatedData.fsst_cancel,
-        },
-    ];
 
     return (
         <div>
@@ -138,9 +117,11 @@ const FourthSheet = ({ isPdfMode }) => {
                         </thead>
                         <tbody>
                             {[
-                                { reason: 'Reason 1', cancelled: aggregatedData.reason_1 },
-                                { reason: 'Reason 2', cancelled: aggregatedData.reason_2 },
-                                { reason: 'Reason 3', cancelled: aggregatedData.reason_3 },
+                                { reason: 'Cancel Change', cancelled: aggregatedData.cancel_change },
+                                { reason: 'Postpone scheduler', cancelled: aggregatedData.postpone_scheduler },
+                                { reason: 'Encountered error(s) during implementation', cancelled: aggregatedData.encountered_error_during_implementation },
+                                { reason: 'Revisit the issue and conduct a thorough analysis', cancelled: aggregatedData.revisit_the_issue_and_conduct_a_thorough_analysis },
+                                { reason: 'Unable to contact to implementation team', cancelled: aggregatedData.unable_to_contact_implementation_team },
                             ].map((row, index) => (
                                 <tr key={index} className={index % 2 === 0 ? 'bg-white text-center' : 'bg-gray-50 text-center'}>
                                     <td className="py-2 px-4 border-b">{row.reason}</td>
@@ -166,7 +147,7 @@ const DonutChart = ({ data }) => {
 
     useEffect(() => {
         const width = 320;
-        const height = 240;
+        const height = 250;
         const innerRadius = 50;
         const center = width / 2;
 
@@ -174,7 +155,7 @@ const DonutChart = ({ data }) => {
             .select(svgRef.current)
             .attr("width", width)
             .attr("height", height)
-            .attr("viewBox", `0 0 ${width} ${height + 40}`)  // Added viewBox to scale the SVG properly
+            .attr("viewBox", `0 0 ${width} ${height + 40}`)
             .append("g")
             .attr("transform", `translate(${center}, ${center - 10})`);
 
@@ -294,8 +275,6 @@ const DonutChart = ({ data }) => {
 const BarChart = ({ data }) => {
     const [selectedData, setSelectedData] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const cancelArr = [data.reason_1, data.reason_2, data.reason_3];
-    const totalCancel = d3.sum(cancelArr);
 
     const svgRef = useRef();
 
@@ -305,81 +284,86 @@ const BarChart = ({ data }) => {
         const svg = d3.select(svgRef.current);
         svg.selectAll("*").remove();
 
-        const width = 270, height = 200;
-        const barHeight = 20, spacing = 50;
+        const width = 270, height = 250;
+        const barHeight = 10, spacing = 50;
+        const labelWidth = 10;  // Increased label width for longer labels
 
         svg.attr("width", width).attr("height", height);
 
         // Prepare the data and sort based on value
         const reasons = [
-            { name: "Reason 1", value: data.reason_1 },
-            { name: "Reason 2", value: data.reason_2 },
-            { name: "Reason 3", value: data.reason_3 },
+            { name: "Cancel change", value: data.cancel_change, dataKey: "cancel_change_data" },
+            { name: "Postpone scheduler", value: data.postpone_scheduler, dataKey: "postpone_scheduler_data" },
+            { name: "Encountered error(s) during implementation", value: data.encountered_error_during_implementation, dataKey: "encountered_error_during_implementation_data" },
+            { name: "Revisit the issue and conduct a thorough analysis", value: data.revisit_the_issue_and_conduct_a_thorough_analysis, dataKey: "revisit_the_issue_and_conduct_a_thorough_analysis_data" },
+            { name: "Unable to contact to implementation team", value: data.unable_to_contact_implementation_team, dataKey: "unable_to_contact_implementation_team_data" },
         ];
 
         // Sort data in descending order based on values
         reasons.sort((a, b) => b.value - a.value);
 
+        // Filter out reasons with null or undefined values
+        const validReasons = reasons.filter(reason => reason.value !== null && reason.value !== undefined);
+
         // Get the max value for the bars
-        const maxVal = d3.max(reasons, d => d.value);
-        const labelWidth = 80;
+        const maxVal = d3.max(validReasons, d => d.value);
+
         // Set up the scale for the bars' width
-        const xScale = d3.scaleLinear().domain([0, maxVal]).range([0, width - labelWidth + 40]);
+        const xScale = d3.scaleLinear().domain([0, maxVal]).range([0, width - labelWidth - 20]);
+
+        // Create y scale for positioning bars
+        const yScale = d3.scaleBand()
+            .domain(validReasons.map(d => d.name))
+            .range([0, height - 50])
+            .padding(0.3);
+
 
         // Create bar groups (one per reason)
         const bars = svg.selectAll(".bar-group")
-            .data(reasons)
+            .data(validReasons)
             .enter()
             .append("g")
-            .attr("transform", (d, i) => `translate(${labelWidth}, ${i * (barHeight + spacing)})`);
+            .attr("transform", (d) => `translate(${labelWidth}, ${yScale(d.name) + 10})`);  // Adjusted translateY to move bars down
 
         // Draw bars
         bars.append("rect")
-            .attr("height", barHeight)
-            .attr("width", d => Math.max(0, xScale(d.value) - 40))
+            .attr("height", yScale.bandwidth()/2)
+            .attr("width", d => xScale(d.value))
             .attr("fill", "#E50046")
-            .attr("rx", 10)
+            .attr("rx", 5)
             .style("cursor", "pointer")
             .on("click", function (event, d) {
-                // Handle bar click
-                let processed_name = d.name.split(" ").join('_').toLowerCase();
                 setSelectedData({
                     category: d.name,
-                    filteredData: data[`${processed_name}_data`] || []// If needed, add filtered data logic here
+                    filteredData: data[d.dataKey] || []
                 });
-                console.log(d.name);
                 setIsDialogOpen(true);
             });
 
-        // Add text labels for values inside the bars (centered)
         bars.append("text")
-            .attr("x", d => xScale(d.value) / 2 - 20)  // Center the text inside the bar
-            .attr("y", barHeight / 2)
-            .attr("dy", "0.35em")
-            .attr("fill", "white")
-            .attr("font-size", "14px")
-            .attr("text-anchor", "middle")
+            .attr("x", d => xScale(d.value) / 2)  // 5px from the start of the bar (left edge)
+            .attr("y", yScale.bandwidth() / 4)  // vertically centered in the bar
+            .attr("dy", "0.35em")  // vertical alignment tweak
+            .attr("fill", "white")  // white text for contrast
+            .attr("font-size", "10px")  // optional: reduce size to fit inside
+            .attr("text-anchor", "start")
             .text(d => d.value);
-
-        // Add text labels for reason names next to the bars (outside the bars)
-        svg.selectAll(".label")
-            .data(reasons)
-            .enter()
-            .append("text")
-            .attr("x", 70) // Position to the left of the bar
-            .attr("y", (d, i) => i * (barHeight + spacing) + barHeight / 2)
-            .attr("dy", "0.35em")
-            .attr("text-anchor", "end")
+        // Add reason name labels above each bar, centered horizontally
+        bars.append("text")
+            .attr("x", 0) // Centered on the bar
+            .attr("y", -4)
             .attr("fill", "#E50046")
             .attr("font-weight", "bold")
-            .attr("font-size", "14px")
+            .attr("font-size", "8px")
             .text(d => d.name);
+
+
 
     }, [data]);
 
     return (
         <>
-            {totalCancel !== 0 ?
+            {data && Object.keys(data).length !== 0 ?
                 <div>
                     <h1 className="mb-3 text-center text-md text-[#003478]">Change Request Summary</h1>
 
@@ -409,6 +393,5 @@ const BarChart = ({ data }) => {
         </>
     );
 };
-
 
 export default FourthSheet;

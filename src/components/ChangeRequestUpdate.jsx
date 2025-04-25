@@ -951,9 +951,11 @@ function ChangeRequestUpdate() {
                                     onChange={handleChange}
                                 >
                                     <option value=""></option>
-                                    <option value="Reason 1">Reason 1</option>
-                                    <option value="Reason 2">Reason 2</option>
-                                    <option value="Reason 3">Reason 3</option>
+                                    <option value="Cancel change">Cancel change</option>
+                                    <option value="Postpone scheduler">Postpone scheduler</option>
+                                    <option value="Encountered error(s) during implementation">Encountered error(s) during implementation</option>
+                                    <option value="Revisit the issue and conduct a thorough analysis">Revisit the issue and conduct a thorough analysis</option>
+                                    <option value="Unable to contact to implementation team">Unable to contact to implementation team</option>
                                 </select>
                             </div>
 
