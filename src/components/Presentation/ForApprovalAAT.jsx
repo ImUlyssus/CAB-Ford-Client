@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import Ford_Logo from '../../assets/ford_logo.png';
 import { Info } from 'lucide-react';
 import AppendixDialog from './AppendixDialog';
 import StyleText from '../StyleText';
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 const formatDate = (dateString) => {
     if (!dateString) return '';
 
@@ -15,13 +16,74 @@ const formatDate = (dateString) => {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
-        timeZone: 'Asia/Bangkok' // Set the timezone
+        timeZone: 'Asia/Bangkok'
     });
 
     return formatter.format(date);
 };
-const ForApprovalAAT = ({changeRequests}) => {
+
+const ForApprovalAAT = ({ changeRequests }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const axiosPrivate = useAxiosPrivate();
+    // State to hold the approval status for each request
+    // Using request.id as the key for robustness
+    const [approvals, setApprovals] = useState({});
+
+    // Effect to initialize the approvals state when changeRequests prop changes
+    useEffect(() => {
+        const initialApprovals = {};
+        // Apply the same filter logic as in the render method
+        const filteredRequests = changeRequests.toApprove.filter(request =>
+            request.change_sites.includes('aat') &&
+            !request.change_sites.includes('ftm') &&
+            !request.change_sites.includes('fsst')
+        );
+
+        filteredRequests.forEach((request) => { // No need for index here for state initialization
+            // Initialize state for this request using its unique ID
+            initialApprovals[request.id] = request.approval; // Assuming each request has a unique `id`
+        });
+
+        setApprovals(initialApprovals);
+
+        // Dependency array: re-run this effect only when changeRequests changes
+    }, [changeRequests]);
+
+    // Handler function to update the local approval state AND send to backend
+    const handleApprovalChange = async (requestId, newValue) => {
+        // 1. Optimistically update local state for immediate UI feedback
+        setApprovals(prevApprovals => ({
+            ...prevApprovals,
+            [requestId]: newValue
+        }));
+
+        // 2. Send the update to the backend
+        try {
+            const response = await axiosPrivate.put('/change-requests/update-approval', {
+                id: requestId,
+                approval: newValue
+            });
+
+            console.log('Approval updated successfully:', response.data);
+            // You might want to handle the response, e.g., show a success message
+        } catch (error) {
+            console.error('Error updating approval:', error);
+            // Handle errors! You might want to revert the local state
+            setApprovals(prevApprovals => ({
+                ...prevApprovals,
+                [requestId]: prevApprovals[requestId]
+            }));
+        }
+    };
+
+    // Filter the requests once here to avoid re-filtering in the map
+    const filteredChangeRequests = changeRequests.toApprove.filter(request =>
+        request.change_sites.includes('aat') &&
+        !request.change_sites.includes('ftm') &&
+        !request.change_sites.includes('fsst')
+    );
+
+
     return (
         <div className="w-full h-full bg-white p-8">
             {/* Title */}
@@ -51,70 +113,89 @@ const ForApprovalAAT = ({changeRequests}) => {
                             <th className="border border-gray-300 px-1 py-2">Impact/<div>Priority</div></th>
                             <th className="border border-gray-300 px-4 py-2">Contact</th>
                             <th className="border border-gray-300 px-4 py-2">Reference #</th>
-                            <th className="border border-gray-300 px-1 py-2">Approval</th>
+                            <th className="border border-gray-300 px-1 py-2">Approval</th> {/* This column will now have dropdowns */}
                         </tr>
                     </thead>
                     <tbody className="text-black text-xs">
-                        {changeRequests.toApprove.filter(request => request.change_sites.includes('aat') && !request.change_sites.includes('ftm') && !request.change_sites.includes('fsst')).map((request, index) => (
-                            <tr key={index}>
-                            <td className="border border-gray-300 px-4 py-2 align-top min-w-[140px] max-w-[160px]">{StyleText(request.change_name)}</td>
-                            <td className="border border-gray-300 px-2 py-2 text-center max-w-[120px] align-top">
-                                <div className="flex flex-col justify-start gap-4">
-                                    {[
-                                        ...(request?.aat_schedule_change || []).map(s => ({ ...s, site: 'AAT' })),
-                                    ].map((schedule, index2) => (
-                                        <div key={index2} className="space-y-1">
-                                            <div className="font-bold text-blue-500">{schedule.schedule_title}</div>
-                                            <div>{formatDate(schedule.startdate)} - </div>
-                                            <div> {formatDate(schedule.enddate)}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </td>
-                            <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">{StyleText(request.description)}</td>
-                            <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">
-                                {request.aat_test_plan?.length > 0 &&
-                                <div className='mb-2'>
-                                    <div className="font-bold text-blue-500">AAT</div>
-                                    <div className="text-sm">{StyleText(request.aat_test_plan)}</div>
-                                </div>}
-                            </td>
-                            <td className="border border-gray-300">{StyleText(request?.rollback_plan) || ""}</td>
-                            <td className="border border-gray-300 text-center align-top p-1">{request.impact}/<div>{request.priority}</div></td>
-                            <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px]">
-                                {request?.aat_it_contact?.length > 0 &&
-                                    <>
-                                        <div className='font-bold text-blue-500'>AAT</div>
-                                        <div>{request.aat_it_contact.split(',')[0].replace(/_/g, ' ')}</div>
-                                        <div className='mb-2'>{request.aat_it_contact.split(',')[1]}</div>
-                                    </>
-                                }
-                                {request?.business_team_contact?.length > 0 &&
-                                    <>
-                                        <div className='font-bold text-blue-500'>Business</div>
-                                        <div>{request.business_team_contact.split(',')[0].replace(/_/g, ' ')}</div>
-                                        <div className='mb-2'>{request.business_team_contact.split(',')[1]}</div>
-                                    </>
-                                }
-                                {request?.global_team_contact?.length > 0 &&
-                                    <>
-                                        <div className='font-bold text-blue-500'>Global</div>
-                                        <div>{request.global_team_contact.split(',')[0].replace(/_/g, ' ')}</div>
-                                        <div className='mb-2'>{request.global_team_contact.split(',')[1]}</div>
-                                    </>
-                                }
-                            </td>
-                            <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top">
-                                {request?.aat_crq?.length > 1 &&
-                                    <>
-                                        <div className='font-bold text-blue-500'>AAT</div>
-                                        <div>{request.aat_crq.split(',')[0].replace(/_/g, ' ')}</div>
-                                        <div className='mb-2'>{request.aat_crq.split(',')[1]}</div>
-                                    </>
-                                }
-                            </td>
-                            <td className="border border-gray-300 text-center align-top">{request.approval}</td>
-                        </tr>
+                        {/* Use the pre-filtered array */}
+                        {filteredChangeRequests.map((request, index) => ( // Keep index for the tr key
+                            <tr key={index}> {/* Using index for the React list key is fine */}
+                                <td className="border border-gray-300 px-4 py-2 align-top min-w-[140px] max-w-[160px]">{StyleText(request.change_name)}</td>
+                                <td className="border border-gray-300 px-2 py-2 text-center max-w-[120px] align-top">
+                                    <div className="flex flex-col justify-start gap-4">
+                                        {[
+                                            ...(request?.aat_schedule_change || []).map(s => ({ ...s, site: 'AAT' })),
+                                        ].map((schedule, index2) => (
+                                            <div key={index2} className="space-y-1">
+                                                <div className="font-bold text-blue-500">{schedule.schedule_title}</div>
+                                                <div>{formatDate(schedule.startdate)} - </div>
+                                                <div> {formatDate(schedule.enddate)}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </td>
+                                <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">{StyleText(request.description)}</td>
+                                <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">
+                                    {request.aat_test_plan?.length > 0 &&
+                                    <div className='mb-2'>
+                                        <div className="font-bold text-blue-500">AAT</div>
+                                        <div className="text-sm">{StyleText(request.aat_test_plan)}</div>
+                                    </div>}
+                                </td>
+                                <td className="border border-gray-300">{StyleText(request?.rollback_plan) || ""}</td>
+                                <td className="border border-gray-300 text-center align-top p-1">{request.impact}/<div>{request.priority}</div></td>
+                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px]">
+                                    {request?.aat_it_contact?.length > 0 &&
+                                        <>
+                                            <div className='font-bold text-blue-500'>AAT</div>
+                                            <div>{request.aat_it_contact.split(',')[0].replace(/_/g, ' ')}</div>
+                                            <div className='mb-2'>{request.aat_it_contact.split(',')[1]}</div>
+                                        </>
+                                    }
+                                    {request?.business_team_contact?.length > 0 &&
+                                        <>
+                                            <div className='font-bold text-blue-500'>Business</div>
+                                            <div>{request.business_team_contact.split(',')[0].replace(/_/g, ' ')}</div>
+                                            <div className='mb-2'>{request.business_team_contact.split(',')[1]}</div>
+                                        </>
+                                    }
+                                    {request?.global_team_contact?.length > 0 &&
+                                        <>
+                                            <div className='font-bold text-blue-500'>Global</div>
+                                            <div>{request.global_team_contact.split(',')[0].replace(/_/g, ' ')}</div>
+                                            <div className='mb-2'>{request.global_team_contact.split(',')[1]}</div>
+                                        </>
+                                    }
+                                </td>
+                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top">
+                                    {request?.aat_crq?.length > 1 &&
+                                        <>
+                                            <div className='font-bold text-blue-500'>AAT</div>
+                                            <div>{request.aat_crq.split(',')[0].replace(/_/g, ' ')}</div>
+                                            <div className='mb-2'>{request.aat_crq.split(',')[1]}</div>
+                                        </>
+                                    }
+                                </td>
+                                {/* Approval Column with Dropdown */}
+                                <td className="p-2 border border-gray-300 text-center align-top">
+                                    {/* Use request.id as the key to access the state */}
+                                    <select
+                                        value={approvals[request.id] || ''} // Bind value to state using request.id
+                                        onChange={(e) => handleApprovalChange(request.id, e.target.value)} // Pass request.id and new value
+                                        className="border rounded px-2 py-1 text-xs" // Add some basic styling
+                                    >
+                                        {/* Optional: Add a disabled placeholder if the initial value isn't YES/NO/HOLD */}
+                                        {/* This makes it clear if no standard option is initially set */}
+                                        {(!['YES', 'NO', 'Waiting'].includes(request.approval) && request.approval) && (
+                                            <option value={request.approval} disabled>{request.approval == 'Waiting' ? "HOLD":request.id}</option>
+                                        )}
+                                        {/* The actual selectable options */}
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                        <option value="Waiting">HOLD</option>
+                                    </select>
+                                </td>
+                            </tr>
                         ))}
                     </tbody>
                 </table>
