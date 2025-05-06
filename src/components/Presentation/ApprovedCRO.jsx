@@ -84,7 +84,7 @@ const ApprovedCRR = ({ changeRequests }) => {
                                         </div>
                                     </td>
 
-                                    <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px]">
+                                    <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top">
                                     {request?.aat_it_contact?.length > 0 &&
                                             <>
                                                 <div className='font-bold text-blue-500'>AAT</div>

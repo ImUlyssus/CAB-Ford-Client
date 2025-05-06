@@ -99,10 +99,10 @@ const ForApprovalFSST = ({ changeRequests }) => {
                     <thead className="bg-[#003478] text-center text-xs sticky top-0 z-10">
                         <tr>
                             <th className="border border-gray-300 px-4 py-2">Change name</th>
-                            <th className="border border-gray-300 px-2 py-2">Schedule (Thailand GMT+7)</th>
-                            <th className="border border-gray-300 px-7 py-2">Description</th>
+                            <th className="border border-gray-300 px-2 py-2 min-w-[120px]">Schedule (Thailand GMT+7)</th>
+                            <th className="border border-gray-300 px-4 py-2">Description</th>
                             <th className="border border-gray-300 px-4 py-2">Test plan</th>
-                            <th className="border border-gray-300 px-4 py-2">Rollback plan</th>
+                            <th className="border border-gray-300 px-2 py-2">Rollback plan</th>
                             <th className="border border-gray-300 px-1 py-2">Impact/<div>Priority</div></th>
                             <th className="border border-gray-300 px-4 py-2">Contact</th>
                             <th className="border border-gray-300 px-4 py-2">Reference #</th>
@@ -126,17 +126,17 @@ const ForApprovalFSST = ({ changeRequests }) => {
                                         ))}
                                     </div>
                                 </td>
-                                <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">{StyleText(request.description)}</td>
-                                <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">
+                                <td className="border border-gray-300 px-2 align-top">{StyleText(request.description)}</td>
+                                <td className="border border-gray-300 px-2 align-top">
                                     {request.fsst_test_plan?.length > 0 &&
                                     <div className='mb-2'>
-                                        <div className="font-bold text-blue-500">FSST</div>
+                                        <div className="font-bold text-blue-500 text-center">FSST</div>
                                         <div className="text-sm">{StyleText(request.fsst_test_plan)}</div>
                                     </div>}
                                 </td>
-                                <td className="border border-gray-300 text-center">{StyleText(request?.rollback_plan) || ""}</td>
+                                <td className="border border-gray-300 align-top p-1">{StyleText(request?.rollback_plan) || ""}</td>
                                 <td className="border border-gray-300 text-center align-top p-1">{request.impact}/<div>{request.priority}</div></td>
-                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px]">
+                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top">
                                     {request?.fsst_it_contact?.length > 0 &&
                                         <>
                                             <div className='font-bold text-blue-500'>FSST</div>
@@ -159,12 +159,16 @@ const ForApprovalFSST = ({ changeRequests }) => {
                                         </>
                                     }
                                 </td>
-                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top">
-                                    {request?.fsst_crq?.length > 1 &&
-                                        <>
-                                            <div className='font-bold text-blue-500'>FSST</div>
-                                            <div>{request.fsst_crq.split(',')[0].replace(/_/g, ' ')}</div>
-                                            <div className='mb-2'>{request.fsst_crq.split(',')[1]}</div>
+                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top p-1">
+                                {request?.fsst_crq?.length > 1 &&
+                                    <>
+                                        <div className='font-bold text-blue-500'>FSST</div>
+                                        {request.fsst_crq.split(',').map((crq, index) => (
+                                            <div key={index} className='mb-2'>
+                                                <div>{crq.split('!')[0].replace(/_/g, ' ')}</div>
+                                            <div className='mb-2'>{crq.split('!')[1]}</div>
+                                            </div>
+                                        ))}
                                         </>
                                     }
                                 </td>

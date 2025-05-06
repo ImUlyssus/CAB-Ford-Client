@@ -126,17 +126,17 @@ const ForApprovalFTM = ({ changeRequests }) => {
                                         ))}
                                     </div>
                                 </td>
-                                <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">{StyleText(request.description)}</td>
-                                <td className="border border-gray-300 px-2 min-w-[160px] max-w-[180px]">
+                                <td className="border border-gray-300 px-2 align-top">{StyleText(request.description)}</td>
+                                <td className="border border-gray-300 px-2 align-top">
                                     {request.ftm_test_plan?.length > 0 &&
                                     <div className='mb-2'>
-                                        <div className="font-bold text-blue-500">FTM</div>
+                                        <div className="font-bold text-blue-500 text-center">FTM</div>
                                         <div className="text-sm">{StyleText(request.ftm_test_plan)}</div>
                                     </div>}
                                 </td>
-                                <td className="border border-gray-300">{StyleText(request?.rollback_plan) || ""}</td>
+                                <td className="border border-gray-300 align-top p-1">{StyleText(request?.rollback_plan) || ""}</td>
                                 <td className="border border-gray-300 text-center align-top p-1">{request.impact}/<div>{request.priority}</div></td>
-                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px]">
+                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top">
                                     {request?.ftm_it_contact?.length > 0 &&
                                         <>
                                             <div className='font-bold text-blue-500'>FTM</div>
@@ -159,12 +159,16 @@ const ForApprovalFTM = ({ changeRequests }) => {
                                         </>
                                     }
                                 </td>
-                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top">
-                                    {request?.ftm_crq?.length > 1 &&
-                                        <>
-                                            <div className='font-bold text-blue-500'>FTM</div>
-                                            <div>{request.ftm_crq.split(',')[0].replace(/_/g, ' ')}</div>
-                                            <div className='mb-2'>{request.ftm_crq.split(',')[1]}</div>
+                                <td className="border border-gray-300 text-center min-w-[100px] max-w-[130px] align-top p-1">
+                                {request?.ftm_crq?.length > 1 &&
+                                    <>
+                                        <div className='font-bold text-blue-500'>FTM</div>
+                                        {request.ftm_crq.split(',').map((crq, index) => (
+                                            <div key={index} className='mb-2'>
+                                                <div>{crq.split('!')[0].replace(/_/g, ' ')}</div>
+                                            <div className='mb-2'>{crq.split('!')[1]}</div>
+                                            </div>
+                                        ))}
                                         </>
                                     }
                                 </td>
